@@ -15,7 +15,7 @@ class Group{
      * @author Dylan Habans
      * @return true si l'utilisateur rejoint le groupe, false sinon
      */
-    boolean rejoindre (){
+    boolean join() {
 
         return false;
     }

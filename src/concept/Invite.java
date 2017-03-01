@@ -3,7 +3,7 @@ class Invite {
     int id;
     String from;
     String group;
-    int groupid;
+    int group_id;
 
     Invite() {
 

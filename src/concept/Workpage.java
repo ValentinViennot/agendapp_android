@@ -6,7 +6,8 @@ class Workpage {
     String[][] subjectsfilter = new String [][2];
     String[][] flagsfilter = new String [][2];
     Invite[] invits = new Invite [];
-    Section[] works = new Section[];
+    Work[] homeworks = new Work;
+    Section[] sections = new Section[];
 
     Workpage() {
 

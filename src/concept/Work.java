@@ -48,5 +48,10 @@ class Work {
 
     }
 
+    static getHomeworks (Work[]){
+
+        return Work[];
+    }
+
 
 }
