@@ -2,6 +2,8 @@
  * Page "cahier de texte"
  * @author Dylan Habans
  * @author Valentin Viennot
+ * @author Charline Bardin
+ * @author Lucas Probst
  */
 class Workpage {
 
@@ -14,9 +16,9 @@ class Workpage {
     String[][] subjectsfilter = new String [][2];
     /** Drapeaux disponibles au filtrage */
     String[][] flagsfilter = new String [][2];
-    Invite[] invits = new Invite [];
-    Work[] homeworks = new Work;
-    Section[] sections = new Section[];
+    Invite[] invits ;
+    LinkedList<Work> homeworks;
+    Section[] sections ;
 
     Workpage() {
 
