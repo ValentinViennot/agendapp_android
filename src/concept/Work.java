@@ -1,38 +1,53 @@
 import java.util.date;
 
 /**
- * TODO
+ * Représente un devoir
  * @author Dylan Habans
+ * @author Valentin Viennot
  */
 class Work {
 
-    static Work[] homeworks = new Work [];
+    /** Tableau de devoirs à faire */
+    static LinkedList<Work> homeworks;
+    /** Tableau des archives */
+    static LinkedList<Work> archives;
+
+    /** ID dans la base */
     int id;
+    /** ID de l'auteur */
     int user;
+    /** "@prenomnom" de l'auteur */
     String author;
+    /** Nom de la matière */
     String subject;
+    /** Couleur associée la matière */
     Color subject_c;
+    /** Texte du devoir */
     String text;
+    /** Nombre de marqué comme faits */
     int nbr_done;
+    /** Utilisateur a marqué comme fait ? */
     boolean done;
+    /** Drapeau attaché par l'utilisateur */
     int flag;
-    Comment[] remarks = new Comment [];
-    Attachment[] PJ = new Attachment [];
+    /** Liste de commentaires */
+    ArrayList<Comments> remarks;
+    /** Liste de pièces jointes */
+    ArrayList<Attachment> attachments;
 
     Work() {
 
     }
     /**
-     * @author Dylan Habans
+     * Marque comme fait/non fait selon le statut actuel
      * @return true si le devoir est marqué comme fait par l'utilisateur, false sinon
      */
     boolean done (){
-
         return false;
     }
 
     /**
-     * @author Dylan Habans
+     * Supprime le devoir
      * @return true si le devoir est supprimé par l'utilisateur, false sinon
      */
     boolean delete (){
@@ -42,18 +57,13 @@ class Work {
     }
 
     /**
-     * @author Dylan Habans
+     * Signale le devoir au modérateur
      * @return true si le devoir est signalé par l'utilisateur, false sinon
      */
     boolean report () {
 
         return false;
 
-    }
-
-    static getHomeworks (Work[]){
-
-        return Work[];
     }
 
 
