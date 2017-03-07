@@ -1,11 +1,15 @@
-class Subject extends Group{
+/**
+ * Matière
+ * @author Dylan Habans
+ * @author Valentin Viennot
+ */
+class Subject extends Group {
 
     Subject() {
         super(2);
     }
 
     /**
-     * @author Dylan Habans
      * @param c couleur choisie pour la matière
      * @return true si la couleur ets changée par l'utilisateur, false sinon
      */

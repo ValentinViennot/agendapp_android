@@ -1,6 +1,9 @@
 import java.util.date;
 
-
+/**
+ * TODO
+ * @author Dylan Habans
+ */
 class Work {
 
     static Work[] homeworks = new Work [];

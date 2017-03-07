@@ -1,5 +1,10 @@
+/**
+ * TODO
+ * @author Dylan Habans
+ */
 class User {
 
+    static User user;
     int id;
     String firstname;
     String lastname;
@@ -18,5 +23,4 @@ class User {
     void logout (){
 
     }
-
 }
