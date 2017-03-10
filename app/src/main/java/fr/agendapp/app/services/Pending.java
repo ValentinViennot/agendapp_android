@@ -1,4 +1,4 @@
-package services;
+package fr.agendapp.app.services;
 
 abstract class Pending {
 

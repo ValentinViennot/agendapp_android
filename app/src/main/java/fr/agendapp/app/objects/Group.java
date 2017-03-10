@@ -1,3 +1,7 @@
+package fr.agendapp.app.objects;
+
+import android.graphics.Color;
+
 /**
  * Groupe : peut être un dossier ou une matière
  * @author Dylan Habans

@@ -1,16 +1,24 @@
+package fr.agendapp.app.objects;
+
+import java.util.LinkedList;
+
 /**
- * @author  Dylan Habans
+ * @author Dylan Habans
  * @author Valentin Viennot
  * @author Lucas Probst
  * @author Charline Bardin
  */
-class Section {
+public class Section {
 
     String month;
     String day;
     int date;
     LinkedList<Work> homeworks;
 
+    public Section() {
+
+    }
+    /*
     public Section (Work w){
         this.month = w.date.monthOfYear();
         this.day = w.date.dayOfWeek();
@@ -23,13 +31,15 @@ class Section {
         this.day = w.date.dayOfWeek();
         this.date = w.date.dayOfMonth();
         homeworks = new LinkedList<Work>;
-    }
+    }*/
+
     /**
      * Transforme une liste de devoirs(triée) en une liste de sections
      * Une liste de section ne doit pas changer l'ordre des devoirs
      * Une liste de section doit séparer les devoirs par date en faisant apparaitre le mois si différent du précédent (sinon , vaut null)
      * @return  Liste de sections transformée
      */
+    /*
     static ArrayList<Section> getSections(LinkedList<Work> liste){
         ArrayList<Section> result = new ArrayList<Section>;
         int j=0;
@@ -58,4 +68,5 @@ class Section {
         }
         return result;
     }
+    */
 }

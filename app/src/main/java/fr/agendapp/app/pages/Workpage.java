@@ -1,3 +1,12 @@
+package fr.agendapp.app.pages;
+
+import android.app.Activity;
+import android.os.Bundle;
+
+import java.util.LinkedList;
+
+import fr.agendapp.app.objects.*;
+
 /**
  * Page "cahier de texte"
  * @author Dylan Habans
@@ -5,7 +14,7 @@
  * @author Charline Bardin
  * @author Lucas Probst
  */
-class Workpage {
+public class WorkPage extends Activity {
 
     static String type = "devoirs";
     /** Filtre ajouté par l'utilisateur */
@@ -13,19 +22,20 @@ class Workpage {
     /** Filtre ajouté par l'ordinateur */
     String autofilter;
     /** Matières disponibles pour le filtrage */
-    String[][] subjectsfilter = new String [][2];
+    String[][] subjectsfilter;
     /** Drapeaux disponibles au filtrage */
-    String[][] flagsfilter = new String [][2];
+    String[][] flagsfilter;
     Invite[] invits ;
     LinkedList<Work> homeworks;
     Section[] sections ;
 
-    Workpage() {
-
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
     }
 
-    private addFilter(String filter) {
-        filtre+="&&"+filter;
+    private void addFilter(String filter) {
+        this.filter+="&&"+filter;
     }
 
 }

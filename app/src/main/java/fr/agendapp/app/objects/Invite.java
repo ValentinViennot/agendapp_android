@@ -1,9 +1,11 @@
+package fr.agendapp.app.objects;
+
 /**
  * Invitation à rejoindre un groupe
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Invite {
+public class Invite {
 
     /** ID dans la base */
     int id;
@@ -23,7 +25,7 @@ class Invite {
      * @return true si réussite
      */
     boolean accept() {
-
+        return false;
     }
 
     /**

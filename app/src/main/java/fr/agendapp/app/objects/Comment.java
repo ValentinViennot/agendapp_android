@@ -1,4 +1,4 @@
-import java.util.date;
+package fr.agendapp.app.objects;
 
 /**
  * Commentaire
@@ -27,7 +27,7 @@ class Comment {
      * @return true si réussite
      */
     boolean delete() {
-
+        return false;
     }
 
 }

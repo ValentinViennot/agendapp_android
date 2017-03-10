@@ -1,9 +1,11 @@
+package fr.agendapp.app.objects;
+
 /**
  * Pièce jointe attachée à un commentaire ou à un devoir
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Attachment{
+class Attachment {
 
     /** "@prenomnom" de l'auteur de la pièce jointe */
     String author;
@@ -21,7 +23,7 @@ class Attachment{
     /**
      * Lance le téléchargement de la pièce jointe sur l'appareil de l'utilisateur
      */
-    void download (){
+    void download () {
         // TODO
     }
 

@@ -1,4 +1,4 @@
-package services;
+package fr.agendapp.app.services;
 
 import java.util.ArrayList;
 
@@ -22,14 +22,18 @@ class PendDO extends Pending {
         return json;
     }
 
+/*
     void add(Work w) {
         String[] pend = new String[2];
         pend[0] = ""+w.getID();
         pend[1] = ""+w.getDone();
         pends.add(pend);
     }
+*/
 
-    static void add(Work w) {
-        Pending.pendingList[1].add(w);
+
+    @Override
+    void add(Object o) {
+
     }
 }

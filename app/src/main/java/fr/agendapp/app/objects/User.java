@@ -1,3 +1,5 @@
+package fr.agendapp.app.objects;
+
 /**
  * TODO
  * @author Dylan Habans
@@ -14,7 +16,7 @@ class User {
     boolean notif_email;
     boolean fake_identity;
     int root;
-    Group[] courses = new Group[];
+    Group[] courses;
 
     User() {
 

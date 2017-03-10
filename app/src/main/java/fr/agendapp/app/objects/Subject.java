@@ -1,3 +1,7 @@
+package fr.agendapp.app.objects;
+
+import android.graphics.Color;
+
 /**
  * Matière
  * @author Dylan Habans

@@ -1,3 +1,5 @@
+package fr.agendapp.app.objects;
+
 /**
  * Dossier (groupe)
  * @author Dylan Habans

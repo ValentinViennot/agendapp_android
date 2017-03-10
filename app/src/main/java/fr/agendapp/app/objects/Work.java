@@ -1,11 +1,17 @@
-import java.util.date;
+package fr.agendapp.app.objects;
+
+import android.graphics.Color;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.LinkedList;
 
 /**
  * Représente un devoir
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Work {
+public class Work {
 
     /** Tableau de devoirs à faire */
     static LinkedList<Work> homeworks;
@@ -24,6 +30,8 @@ class Work {
     Color subject_c;
     /** Texte du devoir */
     String text;
+    /** Date d'échéance */
+    Date date;
     /** Nombre de marqué comme faits */
     int nbr_done;
     /** Utilisateur a marqué comme fait ? */
@@ -31,7 +39,7 @@ class Work {
     /** Drapeau attaché par l'utilisateur */
     int flag;
     /** Liste de commentaires */
-    ArrayList<Comments> remarks;
+    ArrayList<Comment> remarks;
     /** Liste de pièces jointes */
     ArrayList<Attachment> attachments;
 
