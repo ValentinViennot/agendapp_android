@@ -5,29 +5,57 @@ package fr.agendapp.app.objects;
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Comment {
+public class Comment {
 
     /** ID du commentaire dans la base */
-    int id;
+    private int id;
     /** ID de l'auteur */
-    int user;
+    private int user;
     /** "@prenomnom" de l'auteur */
-    String author;
+    private String auteur;
     /** texte du commentaire */
-    String text;
+    private String texte;
     /** Pièces jointes attachées au commentaire */
-    Attachment[] PJ;
+    private Attachment[] pjs;
 
-    Comment() {
+    public Comment() {
         // TODO
     }
 
     /**
      * Supprimer le commentaire
+     * - Supprimer localement du fil de commentaire
+     * - Appel à l'API
+     * Nécessite que l'utilisateur actuel en soit l'auteur
      * @return true si réussite
      */
-    boolean delete() {
-        return false;
+    public boolean delete() {
+        if (User.getActive().getId() == this.user) {
+            // TODO
+            return false;
+        } else {
+            // TODO ajout d'un message (Toast ?)
+            return false;
+        }
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getUser() {
+        return user;
+    }
+
+    public String getAuteur() {
+        return auteur;
+    }
+
+    public String getTexte() {
+        return texte;
+    }
+
+    public Attachment[] getPjs() {
+        return pjs;
+    }
 }
