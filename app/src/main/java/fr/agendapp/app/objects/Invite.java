@@ -8,15 +8,15 @@ package fr.agendapp.app.objects;
 public class Invite {
 
     /** ID dans la base */
-    int id;
+    private int id;
     /** Prénom de l'utilisateur qui invite */
-    String from;
+    private String de;
     /** Nom du groupe */
-    String group;
+    private String groupe;
     /** ID du groupe invité */
-    int group_id;
+    private int groupeid;
 
-    Invite() {
+    public Invite() {
 
     }
 
@@ -24,7 +24,8 @@ public class Invite {
      * Accepte l'invitation (donc rejoins le groupe , API)
      * @return true si réussite
      */
-    boolean accept() {
+    public boolean accept() {
+        // TODO
         return false;
     }
 
@@ -32,7 +33,21 @@ public class Invite {
      * Refuse l'invitation (supprime)
      * @return true si réussite
      */
-    void decline() {
+    public void decline() {
+        // TODO
+    }
 
+    // GETTERS
+
+    public int getId() {
+        return id;
+    }
+
+    public String getDe() {
+        return de;
+    }
+
+    public String getGroupe() {
+        return groupe;
     }
 }

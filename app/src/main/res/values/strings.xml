@@ -1,3 +1,27 @@
 <resources>
+    <!-- Nom de l'application -->
     <string name="app_name">Agendapp</string>
+
+    <!-- Mois de l'année -->
+    <string name="janvier">Janvier</string>
+    <string name="fevrier">Février</string>
+    <string name="mars">Mars</string>
+    <string name="avril">Avril</string>
+    <string name="mai">Mai</string>
+    <string name="juin">Juin</string>
+    <string name="juillet">Juillet</string>
+    <string name="aout">Août</string>
+    <string name="septembre">Septembre</string>
+    <string name="octobre">Octobre</string>
+    <string name="novembre">Novembre</string>
+    <string name="decembre">Décembre</string>
+
+    <!-- Jours de la semaine -->
+    <string name="lundi">Lundi</string>
+    <string name="mardi">Mardi</string>
+    <string name="mercredi">Mercredi</string>
+    <string name="jeudi">Jeudi</string>
+    <string name="vendredi">Vendredi</string>
+    <string name="samedi">Samedi</string>
+    <string name="dimanche">Dimanche</string>
 </resources>
