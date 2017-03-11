@@ -5,25 +5,25 @@ package fr.agendapp.app.objects;
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Attachment {
+public class Attachment {
 
     /** "@prenomnom" de l'auteur de la pièce jointe */
-    String author;
+    private String auteur;
     /** ID de l'auteur */
-    int user;
+    private int user;
     /** Nom du fichier sur le serveur */
-    String file;
+    private String file;
     /** Nom lisible du fichier */
-    String title;
+    private String title;
 
-    Attachment() {
+    public Attachment() {
         // TODO
     }
 
     /**
      * Lance le téléchargement de la pièce jointe sur l'appareil de l'utilisateur
      */
-    void download () {
+    public void download() {
         // TODO
     }
 
@@ -31,9 +31,37 @@ class Attachment {
      * Supprime la pièce jointe de la base de données
      * @return true si la pièce jointe est bien supprimée par l'utilisateur, false sinon
      */
-    boolean delete (){
+    public boolean delete() {
         // TODO
         // Attention : penser à vérifier que l'utilisateur actuel est bien l'auteur
         return false;
+    }
+
+    // GETTERS
+
+    public String getAuteur() {
+        return auteur;
+    }
+
+    public int getUser() {
+        return user;
+    }
+
+    public String getFile() {
+        return file;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    /**
+     * @param token Token d'identification aux APIs
+     * @return URL (lien) d'accès au fichier
+     */
+    public String getLink(String token) {
+        return (
+                "https://apis.agendapp.fr/cdn/?get=" + this.file + "&token=" + token
+        );
     }
 }
