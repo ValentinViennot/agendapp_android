@@ -19,60 +19,116 @@ public class Work {
     static LinkedList<Work> archives;
 
     /** ID dans la base */
-    int id;
+    private int id;
     /** ID de l'auteur */
-    int user;
+    private int user;
     /** "@prenomnom" de l'auteur */
-    String author;
+    private String auteur;
     /** Nom de la matière */
-    String subject;
+    private String matiere;
     /** Couleur associée la matière */
-    Color subject_c;
+    private Color matiere_c;
     /** Texte du devoir */
-    String text;
+    private String texte;
     /** Date d'échéance */
-    Date date;
+    private Date date;
     /** Nombre de marqué comme faits */
-    int nbr_done;
+    private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    boolean done;
+    private boolean fait;
     /** Drapeau attaché par l'utilisateur */
-    int flag;
+    private int flag;
     /** Liste de commentaires */
-    ArrayList<Comment> remarks;
+    private ArrayList<Comment> commentaires;
     /** Liste de pièces jointes */
-    ArrayList<Attachment> attachments;
+    private ArrayList<Attachment> pjs;
 
     Work() {
 
     }
+
+    public static LinkedList<Work> getHomeworks() {
+        return homeworks;
+    }
+
+    public static LinkedList<Work> getArchives() {
+        return archives;
+    }
+
     /**
      * Marque comme fait/non fait selon le statut actuel
      * @return true si le devoir est marqué comme fait par l'utilisateur, false sinon
      */
-    boolean done (){
+    boolean done() {
+        // TODO
         return false;
     }
+
+    // GETTERS
 
     /**
      * Supprime le devoir
      * @return true si le devoir est supprimé par l'utilisateur, false sinon
      */
-    boolean delete (){
-
+    boolean delete() {
+        // TODO
         return false;
-
     }
 
     /**
      * Signale le devoir au modérateur
      * @return true si le devoir est signalé par l'utilisateur, false sinon
      */
-    boolean report () {
-
+    boolean report() {
+        //TODO
         return false;
-
     }
 
+    public int getId() {
+        return id;
+    }
 
+    public int getUser() {
+        return user;
+    }
+
+    public String getAuthor() {
+        return auteur;
+    }
+
+    public String getSubject() {
+        return matiere;
+    }
+
+    public Color getSubjectColor() {
+        return matiere_c;
+    }
+
+    public String getText() {
+        return texte;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public int getNbDone() {
+        return nb_fait;
+    }
+
+    public boolean isDone() {
+        return fait;
+    }
+
+    public int getFlag() {
+        return flag;
+    }
+
+    public ArrayList<Comment> getComments() {
+        return commentaires;
+    }
+
+    public ArrayList<Attachment> getAttachments() {
+        return pjs;
+    }
 }

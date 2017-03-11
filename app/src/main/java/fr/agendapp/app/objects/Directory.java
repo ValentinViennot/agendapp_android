@@ -5,9 +5,10 @@ package fr.agendapp.app.objects;
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-class Directory extends Group {
+public class Directory extends Group {
 
     Directory() {
         super(1);
     }
+
 }

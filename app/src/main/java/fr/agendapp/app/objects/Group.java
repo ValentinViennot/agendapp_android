@@ -7,38 +7,93 @@ import android.graphics.Color;
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-abstract class Group{
+public abstract class Group {
 
     /** ID dans la base */
-    int id;
+    private int id;
     /** ID du groupe parent */
-    int parentid;
+    private int parentid;
     /** Nom du groupe */
-    String name;
-    /** Type de groupe (héritage) */
-    int type;
+    private String nom;
+    /**
+     * Type de groupe (héritage)
+     * 0 : Invisible
+     * 1 : Dossier
+     * 2 : Matière
+     */
+    private int type;
     /** Couleur du groupe (personnalisée) */
-    Color color;
+    private Color color;
     /** True si l'utilisateur est inscrit au groupe */
-    boolean isUser;
+    private boolean isUser;
 
-    Group(int type) {
+    public Group(int type) {
         this.type = type;
+    }
+
+    /**
+     * Création d'un nouveau Groupe (matière ou dossier)
+     * Renvoi l'objet local créé et l'envoi au serveur (async) pour traitement
+     *
+     * @param parentid ID du groupe conteneur
+     * @param nom      Nom du groupe à créer
+     * @param type     1 Dossier, 2 Matière, 0 invisible
+     * @return Groupe nouvellement créé , null si erreur
+     */
+    public static Group newGroup(
+            int parentid,
+            String nom,
+            int type
+    ) {
+        // TODO
+        // Création du groupe local et envoi sur le serveur
+        if (type == 1) return new Directory();
+        else return new Subject();
     }
 
     /**
      * Rejoindre le groupe
      * @return true si l'utilisateur rejoint le groupe, false sinon
      */
-    boolean join() {
+    public boolean join() {
+        // TODO
         return false;
     }
+
+    // GETTERS
 
     /**
      * Quitter le groupe
      * @return true si réussite
      */
-    boolean quit() {
+    public boolean quit() {
+        // TODO
         return false;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getParentid() {
+        return parentid;
+    }
+
+    public String getNom() {
+        return nom;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    // Méthodes statiques
+
+    public boolean isUser() {
+        return isUser;
     }
 }
