@@ -1,6 +1,7 @@
 package fr.agendapp.app.objects;
 
 import android.content.Context;
+import android.content.res.Resources;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,7 +36,7 @@ public class Section {
     private List<Work> homeworks;
 
 
-    public Section(int date, String month, String day) {
+    private Section(int date, String month, String day) {
         this.date = date;
         this.month = month;
         this.day = day;
@@ -114,31 +115,32 @@ public class Section {
      * @return nom du mois correspondant à la date
      */
     private static String getMonthName(Context context, int month) {
+        Resources r = context.getResources();
         switch (month) {
             case 0:
-                return context.getResources().getString(R.string.janvier);
+                return r.getString(R.string.janvier);
             case 1:
-                return context.getResources().getString(R.string.fevrier);
+                return r.getString(R.string.fevrier);
             case 2:
-                return context.getResources().getString(R.string.mars);
+                return r.getString(R.string.mars);
             case 3:
-                return context.getResources().getString(R.string.avril);
+                return r.getString(R.string.avril);
             case 4:
-                return context.getResources().getString(R.string.mai);
+                return r.getString(R.string.mai);
             case 5:
-                return context.getResources().getString(R.string.juin);
+                return r.getString(R.string.juin);
             case 6:
-                return context.getResources().getString(R.string.juillet);
+                return r.getString(R.string.juillet);
             case 7:
-                return context.getResources().getString(R.string.aout);
+                return r.getString(R.string.aout);
             case 8:
-                return context.getResources().getString(R.string.septembre);
+                return r.getString(R.string.septembre);
             case 9:
-                return context.getResources().getString(R.string.octobre);
+                return r.getString(R.string.octobre);
             case 10:
-                return context.getResources().getString(R.string.novembre);
+                return r.getString(R.string.novembre);
             case 11:
-                return context.getResources().getString(R.string.decembre);
+                return r.getString(R.string.decembre);
         }
         return null;
     }
@@ -149,21 +151,22 @@ public class Section {
      * @return représentation locale du jour de la semaine
      */
     private static String getWeekName(Context context, int day) {
+        Resources r = context.getResources();
         switch (day) {
             case 0:
-                return context.getResources().getString(R.string.dimanche);
+                return r.getString(R.string.dimanche);
             case 1:
-                return context.getResources().getString(R.string.lundi);
+                return r.getString(R.string.lundi);
             case 2:
-                return context.getResources().getString(R.string.mardi);
+                return r.getString(R.string.mardi);
             case 3:
-                return context.getResources().getString(R.string.mercredi);
+                return r.getString(R.string.mercredi);
             case 4:
-                return context.getResources().getString(R.string.jeudi);
+                return r.getString(R.string.jeudi);
             case 5:
-                return context.getResources().getString(R.string.vendredi);
+                return r.getString(R.string.vendredi);
             case 6:
-                return context.getResources().getString(R.string.samedi);
+                return r.getString(R.string.samedi);
         }
         return null;
     }

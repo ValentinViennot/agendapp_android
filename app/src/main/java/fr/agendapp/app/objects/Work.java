@@ -1,10 +1,15 @@
 package fr.agendapp.app.objects;
 
 import android.graphics.Color;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
+
+import fr.agendapp.app.R;
 
 /**
  * Représente un devoir
@@ -12,11 +17,6 @@ import java.util.LinkedList;
  * @author Valentin Viennot
  */
 public class Work {
-
-    /** Tableau de devoirs à faire */
-    static LinkedList<Work> homeworks;
-    /** Tableau des archives */
-    static LinkedList<Work> archives;
 
     /** ID dans la base */
     private int id;
@@ -43,16 +43,8 @@ public class Work {
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
-    Work() {
-
-    }
-
-    public static LinkedList<Work> getHomeworks() {
-        return homeworks;
-    }
-
-    public static LinkedList<Work> getArchives() {
-        return archives;
+    public Work(String auteur) {
+        this.auteur = auteur;
     }
 
     /**
@@ -83,6 +75,8 @@ public class Work {
         //TODO
         return false;
     }
+
+    // GETTERS
 
     public int getId() {
         return id;
@@ -130,5 +124,26 @@ public class Work {
 
     public ArrayList<Attachment> getAttachments() {
         return pjs;
+    }
+
+    /**
+     * Définition de l'affichage d'un devoir (UI)
+     * Quels widgets sont nécessaires pour l'affichage ?
+     * Comment sont affichées les données ? etc
+     */
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        public TextView name;
+
+        public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.object_work, parent, false));
+            name = (TextView) itemView.findViewById(R.id.card_title);
+        }
+
+        public void setWork(Work w) {
+            // textview.setText() et compagnie
+            name.setText(w.auteur);
+        }
+
     }
 }
