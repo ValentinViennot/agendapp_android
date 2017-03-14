@@ -2,6 +2,9 @@
     <!-- Nom de l'application -->
     <string name="app_name">Agendapp</string>
 
+    <!-- Navigation -->
+    <string name="nav_devoirs">À faire</string>
+
     <!-- Mois de l'année -->
     <string name="janvier">Janvier</string>
     <string name="fevrier">Février</string>

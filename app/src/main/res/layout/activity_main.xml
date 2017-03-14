@@ -8,10 +8,12 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="fr.agendapp.app.MainActivity">
+    tools:context="fr.agendapp.app.App">
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Chargement... [Ne devrait pas rester plus de quelques secondes]" />
+    <!-- TODO Afficher un splashScreen -->
+
 </RelativeLayout>
