@@ -1,39 +1,43 @@
 package fr.agendapp.app.factories;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.ListIterator;
 
 class PendDO extends Pending {
 
-    ArrayList<String[]> pends;
+    private static List<PendDO> pending;
 
-    PendDO() {
-        pends = new ArrayList<>();
+    private int id;
+    private boolean done;
+
+    public PendDO(int id, boolean done) {
+        this.id = id;
+        this.done = done;
+        pending.add(this);
     }
 
-    public String toString() {
+    /**
+     * @return représentation JSON de la liste d'actions PendDO
+     */
+    static String getList() {
+        ListIterator<PendDO> i = pending.listIterator();
         String json = "[";
-        for(String[] pend : pends) {
-            json+="{";
-            json+="\"id\":"+pend[0]+",";
-            json+="\"done\":"+pend[1];
-            json+="}";
+        while (i.hasNext()) {
+            json += i.next();
+            if (i.hasNext()) json += ",";
         }
         json+="]";
         return json;
     }
 
-/*
-    void add(Work w) {
-        String[] pend = new String[2];
-        pend[0] = ""+w.getID();
-        pend[1] = ""+w.getDone();
-        pends.add(pend);
-    }
-*/
-
-
-    @Override
-    void add(Object o) {
-
+    /**
+     * @return Représentation JSON de l'action PendDO
+     */
+    public String toString() {
+        String json = "{";
+        json += "\"id\":" + id + ",";
+        json += "\"done\":" + (done ? "true" : "false");
+        json += "}";
+        return json;
     }
 }
