@@ -131,4 +131,36 @@ public class Work {
     public ArrayList<Attachment> getAttachments() {
         return pjs;
     }
+
+    public String getAuteur() {
+        return auteur;
+    }
+
+    public String getMatiere() {
+        return matiere;
+    }
+
+    public Color getMatiere_c() {
+        return matiere_c;
+    }
+
+    public String getTexte() {
+        return texte;
+    }
+
+    public int getNb_fait() {
+        return nb_fait;
+    }
+
+    public boolean isFait() {
+        return fait;
+    }
+
+    public ArrayList<Comment> getCommentaires() {
+        return commentaires;
+    }
+
+    public ArrayList<Attachment> getPjs() {
+        return pjs;
+    }
 }
