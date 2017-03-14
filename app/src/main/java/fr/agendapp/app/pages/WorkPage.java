@@ -2,6 +2,14 @@ package fr.agendapp.app.pages;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+
+import fr.agendapp.app.objects.Invite;
+import fr.agendapp.app.objects.Section;
+import fr.agendapp.app.objects.Work;
+
+import java.util.LinkedList;
+import java.util.ListIterator;
+
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -75,6 +83,17 @@ public class WorkPage extends Fragment {
         @Override
         public int getItemCount() {
             return WorkPage.homeworks.size();
+        }
+    }
+
+    private void insert(Work w) {
+        ListIterator<Work> i = homeworks.listIterator();
+        while (i.hasNext()) {
+            Work h = i.next();
+            if (h.getDate().compareTo(w.getDate()) <= 0) {
+                i.add(w);
+                return;
+            }
         }
     }
 

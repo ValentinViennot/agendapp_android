@@ -2,17 +2,12 @@ package fr.agendapp.app.factories;
 
 abstract class Pending {
 
-    static Pending[] pendingList = new Pending[8];
-
     /**
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
      */
     static void init() {
         // TODO
-        // Charge depuis le stockage si existant
-        // Sinon
-        pendingList[1] = new PendDO();
     }
 
     /**
@@ -21,7 +16,6 @@ abstract class Pending {
      */
     static void save() {
         // TODO
-        // Enregistre la pending List
     }
 
     /**
@@ -34,12 +28,24 @@ abstract class Pending {
     public static String toJson() {
         // TODO
         String json = "[";
-        json+="\"pendDO\":"+pendingList[1];
-        //json+=",";
+        json += "\"pendADD\":" + PendADD.getList();
+        json += ",";
+        json += "\"pendDO\":" + PendDO.getList();
+        json += ",";
+        json += "\"pendFLAG\":" + PendFLAG.getList();
+        json += ",";
+        json += "\"pendALERT\":" + PendALERT.getList();
+        json += ",";
+        json += "\"pendCOMM\":" + PendCOMM.getList();
+        json += ",";
+        json += "\"pendDELc\":" + PendDELc.getList();
+        json += ",";
+        json += "\"pendMERGE\":" + PendMERGE.getList();
+        json += ",";
+        json += "\"pendDEL\":" + PendDEL.getList();
         json+="]";
         return json;
     }
 
-    abstract void add(Object o);
 
 }

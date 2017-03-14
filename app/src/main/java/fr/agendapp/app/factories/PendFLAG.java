@@ -3,48 +3,46 @@ package fr.agendapp.app.factories;
 import java.util.List;
 import java.util.ListIterator;
 
-class PendDO extends Pending {
+class PendFLAG extends Pending {
 
-    private static List<PendDO> pending;
-
+    private static List<PendFLAG> pending;
     private int id;
-    private boolean done;
+    private int flag;
 
     /**
      * @param id
-     * @param done
-     * @author Valentin Viennot
-     * Constructeur de PendDO
+     * @param flag
+     * @author Dylan Habans
+     * Constructeur de PendFLAG
      */
-    public PendDO(int id, boolean done) {
+    public PendFLAG(int id, int flag) {
         this.id = id;
-        this.done = done;
+        this.flag = flag;
         pending.add(this);
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDO
+     * @return représentation JSON de la liste d'actions PendFLAG
      */
     static String getList() {
-        ListIterator<PendDO> i = pending.listIterator();
+        ListIterator<PendFLAG> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
             if (i.hasNext()) json += ",";
         }
-        json+="]";
+        json += "]";
         return json;
     }
 
     /**
-     * @return Représentation JSON de l'action PendDO
+     * @return représentation JSON de l'action PendFLAG
      */
     public String toString() {
         String json = "{";
         json += "\"id\":" + id + ",";
-        json += "\"done\":" + (done ? "true" : "false");
+        json += "\"flag\":" + flag;
         json += "}";
         return json;
     }
-
 }
