@@ -1,7 +1,5 @@
 package fr.agendapp.app.factories;
 
-/**
- * Created by Dylan on 14/03/2017.
- */
-public class PendALERT {
+public class PendALERT extends Pending {
+    //TODO
 }

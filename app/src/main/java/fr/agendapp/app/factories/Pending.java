@@ -38,6 +38,11 @@ abstract class Pending {
         json += ",";
         json += "\"pendCOMM\":" + PendCOMM.getList();
         json += ",";
+        json += "\"pendDELc\":" + PendDELc.getList();
+        json += ",";
+        json += "\"pendMERGE\":" + PendMERGE.getList();
+        json += ",";
+        json += "\"pendDEL\":" + PendDEL.getList();
         json+="]";
         return json;
     }

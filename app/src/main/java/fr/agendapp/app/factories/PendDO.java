@@ -10,6 +10,12 @@ class PendDO extends Pending {
     private int id;
     private boolean done;
 
+    /**
+     * @param id
+     * @param done
+     * @author Valentin Viennot
+     * Constructeur de PendDO
+     */
     public PendDO(int id, boolean done) {
         this.id = id;
         this.done = done;

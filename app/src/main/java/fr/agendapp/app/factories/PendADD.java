@@ -8,10 +8,17 @@ class PendADD extends Pending {
 
     private static List<PendADD> pending;
 
-    String date;
-    String text;
-    int groupe;
+    private String date;
+    private String text;
+    private int groupe;
 
+    /**
+     * @param date
+     * @param text
+     * @param groupe
+     * @author Dylan Habans
+     * Constructeur de PendADD :
+     */
     public PendADD(Date date, String text, int groupe) {
         DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
         format.setTimeZone(TimeZone.getTimeZone("GMT"));
@@ -21,6 +28,9 @@ class PendADD extends Pending {
         pending.add(this);
     }
 
+    /**
+     * @return représentation JSON de la liste d'actions PendADD
+     */
     static String getList() {
         ListIterator<PendADD> i = pending.listIterator();
         String json = "[";
@@ -32,14 +42,18 @@ class PendADD extends Pending {
         return json;
     }
 
+    /**
+     * @return Représentation JSON de l'action PendADD
+     */
     public String toString() {
-        String json+="{";
+        String json = "{";
         json += "\"date\":\"" + date + "\",";
         json += "\"texte\":\"" + text + "\",";
         json += "\"user\":" + groupe;
         json += "}";
+        return json;
     }
+
 }
 
-{
-        }
+

@@ -1,7 +1,5 @@
 package fr.agendapp.app.factories;
 
-/**
- * Created by Dylan on 14/03/2017.
- */
-public class PendMERGE {
+
+public class PendMERGE extends Pending {
 }
