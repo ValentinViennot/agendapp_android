@@ -22,6 +22,11 @@ class PendDO extends Pending {
         return json;
     }
 
+    @Override
+    void add(Object o) {
+
+    }
+
 /*
     void add(Work w) {
         String[] pend = new String[2];
@@ -30,10 +35,4 @@ class PendDO extends Pending {
         pends.add(pend);
     }
 */
-
-
-    @Override
-    void add(Object o) {
-
-    }
 }
