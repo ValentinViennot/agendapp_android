@@ -2,10 +2,12 @@ package fr.agendapp.app.pages;
 
 import android.app.Activity;
 import android.os.Bundle;
+import fr.agendapp.app.objects.Invite;
+import fr.agendapp.app.objects.Section;
+import fr.agendapp.app.objects.Work;
 
 import java.util.LinkedList;
-
-import fr.agendapp.app.objects.*;
+import java.util.ListIterator;
 
 /**
  * Page "cahier de texte"
@@ -36,6 +38,17 @@ public class WorkPage extends Activity {
 
     private void addFilter(String filter) {
         this.filter+="&&"+filter;
+    }
+
+    private void insert(Work w) {
+        ListIterator<Work> i = homeworks.listIterator();
+        while (i.hasNext()) {
+            Work h = i.next();
+            if (h.getDate().compareTo(w.getDate()) <= 0) {
+                i.add(w);
+                return;
+            }
+        }
     }
 
 }
