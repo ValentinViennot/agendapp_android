@@ -17,8 +17,6 @@ import java.util.ListIterator;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
-import fr.agendapp.app.objects.Filter;
-import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Section;
 import fr.agendapp.app.objects.Work;
 
@@ -30,17 +28,9 @@ import static android.content.Context.MODE_PRIVATE;
  */
 public class WorkPage extends Fragment {
 
-    static String type = "devoirs";
+    // TODO supprimer
     static List<Work> homeworks;
-    /**
-     * Filtre ajouté par l'utilisateur
-     */
-    Filter filter;
-    /**
-     * Filtre ajouté par l'ordinateur
-     */
-    String autofilter;
-    Invite[] invits;
+    String type = "devoirs";
     // TODO penser l'affichage d'une liste de section contenant elles même une liste de devoirs
     Section[] sections;
 
@@ -60,44 +50,6 @@ public class WorkPage extends Fragment {
         ));
         //
         return recyclerView;
-    }
-
-    /**
-     * Méthode qui renvoie une liste de devoirs après avoir appliqué un filtre
-     *
-     * @return : la liste de devoirs filtrés
-     */
-    private List<Work> applyFilter() {
-        List<Work> res = new LinkedList<>();
-        for (fr.agendapp.app.objects.Work w : homeworks) {
-            boolean intermediaire = false;
-            for (String s : filter.getMatieres()) {
-                if (w.getMatiere().contains(s) || filter.getMatieres() == null) {
-                    intermediaire = true;
-                    break;
-                }
-            }
-            if (intermediaire) {
-                for (Integer i : filter.getFlag()) {
-                    if (w.getFlag() == i || filter.getFlag() == null) {
-                        intermediaire = true;
-                        break;
-                    } else {
-                        intermediaire = false;
-                    }
-                }
-
-            }
-            if (intermediaire) {
-                if ((filter.isFait() == w.isFait()) && (filter.getAuteur().indexOf(w.getAuteur()) != -1 || filter.getAuteur() == null) &&
-                        (filter.getResearch().indexOf(w.getText()) != -1 || filter.getResearch() == null)) {
-                    res.add(w);
-                }
-
-            }
-
-        }
-        return res;
     }
 
     private void insert(Work w) {

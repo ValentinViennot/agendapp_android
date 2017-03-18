@@ -2,6 +2,7 @@ package fr.agendapp.app.objects;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
@@ -138,30 +139,46 @@ public class Work {
         return auteur;
     }
 
-    public String getText() {
-        return texte;
-    }
-
     public Date getDate() {
         return date;
     }
 
+    public int getUser() {
+        return user;
+    }
+
+    public String getSubject() {
+        return matiere;
+    }
+
+    public int getSubjectColor() {
+        return Color.parseColor(matiere_c);
+    }
+
+    public String getText() {
+        return texte;
+    }
+
+    public int getNbDone() {
+        return nb_fait;
+    }
+
     // STATIC
+
+    public boolean isDone() {
+        return fait > 0;
+    }
 
     public int getFlag() {
         return flag;
     }
 
-    public String getAuteur() {
-        return auteur;
+    public ArrayList<Comment> getCommentaires() {
+        return commentaires;
     }
 
-    public String getMatiere() {
-        return matiere;
-    }
-
-    public boolean isFait() {
-        return fait > 0;
+    public ArrayList<Attachment> getPjs() {
+        return pjs;
     }
 
     /**
