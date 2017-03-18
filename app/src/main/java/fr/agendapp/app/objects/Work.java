@@ -1,15 +1,24 @@
 package fr.agendapp.app.objects;
 
-import android.graphics.Color;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.ParseFactory;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Représente un devoir
@@ -18,6 +27,9 @@ import fr.agendapp.app.R;
  */
 public class Work {
 
+    public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+    private static List<Work> comingwork;
+    private static List<Work> pastwork;
     /** ID dans la base */
     private int id;
     /** ID de l'auteur */
@@ -27,7 +39,7 @@ public class Work {
     /** Nom de la matière */
     private String matiere;
     /** Couleur associée la matière */
-    private Color matiere_c;
+    private String matiere_c;
     /** Texte du devoir */
     private String texte;
     /** Date d'échéance */
@@ -35,7 +47,7 @@ public class Work {
     /** Nombre de marqué comme faits */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    private boolean fait;
+    private int fait;
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
@@ -43,9 +55,44 @@ public class Work {
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
-    public Work(String auteur) {
-        this.auteur = auteur;
+    public Work() {
     }
+
+    // SETTERS
+
+    public static void setComingwork(Context context, String json) {
+        comingwork = ParseFactory.parseWork(json);
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("devoirs", json);
+        editor.apply();
+    }
+
+    public static void setPastwork(Context context, String json) {
+        pastwork = ParseFactory.parseWork(json);
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("archives", json);
+        editor.apply();
+    }
+
+    public static List<Work> getPastwork(Context activity) {
+        if (pastwork == null) {
+            SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
+            pastwork = ParseFactory.parseWork(preferences.getString("archives", "[]"));
+        }
+        return pastwork;
+    }
+
+    public static List<Work> getComingwork(Context activity) {
+        if (comingwork == null) {
+            SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
+            comingwork = ParseFactory.parseWork(preferences.getString("devoirs", "[]"));
+        }
+        return comingwork;
+    }
+
+    // GETTERS
 
     /**
      * Marque comme fait/non fait selon le statut actuel
@@ -55,8 +102,6 @@ public class Work {
         // TODO
         return false;
     }
-
-    // GETTERS
 
     /**
      * Supprime le devoir
@@ -76,27 +121,21 @@ public class Work {
         return false;
     }
 
-    // GETTERS
-    // TODO getters en doubles !!!
+    /**
+     * @param c Commentaire à ajouter au devoir
+     * @return true en cas de succes
+     */
+    boolean addComment(Comment c) {
+        // TODO
+        return false;
+    }
 
     public int getId() {
         return id;
     }
 
-    public int getUser() {
-        return user;
-    }
-
     public String getAuthor() {
         return auteur;
-    }
-
-    public String getSubject() {
-        return matiere;
-    }
-
-    public Color getSubjectColor() {
-        return matiere_c;
     }
 
     public String getText() {
@@ -107,26 +146,11 @@ public class Work {
         return date;
     }
 
-    public int getNbDone() {
-        return nb_fait;
-    }
-
-    public boolean isDone() {
-        return fait;
-    }
+    // STATIC
 
     public int getFlag() {
         return flag;
     }
-
-    public ArrayList<Comment> getComments() {
-        return commentaires;
-    }
-
-    public ArrayList<Attachment> getAttachments() {
-        return pjs;
-    }
-
 
     public String getAuteur() {
         return auteur;
@@ -136,28 +160,8 @@ public class Work {
         return matiere;
     }
 
-    public Color getMatiere_c() {
-        return matiere_c;
-    }
-
-    public String getTexte() {
-        return texte;
-    }
-
-    public int getNb_fait() {
-        return nb_fait;
-    }
-
     public boolean isFait() {
-        return fait;
-    }
-
-    public ArrayList<Comment> getCommentaires() {
-        return commentaires;
-    }
-
-    public ArrayList<Attachment> getPjs() {
-        return pjs;
+        return fait > 0;
     }
 
     /**
@@ -176,7 +180,7 @@ public class Work {
 
         public void setWork(Work w) {
             // textview.setText() et compagnie
-            name.setText(w.auteur);
+            name.setText(w.matiere);
         }
 
     }

@@ -33,16 +33,16 @@ abstract class Pending {
         json += "\"pendDO\":" + PendDO.getList();
         json += ",";
         json += "\"pendFLAG\":" + PendFLAG.getList();
-        json += ",";
-        json += "\"pendALERT\":" + PendALERT.getList();
-        json += ",";
-        json += "\"pendCOMM\":" + PendCOMM.getList();
-        json += ",";
-        json += "\"pendDELc\":" + PendDELc.getList();
-        json += ",";
-        json += "\"pendMERGE\":" + PendMERGE.getList();
-        json += ",";
-        json += "\"pendDEL\":" + PendDEL.getList();
+//        json += ",";
+//        json += "\"pendALERT\":" + PendALERT.getList();
+//        json += ",";
+//        json += "\"pendCOMM\":" + PendCOMM.getList();
+//        json += ",";
+//        json += "\"pendDELc\":" + PendDELc.getList();
+//        json += ",";
+//        json += "\"pendMERGE\":" + PendMERGE.getList();
+//        json += ",";
+//        json += "\"pendDEL\":" + PendDEL.getList();
         json+="]";
         return json;
     }

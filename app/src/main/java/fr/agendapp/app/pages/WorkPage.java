@@ -1,22 +1,8 @@
 package fr.agendapp.app.pages;
 
 
-import fr.agendapp.app.objects.Filter;
-import fr.agendapp.app.objects.Invite;
-import fr.agendapp.app.objects.Section;
-import fr.agendapp.app.objects.Work;
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
-
-
-import fr.agendapp.app.objects.Invite;
-import fr.agendapp.app.objects.Section;
-import fr.agendapp.app.objects.Work;
-
-import java.util.LinkedList;
-import java.util.ListIterator;
-
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -26,11 +12,13 @@ import android.view.ViewGroup;
 
 import java.util.LinkedList;
 import java.util.List;
-
+import java.util.ListIterator;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Section;
 import fr.agendapp.app.objects.Work;
 
@@ -43,7 +31,7 @@ import static android.content.Context.MODE_PRIVATE;
 public class WorkPage extends Fragment {
 
     static String type = "devoirs";
-
+    static List<Work> homeworks;
     /**
      * Filtre ajouté par l'utilisateur
      */
@@ -52,12 +40,8 @@ public class WorkPage extends Fragment {
      * Filtre ajouté par l'ordinateur
      */
     String autofilter;
-
     Invite[] invits;
-
-    static List<Work> homeworks;
     // TODO penser l'affichage d'une liste de section contenant elles même une liste de devoirs
-
     Section[] sections;
 
     @Override
@@ -76,34 +60,6 @@ public class WorkPage extends Fragment {
         ));
         //
         return recyclerView;
-    }
-
-    /**
-     * Un Adapter est une classe servant à afficher des listes d'objets
-     * Ici une liste de "Work" dont l'affichage est défini dans la classe interne Work.ViewHolder
-     * Un RecyclerView est simplement une vue réutilisée pour l'affichage de chaque élément
-     * Finalement,
-     * On initialise cet Adapter pour y afficher des "Work" (devoirs) via une "Vue Recyclée"
-     */
-    public static class ContentAdapter extends RecyclerView.Adapter<Work.ViewHolder> {
-
-        ContentAdapter() {
-        }
-
-        @Override
-        public Work.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new Work.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
-        }
-
-        @Override
-        public void onBindViewHolder(Work.ViewHolder holder, int position) {
-            holder.setWork(WorkPage.homeworks.get(position % getItemCount()));
-        }
-
-        @Override
-        public int getItemCount() {
-            return WorkPage.homeworks.size();
-        }
     }
 
     /**
@@ -152,6 +108,34 @@ public class WorkPage extends Fragment {
                 i.add(w);
                 return;
             }
+        }
+    }
+
+    /**
+     * Un Adapter est une classe servant à afficher des listes d'objets
+     * Ici une liste de "Work" dont l'affichage est défini dans la classe interne Work.ViewHolder
+     * Un RecyclerView est simplement une vue réutilisée pour l'affichage de chaque élément
+     * Finalement,
+     * On initialise cet Adapter pour y afficher des "Work" (devoirs) via une "Vue Recyclée"
+     */
+    public static class ContentAdapter extends RecyclerView.Adapter<Work.ViewHolder> {
+
+        ContentAdapter() {
+        }
+
+        @Override
+        public Work.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            return new Work.ViewHolder(LayoutInflater.from(parent.getContext()), parent);
+        }
+
+        @Override
+        public void onBindViewHolder(Work.ViewHolder holder, int position) {
+            holder.setWork(WorkPage.homeworks.get(position % getItemCount()));
+        }
+
+        @Override
+        public int getItemCount() {
+            return WorkPage.homeworks.size();
         }
     }
 
