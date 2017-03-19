@@ -18,13 +18,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/headertitle"
     android:layout_width="match_parent"
-    android:layout_height="64dp"
-    android:background="#55AA33"
+    android:layout_height="40dp"
+    android:background="@color/colorText"
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:textAppearance="?android:attr/textAppearanceLarge"
-    android:textColor="#FFF"
+    android:textColor="@color/colorSecondaryText"
     tools:text="Sample text">
 
 </TextView>

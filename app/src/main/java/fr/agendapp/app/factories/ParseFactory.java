@@ -11,6 +11,7 @@ import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 import fr.agendapp.app.objects.Work;
@@ -22,7 +23,19 @@ public class ParseFactory {
             .create();
 
     public static List<Work> parseWork(String json) {
-        Type collectionType = new TypeToken<List<Work>>() {
+        Type collectionType = new TypeToken<LinkedList<Work>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendDO> parsePendDO(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendDO>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendFLAG> parsePendFLAG(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendFLAG>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }

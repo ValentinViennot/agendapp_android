@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/colorLight"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/attachment_title"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content" />
+
+    <ImageButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/attachment_delete"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="24dp"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@id/attachment_title"
+        android:layout_toEndOf="@id/attachment_title"
+        android:layout_toRightOf="@id/attachment_title"
+        android:contentDescription="@string/button_delete"
+        android:tint="@color/colorPrimary"
+        app:srcCompat="@drawable/ic_delete_black_24dp" />
+
+</RelativeLayout>

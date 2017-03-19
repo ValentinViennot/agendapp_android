@@ -19,12 +19,12 @@
     android:id="@+id/subheadertitle"
     android:layout_width="match_parent"
     android:layout_height="40dp"
-    android:background="#775599"
+    android:background="@color/colorText"
     android:gravity="center_vertical"
     android:paddingLeft="16dp"
     android:paddingRight="16dp"
     android:textAppearance="?android:attr/textAppearanceMedium"
-    android:textColor="#FFF"
+    android:textColor="@color/colorSecondaryText"
     tools:text="Sample text">
 
 </TextView>

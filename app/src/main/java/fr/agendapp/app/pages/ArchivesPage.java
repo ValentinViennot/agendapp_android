@@ -11,9 +11,13 @@ public class ArchivesPage extends WorkPage {
 
     // Réécrire type et getHomeworks()
 
-
     private List<Work> getHomeworks() {
         return Work.getPastwork(this.getContext());
+    }
+
+    @Override
+    public boolean isArchives() {
+        return true;
     }
 
 }

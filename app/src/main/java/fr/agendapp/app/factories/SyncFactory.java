@@ -1,6 +1,7 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.android.volley.AuthFailureError;
@@ -19,18 +20,37 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
+import fr.agendapp.app.pages.SyncListener;
 
 public class SyncFactory {
 
     private static final String baseUrl = "https://apis.agendapp.fr/";
+    /**
+     * Instance active du service de synchronisation
+     */
     private static SyncFactory instance = null;
-    private String token;
+    /**
+     * Token d'identification aux APIs
+     */
+    private static String token;
+    /** File d'attente des requêtes HTTP (Pile du Thread HTTP) */
     private RequestQueue mRequestQueue;
+    /** Callback universel en cas d'erreur avec une requête http */
     private Response.ErrorListener errorListener;
 
-    private SyncFactory(Context context, String token) {
-        this.token = token == null ? "" : token;
+    // TODO gestion de l'hors connexion ?
+
+    /**
+     * Création d'une nouvelle instance du service de synchronisation
+     *
+     * @param context Android
+     * @param t       Token API
+     */
+    private SyncFactory(Context context, String t) {
+        // Evite un NullPointer
+        token = t == null ? "" : t;
         mRequestQueue = getRequestQueue(context);
         // TODO : Notifications ?
         errorListener = new Response.ErrorListener() {
@@ -39,19 +59,21 @@ public class SyncFactory {
                 Log.e(App.TAG, "response error \n" + error.networkResponse.statusCode);
             }
         };
+        // Initialisation des Pending (Listes d'actions en attente)
+        Pending.init(context);
     }
 
     /**
      * Initialisation du service de discussion avec le serveur d'APIs
      *
      * @param context Application
-     * @param token   Token d'identification aux APIs
+     * @param t   Token d'identification aux APIs
      */
-    public static synchronized void init(Context context, String token) {
+    public static synchronized void init(Context context, String t) {
         if (instance != null)
-            instance.setToken(token);
+            instance.setToken(t);
         else
-            instance = new SyncFactory(context, token);
+            instance = new SyncFactory(context, t);
     }
 
     // Remarque : le mot clé "synchronized" permet de signifier que cette méthode ne peut pas être appelée deux fois en même temps
@@ -111,6 +133,79 @@ public class SyncFactory {
         }
     }
 
+    public static String getToken() {
+        return token;
+    }
+
+    private void setToken(String t) {
+        token = t;
+    }
+
+    /**
+     * Récupère les devoirs depuis le serveur et les écrit au localStorage
+     *
+     * @param syncListener Instance à notifier lors de la récupération des devoirs
+     * @param context      Android Context
+     * @param version      Version requise des données
+     */
+    private void getWork(final SyncListener syncListener, final Context context, final String version) {
+        req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Ecrire la réponse au localStorage (SharedPreferences)
+                        if (syncListener.isArchives()) {
+                            Work.setPastwork(context, response, version);
+                        } else {
+                            Work.setComingwork(context, response, version);
+                        }
+                        // Notification qu'une nouvelle version des données a été synchronisée
+                        syncListener.onSync();
+                    }
+                }
+        );
+    }
+
+    /**
+     * Récupère la version distante des données (devoirs) et la compare avec la version locale
+     *
+     * @param syncListener Service à notifier en cas de changement de version
+     * @param context      Android Context
+     */
+    private void getVersion(final SyncListener syncListener, final Context context) {
+        // Nom de la version à controler (Archives ou Devoirs)
+        final String name = "version" + (syncListener.isArchives() ? "A" : "D");
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        // Récupération de la version locale des données
+        final String version = preferences.getString(name, "0");
+        Log.i(App.TAG, "Version des données (" + (syncListener.isArchives() ? "A" : "D") + ") : " + version);
+        // Requete de la version distante
+        req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                if (!response.equals(version)) {
+                    // Une nouvelle version des données est disponible
+                    Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
+                    getWork(syncListener, context, response);
+                }
+            }
+        });
+    }
+
+    synchronized void synchronize(final SyncListener syncListener, final Context context, String json) {
+        // On commence par envoyer les actions en attente au serveur
+        req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // La liste de requêtes est bien parvenue au serveur
+                // On nettoie la liste de requetes
+                Pending.clear(context);
+                // On récupère les nouveaux devoirs si nécessaire
+                getVersion(syncListener, context);
+            }
+        });
+    }
+
     private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener) {
         // créé la requête
         Request req = new StringRequest(
@@ -158,9 +253,5 @@ public class SyncFactory {
             mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return mRequestQueue;
-    }
-
-    private void setToken(String token) {
-        this.token = token;
     }
 }

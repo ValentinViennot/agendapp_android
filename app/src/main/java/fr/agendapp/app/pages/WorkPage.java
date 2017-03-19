@@ -18,6 +18,7 @@ import java.util.ListIterator;
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
+import fr.agendapp.app.factories.Pending;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
 
@@ -25,7 +26,7 @@ import fr.agendapp.app.objects.Work;
  * Page (Vue) d'affichage des devoirs à faire
  * Une Vue est un composant affichable dans une activité
  */
-public class WorkPage extends Fragment {
+public class WorkPage extends Fragment implements SyncListener {
 
     private String type = "devoirs";
     private List<Header> headers;
@@ -118,6 +119,20 @@ public class WorkPage extends Fragment {
         }
         if (month != null) month.setTo(i);
         if (day != null) day.setTo(i);
+    }
+
+    void sync() {
+        Pending.send(this, this.getContext());
+    }
+
+    @Override
+    public void onSync() {
+
+    }
+
+    @Override
+    public boolean isArchives() {
+        return false;
     }
 
     /* TODO ?
