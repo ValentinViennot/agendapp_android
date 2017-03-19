@@ -2,6 +2,8 @@ package fr.agendapp.app.factories;
 
 abstract class Pending {
 
+    // private static List<Pending> pending;
+
     /**
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
@@ -26,7 +28,7 @@ abstract class Pending {
     }
 
     public static String toJson() {
-        // TODO
+
         String json = "[";
         json += "\"pendADD\":" + PendADD.getList();
         json += ",";
@@ -47,5 +49,16 @@ abstract class Pending {
         return json;
     }
 
+    /** abstract static String getList(List<Pending>pending) {
+     ListIterator<Pending> i = pending.listIterator();
+     String json = "[";
+     while (i.hasNext()) {
+     json += i.next();
+     if (i.hasNext()) json += ",";
+     }
+     json+="]";
+     return json;
+     }
+     **/
 
 }
