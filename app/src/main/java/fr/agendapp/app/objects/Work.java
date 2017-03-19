@@ -31,6 +31,8 @@ public class Work {
     public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private static List<Work> comingwork;
     private static List<Work> pastwork;
+
+
     /** ID dans la base */
     private int id;
     /** ID de l'auteur */
@@ -58,8 +60,6 @@ public class Work {
 
     public Work() {
     }
-
-    // SETTERS
 
     public static void setComingwork(Context context, String json) {
         comingwork = ParseFactory.parseWork(json);
@@ -92,8 +92,6 @@ public class Work {
         }
         return comingwork;
     }
-
-    // GETTERS
 
     /**
      * Marque comme fait/non fait selon le statut actuel
@@ -163,8 +161,6 @@ public class Work {
         return nb_fait;
     }
 
-    // STATIC
-
     public boolean isDone() {
         return fait > 0;
     }
@@ -173,11 +169,11 @@ public class Work {
         return flag;
     }
 
-    public ArrayList<Comment> getCommentaires() {
+    public ArrayList<Comment> getComments() {
         return commentaires;
     }
 
-    public ArrayList<Attachment> getPjs() {
+    public ArrayList<Attachment> getAttachments() {
         return pjs;
     }
 
@@ -197,7 +193,7 @@ public class Work {
 
         public void setWork(Work w) {
             // textview.setText() et compagnie
-            name.setText(w.matiere);
+            name.setText(w.matiere + "" + w.getDate().toLocaleString());
         }
 
     }
