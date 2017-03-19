@@ -13,6 +13,7 @@ public abstract class Pending {
     static void init(Context context) {
         // TODO
         PendDO.initList(context);
+        PendFLAG.initList(context);
     }
 
     /**
@@ -22,6 +23,7 @@ public abstract class Pending {
     static void save(Context context) {
         // TODO
         PendDO.saveList(context);
+        PendFLAG.save(context);
     }
 
     /**

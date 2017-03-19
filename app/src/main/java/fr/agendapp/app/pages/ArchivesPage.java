@@ -1,7 +1,5 @@
 package fr.agendapp.app.pages;
 
-import java.util.List;
-
 import fr.agendapp.app.objects.Work;
 
 /**
@@ -9,10 +7,9 @@ import fr.agendapp.app.objects.Work;
 */
 public class ArchivesPage extends WorkPage {
 
-    // Réécrire type et getHomeworks()
-
-    private List<Work> getHomeworks() {
-        return Work.getPastwork(this.getContext());
+    @Override
+    protected void setHomeworks() {
+        this.homeworks = Work.getPastwork(this.getContext());
     }
 
     @Override

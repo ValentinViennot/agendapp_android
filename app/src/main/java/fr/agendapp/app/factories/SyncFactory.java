@@ -183,7 +183,10 @@ public class SyncFactory {
         req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
-                if (!response.equals(version)) {
+                if (response.equals(version)) {
+                    // Si la version n'a pas changée, on notifie le SyncListener qui a appelé la mise à jour
+                    syncListener.onSyncNotAvailable();
+                } else {
                     // Une nouvelle version des données est disponible
                     Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
                     getWork(syncListener, context, response);

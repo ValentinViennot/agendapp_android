@@ -1,5 +1,7 @@
 package fr.agendapp.app.pages;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,13 +9,11 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.R;
@@ -28,35 +28,28 @@ import fr.agendapp.app.objects.Work;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
-    private String type = "devoirs";
-    private List<Header> headers;
-    private List<Header> subheaders;
-    private List<Work> homeworks;
+    protected List<Header> headers;
+    protected List<Header> subheaders;
+    protected List<Work> homeworks;
 
-    private static long getLongId(int position, List<Header> headers) {
-        int i = headers.size(), total;
-        ListIterator<Header> li = headers.listIterator(i);
-        // Iteration dans le sens inversé
-        while (li.hasPrevious()) {
-            i--;
-            total = li.previous().getTo();
-            if (position >= total)
-                return i + position / total;
-        }
-        return 0;
-    }
+    protected DoubleHeaderAdapter adapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-                R.layout.recycler_view, container, false);
-        final DoubleHeaderAdapter adapter = new DoubleHeaderAdapter();
-        DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 
         headers = new LinkedList<>();
         subheaders = new LinkedList<>();
         homeworks = new LinkedList<>();
-        recalcSections();//TODO Notifier l'adapter à la fin du recalc (ASync)
+
+        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
+                R.layout.recycler_view, container, false);
+        adapter = new DoubleHeaderAdapter(this);
+        DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
+
+        // Simule l'arrivée de nouvelles données pour forcer le premier affichage
+        onSync();
+        // Force la première synchronisation des données, la planification s'enchainera
+        sync();
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
@@ -70,9 +63,9 @@ public class WorkPage extends Fragment implements SyncListener {
     /**
      * Calcule les en-têtes et leur emplacement en fonction de la liste de devoirs
      */
-    private void recalcSections() {
+    protected void recalcSections() {
         // Liste de devoirs
-        homeworks = Work.getComingwork(this.getContext());
+        setHomeworks();
         // Cas où la liste de devoirs est vide
         if (homeworks.size() == 0) {
             headers = new LinkedList<>();
@@ -119,15 +112,31 @@ public class WorkPage extends Fragment implements SyncListener {
         }
         if (month != null) month.setTo(i);
         if (day != null) day.setTo(i);
+
+        // TODO penser à notifier l'Adapter depuis le UI Thread
     }
 
     void sync() {
+        // Envoyer les listes d'actions en attente
         Pending.send(this, this.getContext());
+        // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
+    }
+
+    void planNextSync() {
+        // TODO
     }
 
     @Override
     public void onSync() {
+        SyncTask st = new SyncTask();
+        st.execute();
+    }
 
+    @Override
+    public void onSyncNotAvailable() {
+        // Quand une synchronisation se termine sans nouvelles données
+        // On planifie la prochaine synchronisation
+        planNextSync();
     }
 
     @Override
@@ -135,85 +144,49 @@ public class WorkPage extends Fragment implements SyncListener {
         return false;
     }
 
-    /* TODO ?
-    private void insert(Work w) {
-        ListIterator<Work> i = homeworks.listIterator();
-        while (i.hasNext()) {
-            Work h = i.next();
-            if (h.getDate().compareTo(w.getDate()) <= 0) {
-                i.add(w);
-                return;
+    List<Work> getHomeworks() {
+        return this.homeworks;
+    }
+
+    protected void setHomeworks() {
+        this.homeworks = Work.getComingwork(this.getContext());
+    }
+
+    List<Header> getHeaders() {
+        return headers;
+    }
+
+    List<Header> getSubheaders() {
+        return subheaders;
+    }
+
+    protected class SyncTask extends AsyncTask<Void, Integer, Void> {
+
+        ProgressDialog progressDialog;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // TODO apply filters etc + supprimer Thread Sleep
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        }
-    }*/
-
-    class DoubleHeaderAdapter extends RecyclerView.Adapter<Work.ViewHolder> implements
-            ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<DoubleHeaderAdapter.HeaderHolder, DoubleHeaderAdapter.SubHeaderHolder> {
-
-        DoubleHeaderAdapter() {
+            recalcSections();
+            return null;
         }
 
         @Override
-        public Work.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-            return new Work.ViewHolder(LayoutInflater.from(viewGroup.getContext()), viewGroup);
+        protected void onPreExecute() {
+            super.onPreExecute();
+            progressDialog = ProgressDialog.show(WorkPage.this.getContext(), "Quelques instants", "Mise à jour en cours...");
         }
 
         @Override
-        public void onBindViewHolder(Work.ViewHolder holder, int position) {
-            holder.setWork(homeworks.get(position));
-        }
-
-        @Override
-        public int getItemCount() {
-            return homeworks.size();
-        }
-
-        @Override
-        public long getHeaderId(int position) {
-            return getLongId(position, headers);
-        }
-
-        @Override
-        public long getSubHeaderId(int position) {
-            return getLongId(position, subheaders);
-        }
-
-        @Override
-        public HeaderHolder onCreateHeaderHolder(ViewGroup parent) {
-            return new HeaderHolder(LayoutInflater.from(parent.getContext()), parent);
-        }
-
-        @Override
-        public SubHeaderHolder onCreateSubHeaderHolder(ViewGroup parent) {
-            return new SubHeaderHolder(LayoutInflater.from(parent.getContext()), parent);
-        }
-
-        @Override
-        public void onBindHeaderHolder(HeaderHolder viewholder, int position) {
-            viewholder.title.setText(headers.get((int) getHeaderId(position)).getTitle());
-        }
-
-        @Override
-        public void onBindSubHeaderHolder(SubHeaderHolder viewholder, int position) {
-            viewholder.title.setText(subheaders.get((int) getSubHeaderId(position)).getTitle());
-        }
-
-        class HeaderHolder extends RecyclerView.ViewHolder {
-            TextView title;
-
-            HeaderHolder(LayoutInflater inflater, ViewGroup parent) {
-                super(inflater.inflate(R.layout.header, parent, false));
-                title = (TextView) itemView.findViewById(R.id.headertitle);
-            }
-        }
-
-        class SubHeaderHolder extends RecyclerView.ViewHolder {
-            TextView title;
-
-            SubHeaderHolder(LayoutInflater inflater, ViewGroup parent) {
-                super(inflater.inflate(R.layout.subheader, parent, false));
-                title = (TextView) itemView.findViewById(R.id.subheadertitle);
-            }
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            adapter.updateList(WorkPage.this);
+            progressDialog.dismiss();
         }
     }
 }
