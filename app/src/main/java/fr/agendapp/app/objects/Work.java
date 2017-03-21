@@ -198,7 +198,7 @@ public class Work {
 
     //Méthode permettant de voir si un devoir a été modifié
     public boolean modified(Work w) {
-        if (this.equals(w)) {
+        if  (this.equals(w)) {
             return (this.getFlag() != w.getFlag() || this.isDone() != w.isDone() || this.getSubjectColor() != w.getSubjectColor()
                     || this.getNbDone() != w.getNbDone() || this.getComments().getLast().getId() != w.getComments().getLast().getId());
         } else {
