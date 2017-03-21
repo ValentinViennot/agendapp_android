@@ -185,6 +185,20 @@ public class Work {
     }
 
     /**
+     * @return Vrai si l'utilisateur actif est l'auteur de ce devoir
+     */
+    public boolean isUser() {
+        return User.getInstance().getId() == this.getUser();
+    }
+
+    /**
+     * @return Vrai si le devoir est publié sur l'Agendapp
+     */
+    public boolean isPublished() {
+        return this.getId() > 0;
+    }
+
+    /**
      * Définition de l'affichage d'un devoir (UI)
      * Quels widgets sont nécessaires pour l'affichage ?
      * Comment sont affichées les données ? etc

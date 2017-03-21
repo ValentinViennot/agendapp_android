@@ -149,6 +149,7 @@ public class SyncFactory {
      * @param version      Version requise des données
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version) {
+        Log.i(App.TAG, "test : GetWork ");
         req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                 new Response.Listener<String>() {
                     @Override
@@ -172,7 +173,8 @@ public class SyncFactory {
      * @param syncListener Service à notifier en cas de changement de version
      * @param context      Android Context
      */
-    private void getVersion(final SyncListener syncListener, final Context context) {
+    public void getVersion(final SyncListener syncListener, final Context context) {
+        Log.i(App.TAG, "test : GetVersion ");
         // Nom de la version à controler (Archives ou Devoirs)
         final String name = "version" + (syncListener.isArchives() ? "A" : "D");
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
@@ -196,6 +198,7 @@ public class SyncFactory {
     }
 
     synchronized void synchronize(final SyncListener syncListener, final Context context, String json) {
+        Log.i(App.TAG, "test : Synchronize ");
         // On commence par envoyer les actions en attente au serveur
         req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
             @Override

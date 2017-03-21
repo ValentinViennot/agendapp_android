@@ -20,13 +20,13 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<Work.ViewHolder> implemen
     private List<Header> subheaders;
 
     DoubleHeaderAdapter(WorkPage wp) {
-        this.homeworks = wp.getHomeworks();
-        this.headers = wp.getHeaders();
-        this.subheaders = wp.getSubheaders();
+        updateList(wp);
     }
 
     void updateList(WorkPage wp) {
         this.homeworks = wp.getHomeworks();
+        this.headers = wp.getHeaders();
+        this.subheaders = wp.getSubheaders();
         this.notifyDataSetChanged();
     }
 
@@ -52,8 +52,9 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<Work.ViewHolder> implemen
         while (li.hasPrevious()) {
             i--;
             total = li.previous().getTo();
-            if (position >= total)
+            if (position >= total) {
                 return i + position / total;
+            }
         }
         return 0;
     }

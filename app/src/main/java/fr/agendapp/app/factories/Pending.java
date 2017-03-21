@@ -1,7 +1,9 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.util.Log;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.pages.SyncListener;
 
 public abstract class Pending {
@@ -30,11 +32,19 @@ public abstract class Pending {
      * Envoie la pendingList au serveur pour traitement
      */
     public static void send(SyncListener syncListener, Context context) {
+        Log.i(App.TAG, "test : Pending.send ");
+        // Récupération des actions en attente au format JSON
         String json = toJson();
+        // S'il y a des actions en attente
         if (json != null) {
+            // On les sauvegarde dans l'attente de l'envoi
             save(context);
+            // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
             SyncFactory.getInstance(context).synchronize(syncListener, context, json);
-            // TODO envoi des pending + save null si réussi (sinon rien)
+        } else {
+            // Lorsqu'il n'y a pas d'actions en attente
+            // On se contente de demander la nouvelle version des devoirs
+            SyncFactory.getInstance(context).getVersion(syncListener, context);
         }
     }
 
