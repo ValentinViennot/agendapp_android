@@ -36,7 +36,6 @@ public class Work {
     private static List<Work> comingwork;
     private static List<Work> pastwork;
 
-
     /** ID dans la base */
     private int id;
     /** ID de l'auteur */
@@ -74,7 +73,8 @@ public class Work {
         editor.apply();
     }
 
-    public static void setPastwork(Context context, String json, String version) {
+
+    public static void setPastwork(Context context, String json) {
         pastwork = ParseFactory.parseWork(json);
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
