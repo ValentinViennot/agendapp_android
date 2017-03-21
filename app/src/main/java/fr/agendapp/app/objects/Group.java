@@ -29,6 +29,7 @@ public abstract class Group {
 
     public Group(int type) {
         this.type = type;
+        this.isUser = true;
     }
 
     /**

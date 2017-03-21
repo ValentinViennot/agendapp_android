@@ -27,4 +27,11 @@
     <string name="vendredi">Vendredi</string>
     <string name="samedi">Samedi</string>
     <string name="dimanche">Dimanche</string>
+
+    <!-- Boutons -->
+    <string name="button_moreCard">Menu</string>
+    <string name="button_flag">Drapeau</string>
+    <string name="button_delete">Supprimer</string>
+    <string name="button_done">Marquer comme fait</string>
+    <string name="button_undone">Marquer comme à faire</string>
 </resources>
