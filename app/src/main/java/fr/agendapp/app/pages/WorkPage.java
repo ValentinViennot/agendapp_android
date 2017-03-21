@@ -1,5 +1,7 @@
 package fr.agendapp.app.pages;
 
+
+import android.content.SharedPreferences;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,10 +23,21 @@ import java.util.TimerTask;
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.objects.Invite;
+import fr.agendapp.app.objects.Section;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.Pending;
+import fr.agendapp.app.objects.Filter;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Page (Vue) d'affichage des devoirs à faire
@@ -32,13 +45,19 @@ import fr.agendapp.app.objects.Work;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
+    final int MAX_FILTERS;
     protected List<Header> headers;
     protected List<Header> subheaders;
     protected List<Work> homeworks;
-
     protected DoubleHeaderAdapter adapter;
     // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
     protected Timer timer = new Timer();
+    // tableau 2D de filtres
+    // Filter[] chaque case de ce tableau doit être vérifiée
+    // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
+    // Il suffit qu'une seule condition j de Filter[i][j] soit validée pour que la condition i soit validée
+    Filter[][] filters = new Filter[Filter.NB_TYPES][MAX_FILTERS];
+    List<Work> homeworks;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -187,6 +206,77 @@ public class WorkPage extends Fragment implements SyncListener {
         return subheaders;
     }
 
+    List<Work> applyFilters2() {
+        List<Work> r;
+        // Pour chaque devoir
+        for (Work w : homeworks) {
+            if (validateFilters(w)) r.add(w);
+        }
+    }
+
+    /**
+     * @return true si le devoir valide les conditions Filter[][]
+     */
+    boolean validateFilters(Work w) {
+        // Pour chaque groupe de filtres
+        for (int i = 0; i < filters.length; ++i) {
+            if (filters[i] != null) {
+                // Le devoir doit correspondre à au moins un filtre du groupe
+                // On suppose que c'est faux
+                boolean b = false;
+                int j = 0;
+                // Tant que c'est faux, on continue d'essayer de le montrer
+                // Jusqu'à avoir testé tous les filtres du groupe
+                while (!b && j < filters[i].length) {
+                    // Si le devoir correspond au filtre
+                    // b vaudra true
+                    // la boucle s'arrêtera
+                    // et on testera le groupe suivant
+                    if (filters[i][j] != null)
+                        b = filters[i][j].correspond(w);
+                    // Filtre suivant
+                    j++;
+                }
+                // Si ce groupe de filtre n'est pas validé, rien ne sert de tester les suivants
+                // le devoir ne correspond pas
+                if (!b) return false;
+            }
+        }
+        // Si la méthode n'a jamais renvoyé false, alors le devoir correspond
+        return true;
+    }
+
+    /**
+     * Ajout d'un filtre
+     * Exemple d'utilisation :
+     * addFilter(new FilterFlag(2))
+     * pour filter sur les devoirs possédant un drapeau de couleur 2
+     */
+    void addFilter(Filter filter) {
+        // Pour le type de filtre demandé
+        boolean intermediaire==true;
+        for (int i = 0; i < filters[filter.getType()].length; ++i) {
+            // On cherche la première case non nulle
+            if (filters[filter.getType()][i] != null) {
+                // On y ajoute le filtre
+                filters[filter.getType()][i] = filter;
+                intermediaire = false;
+                // Quitte la méthode
+                return;
+            }
+        }
+        if (intermediaire) {
+            System.out.println("Erreur : Trop de filtres, limite a +"MAX_FILTERS)
+        }
+        // Si la méthode n'a pas été quittée, il y a eu une erreur
+        // TODO ajouter une notification d'erreur (ex "Trop de filtres : Limité à MAX_FILTERS !")
+        //FAIT
+    }
+
+    void clearFilter(Filter filter) {
+        filter = null;
+    }
+
     protected class SyncTask extends AsyncTask<Void, Integer, Void> {
 
         ProgressDialog progressDialog;
@@ -219,5 +309,5 @@ public class WorkPage extends Fragment implements SyncListener {
             progressDialog.dismiss();
         }
     }
-}
 
+}

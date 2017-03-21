@@ -8,6 +8,8 @@ import fr.agendapp.app.pages.SyncListener;
 
 public abstract class Pending {
 
+    // private static List<Pending> pending;
+
     /**
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
@@ -54,7 +56,8 @@ public abstract class Pending {
         PendFLAG.clearList(context);
     }
 
-    private static String toJson() {
+
+    public static String toJson() {
         // TODO
         boolean first = true;
         int size = 0;
@@ -85,6 +88,5 @@ public abstract class Pending {
         json+="]";
         return size > 0 ? json : null;
     }
-
 
 }
