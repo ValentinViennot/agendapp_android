@@ -29,12 +29,13 @@ public class PendMERGE extends Pending {
     }
 
     public String toString() {
-        String json = "";
-        for (PendMERGE p : pending) {
-            json += ids;
+        String json = "[";
+        for (int i = 0; i < ids.length; i++) {
+            json += ids[i];
             json += ",";
         }
+        json = json.substring(0, json.length() - 1); // supprime la dernière virgule
+        json += "]";
         return json;
-
     }
 }

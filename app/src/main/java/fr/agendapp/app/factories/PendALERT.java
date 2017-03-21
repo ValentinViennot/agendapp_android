@@ -32,10 +32,7 @@ public class PendALERT extends Pending {
      * @return représentation JSON de l'action PendALERT
      */
     public String toString() {
-        String json = "";
-        json += id;
-        json += ",";
-        return json;
+        return ("" + id);
     }
 
 

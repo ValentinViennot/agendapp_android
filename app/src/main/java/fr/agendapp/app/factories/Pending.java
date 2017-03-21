@@ -49,16 +49,4 @@ abstract class Pending {
         return json;
     }
 
-    /** abstract static String getList(List<Pending>pending) {
-     ListIterator<Pending> i = pending.listIterator();
-     String json = "[";
-     while (i.hasNext()) {
-     json += i.next();
-     if (i.hasNext()) json += ",";
-     }
-     json+="]";
-     return json;
-     }
-     **/
-
 }
