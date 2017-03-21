@@ -4,7 +4,14 @@
     <color name="colorPrimaryDark">#D32F2F</color>
     <color name="colorAccent">#7C4DFF</color>
     <color name="colorLight">#FFCDD2</color>
+    <color name="colorDarkText">#000000</color>
     <color name="colorText">#FFFFFF</color>
     <color name="colorSecondaryText">#727272</color>
     <color name="colorDivider">#B6B6B6</color>
+
+    <!-- flag colors -->
+    <color name="flag_grey">#999999</color>
+    <color name="flag_blue">#4178BE</color>
+    <color name="flag_orange">#FF7832</color>
+    <color name="flag_red">#E71D32</color>
 </resources>

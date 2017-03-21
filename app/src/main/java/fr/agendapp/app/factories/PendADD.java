@@ -1,8 +1,11 @@
 package fr.agendapp.app.factories;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.TimeZone;
+
+import fr.agendapp.app.objects.Work;
 
 class PendADD extends Pending {
 
@@ -20,9 +23,8 @@ class PendADD extends Pending {
      * Constructeur de PendADD :
      */
     public PendADD(Date date, String text, int groupe) {
-        DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-        format.setTimeZone(TimeZone.getTimeZone("GMT"));
-        this.date = format.format(date) + "+02:00";
+        Work.dateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        this.date = Work.dateformat.format(date) + "+02:00";
         this.text = text;
         this.groupe = groupe;
         pending.add(this);

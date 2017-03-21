@@ -1,5 +1,7 @@
 package fr.agendapp.app.objects;
 
+import android.content.Context;
+
 /**
  * TODO
  * @author Dylan Habans
@@ -64,10 +66,21 @@ public class User {
     }
 
     /**
+     * Initialise l'utilisateur actuel
+     */
+    public static void init(Context context) {
+        // TODO
+        // init from local storage
+        // get a new version from server
+    }
+
+    /**
      * @return Utilisateur actif
      */
-    public static User getActive() {
-        // TODO
+    public static User getInstance() {
+        // TODO seule cette méthode et init devraient etre statique
+        // TODO devrait retourner null si rien de sauvegardé...
+        // TODO comme sync
         return user;
     }
 
