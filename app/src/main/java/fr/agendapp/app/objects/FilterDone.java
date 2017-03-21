@@ -12,6 +12,6 @@ public class FilterDone extends Filter {
     }
 
     boolean correspond(Work w) {
-        return (w.isDone() == this.done);
+        return (w.isDone()==this.done);
     }
 }

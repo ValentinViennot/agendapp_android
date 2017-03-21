@@ -12,6 +12,6 @@ public class FilterDate extends Filter {
     }
 
     boolean correspond(Work w) {
-        return (w.getDate() == this.date);
+        return (w.getDate()==this.date);
     }
 }

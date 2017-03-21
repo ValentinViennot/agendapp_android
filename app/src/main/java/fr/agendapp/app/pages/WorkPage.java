@@ -1,6 +1,7 @@
 package fr.agendapp.app.pages;
 
 
+import android.content.SharedPreferences;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -22,11 +23,21 @@ import java.util.TimerTask;
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.objects.Invite;
+import fr.agendapp.app.objects.Section;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.Pending;
 import fr.agendapp.app.objects.Filter;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Page (Vue) d'affichage des devoirs à faire
@@ -201,7 +212,6 @@ public class WorkPage extends Fragment implements SyncListener {
         for (Work w : homeworks) {
             if (validateFilters(w)) r.add(w);
         }
-        return r;
     }
 
     /**

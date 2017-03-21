@@ -12,6 +12,6 @@ public class FilterFlag extends Filter {
     }
 
     boolean correspond(Work w) {
-        return (w.getFlag() == this.flag);
+        return (w.getFlag()==this.flag);
     }
 }

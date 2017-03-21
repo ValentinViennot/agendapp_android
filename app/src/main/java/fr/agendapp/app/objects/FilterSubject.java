@@ -12,6 +12,6 @@ public class FilterSubject extends Filter {
     }
 
     boolean correspond(Work w) {
-        return (w.getSubject() == this.subject);
+        return (w.getSubject()==this.subject);
     }
 }

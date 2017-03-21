@@ -35,7 +35,6 @@ public class Work {
     public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private static List<Work> comingwork;
     private static List<Work> pastwork;
-
     /** ID dans la base */
     private int id;
     /** ID de l'auteur */
@@ -53,7 +52,7 @@ public class Work {
     /** Nombre de marqué comme faits */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    private int fait;
+    private boolean fait;
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
@@ -107,6 +106,8 @@ public class Work {
         // TODO
         return false;
     }
+
+    // GETTERS
 
     /**
      * Supprime le devoir
@@ -164,6 +165,10 @@ public class Work {
         return texte;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
     public int getNbDone() {
         return nb_fait;
     }
@@ -182,20 +187,6 @@ public class Work {
 
     public ArrayList<Attachment> getAttachments() {
         return pjs;
-    }
-
-    /**
-     * @return Vrai si l'utilisateur actif est l'auteur de ce devoir
-     */
-    public boolean isUser() {
-        return User.getInstance().getId() == this.getUser();
-    }
-
-    /**
-     * @return Vrai si le devoir est publié sur l'Agendapp
-     */
-    public boolean isPublished() {
-        return this.getId() > 0;
     }
 
     /**
@@ -259,5 +250,6 @@ public class Work {
             nb = "" + w.getComments().size();
             nbComm.setText(nb);
         }
+
     }
 }

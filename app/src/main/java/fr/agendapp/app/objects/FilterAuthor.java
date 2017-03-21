@@ -12,6 +12,6 @@ public class FilterAuthor extends Filter {
     }
 
     boolean correspond(Work w) {
-        return (w.getUser() == this.user);
+        return (w.getUser()==this.user);
     }
 }
