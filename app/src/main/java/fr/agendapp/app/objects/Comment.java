@@ -30,7 +30,7 @@ public class Comment {
      * @return true si réussite
      */
     public boolean delete() {
-        if (User.getActive().getId() == this.user) {
+        if (User.getInstance().getId() == this.user) {
             // TODO
             return false;
         } else {
