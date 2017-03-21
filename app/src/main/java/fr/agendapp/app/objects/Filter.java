@@ -48,7 +48,7 @@ public class Filter {
         static final int NB_TYPES = 6;
 
         // Chaine de caractère contenue dans le texte du devoir
-        static final int USER_FILTER = 0;
+        static final int USER_TYPE = 0;
         // Drapeau correspond
         static final int FLAG_TYPE = 1;
         // Matière correspond
