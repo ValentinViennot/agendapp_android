@@ -1,6 +1,5 @@
 package fr.agendapp.app.pages;
 
-
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -42,7 +41,7 @@ public class WorkPage extends Fragment {
 
     Invite[] invits;
 
-    static List<Work> homeworks;
+    static LinkedList<Work> homeworks;
     // TODO penser l'affichage d'une liste de section contenant elles même une liste de devoirs
 
     Section[] sections;
@@ -226,5 +225,55 @@ public class WorkPage extends Fragment {
         filter=null;
     }
 
+    //Methode qui compare deux LinkedList de devoirs et met à jour l'ancienne à partir de la nouvelle
+    public void updateWorks(LinkedList<Work> liste){
+        for (Work w : liste ){
+            if (!w.appearsIn(getHomeworks())) {
+                getHomeworks().add(w);
+            }
+        }
+        for (Work w2 : getHomeworks()){
+            if (!w2.appearsIn(liste)){
+                getHomeworks().remove(getHomeworks().indexOf(w2));
+            }
+        }
+
+    }
+
+    public static String getType() {
+        return type;
+    }
+
+    public Filter getFilter() {
+        return filter;
+    }
+
+    public String getAutofilter() {
+        return autofilter;
+    }
+
+    public Invite[] getInvits() {
+        return invits;
+    }
+
+    public static LinkedList<Work> getHomeworks() {
+        return homeworks;
+    }
+
+    public void getLinkedList() {
+        return LinkedList;
+    }
+
+    public Section[] getSections() {
+        return sections;
+    }
+
+    public int getMAX_FILTERS() {
+        return MAX_FILTERS;
+    }
+
+    public Filter[][] getFilters() {
+        return filters;
+    }
 }
 

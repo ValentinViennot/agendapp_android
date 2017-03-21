@@ -7,17 +7,13 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -52,7 +48,7 @@ public class Work {
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
-    private ArrayList<Comment> commentaires;
+    private LinkedList<Comment> commentaires;
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
@@ -167,7 +163,7 @@ public class Work {
         return flag;
     }
 
-    public ArrayList<Comment> getComments() {
+    public LinkedList<Comment> getComments() {
         return commentaires;
     }
 
@@ -195,4 +191,32 @@ public class Work {
         }
 
     }
+    //Méthode permettant de savoir si deux devoirs ont le même ID
+    public boolean equals(Work w){
+        return (this.getId()==w.getId());
+    }
+
+    //Méthode permettant de voir si un devoir a été modifié
+    public boolean modified(Work w) {
+        if (this.equals(w)) {
+            return (this.getFlag() != w.getFlag() || this.isDone() != w.isDone() || this.getSubjectColor() != w.getSubjectColor()
+                    || this.getNbDone() != w.getNbDone() || this.getComments().getLast().getId() != w.getComments().getLast().getId());
+        } else {
+            return false;
+        }
+    }
+
+    //Méthode permettant de voir si un devoir apparait dans une LinkedList de devoirs
+    public boolean appearsIn(LinkedList<Work> liste){
+        boolean res = false;
+        for (Work w : liste){
+            if (this.equals(w) && !this.modified(w)){
+            res = true;
+            break;
+            }
+        }
+        return res;
+    }
+
+
 }
