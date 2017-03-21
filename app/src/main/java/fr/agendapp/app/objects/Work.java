@@ -1,15 +1,29 @@
 package fr.agendapp.app.objects;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.GridView;
+import android.widget.ImageButton;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Locale;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.ParseFactory;
+
+import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Représente un devoir
@@ -17,6 +31,10 @@ import fr.agendapp.app.R;
  * @author Valentin Viennot
  */
 public class Work {
+
+    public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+    private static List<Work> comingwork;
+    private static List<Work> pastwork;
 
     /** ID dans la base */
     private int id;
@@ -27,7 +45,7 @@ public class Work {
     /** Nom de la matière */
     private String matiere;
     /** Couleur associée la matière */
-    private Color matiere_c;
+    private String matiere_c;
     /** Texte du devoir */
     private String texte;
     /** Date d'échéance */
@@ -35,7 +53,7 @@ public class Work {
     /** Nombre de marqué comme faits */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    private boolean fait;
+    private int fait;
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
@@ -43,8 +61,42 @@ public class Work {
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
-    public Work(String auteur) {
-        this.auteur = auteur;
+    public Work() {
+    }
+
+    public static void setComingwork(Context context, String json, String version) {
+        comingwork = ParseFactory.parseWork(json);
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("devoirs", json);
+        editor.putString("versionD", version);
+        editor.apply();
+    }
+
+
+    public static void setPastwork(Context context, String json) {
+        pastwork = ParseFactory.parseWork(json);
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("archives", json);
+        editor.putString("versionA", version);
+        editor.apply();
+    }
+
+    public static List<Work> getPastwork(Context activity) {
+        if (pastwork == null) {
+            SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
+            pastwork = ParseFactory.parseWork(preferences.getString("archives", "[]"));
+        }
+        return pastwork;
+    }
+
+    public static List<Work> getComingwork(Context activity) {
+        if (comingwork == null) {
+            SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
+            comingwork = ParseFactory.parseWork(preferences.getString("devoirs", "[]"));
+        }
+        return comingwork;
     }
 
     /**
@@ -55,8 +107,6 @@ public class Work {
         // TODO
         return false;
     }
-
-    // GETTERS
 
     /**
      * Supprime le devoir
@@ -76,35 +126,42 @@ public class Work {
         return false;
     }
 
-    // GETTERS
-    // TODO getters en doubles !!!
+    /**
+     * @param c Commentaire à ajouter au devoir
+     * @return true en cas de succes
+     */
+    boolean addComment(Comment c) {
+        // TODO
+        return false;
+    }
 
     public int getId() {
         return id;
-    }
-
-    public int getUser() {
-        return user;
     }
 
     public String getAuthor() {
         return auteur;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public int getUser() {
+        return user;
+    }
+
     public String getSubject() {
         return matiere;
     }
 
-    public Color getSubjectColor() {
-        return matiere_c;
+    public int getSubjectColor() {
+        if (matiere_c == null) matiere_c = "000000";
+        return Color.parseColor("#" + matiere_c);
     }
 
     public String getText() {
         return texte;
-    }
-
-    public Date getDate() {
-        return date;
     }
 
     public int getNbDone() {
@@ -112,7 +169,7 @@ public class Work {
     }
 
     public boolean isDone() {
-        return fait;
+        return fait > 0;
     }
 
     public int getFlag() {
@@ -127,37 +184,18 @@ public class Work {
         return pjs;
     }
 
-
-    public String getAuteur() {
-        return auteur;
+    /**
+     * @return Vrai si l'utilisateur actif est l'auteur de ce devoir
+     */
+    public boolean isUser() {
+        return User.getInstance().getId() == this.getUser();
     }
 
-    public String getMatiere() {
-        return matiere;
-    }
-
-    public Color getMatiere_c() {
-        return matiere_c;
-    }
-
-    public String getTexte() {
-        return texte;
-    }
-
-    public int getNb_fait() {
-        return nb_fait;
-    }
-
-    public boolean isFait() {
-        return fait;
-    }
-
-    public ArrayList<Comment> getCommentaires() {
-        return commentaires;
-    }
-
-    public ArrayList<Attachment> getPjs() {
-        return pjs;
+    /**
+     * @return Vrai si le devoir est publié sur l'Agendapp
+     */
+    public boolean isPublished() {
+        return this.getId() > 0;
     }
 
     /**
@@ -167,17 +205,59 @@ public class Work {
      */
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView name;
+        LayoutInflater inflater;
+
+        private CardView card;
+        private RelativeLayout cardHeader;
+        private TextView subject;
+        private TextView text;
+        private ImageButton flag;
+        private TextView nbDone;
+        private TextView nbComm;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.object_work, parent, false));
-            name = (TextView) itemView.findViewById(R.id.card_title);
+            this.inflater = inflater;
+            card = (CardView) itemView.findViewById(R.id.card_view);
+            cardHeader = (RelativeLayout) itemView.findViewById(R.id.card_header);
+            subject = (TextView) itemView.findViewById(R.id.card_subject);
+            text = (TextView) itemView.findViewById(R.id.card_text);
+            flag = (ImageButton) itemView.findViewById(R.id.card_flag);
+            nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
+            nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
         }
 
         public void setWork(Work w) {
-            // textview.setText() et compagnie
-            name.setText(w.auteur);
+            // Matière
+            subject.setText(w.getSubject());
+//            subject.setTextColor(w.getSubjectColor());
+            cardHeader.setBackgroundColor(w.getSubjectColor());
+            // Texte du devoir
+            text.setText(w.getText());
+            // Drapeau / Marqueur
+            int color;
+            switch (w.getFlag()) {
+                case 1:
+                    color = Color.parseColor("#4178BE");
+                    break;
+                case 2:
+                    color = Color.parseColor("#FF7832");
+                    break;
+                case 3:
+                    color = Color.parseColor("#E71D32");
+                    break;
+                default:
+                    color = Color.parseColor("#999999");
+            }
+            flag.setColorFilter(color);
+            // Pièces jointes
+            GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
+            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
+            // Footer
+            String nb = "" + w.getNbDone();
+            nbDone.setText(nb);
+            nb = "" + w.getComments().size();
+            nbComm.setText(nb);
         }
-
     }
 }
