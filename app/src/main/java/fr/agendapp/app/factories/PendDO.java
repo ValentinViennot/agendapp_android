@@ -8,11 +8,12 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-class PendDO extends Pending {
+public class PendDO extends Pending {
 
     private static String name = "pendDO";
     private static List<PendDO> pending;
@@ -30,6 +31,10 @@ class PendDO extends Pending {
         this.id = id;
         this.done = done;
         pending.add(this);
+    }
+
+    public PendDO(Work w) {
+        this(w.getId(), w.isDone());
     }
 
     /**

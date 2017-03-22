@@ -1,13 +1,8 @@
 package fr.agendapp.app.objects;
 
-import java.util.List;
+public abstract class Filter {
 
-/**
- * Created by Charline on 14/03/2017.
- */
-abstract class Filter {
-
-    static final int NB_TYPES = 6;
+    public static final int NB_TYPES = 6;
 
     // Chaine de caractère contenue dans le texte du devoir
     static final int USER_TYPE = 0;
@@ -25,16 +20,16 @@ abstract class Filter {
     // Permet de regrouper les filtres de même types dans une même condition ET
     int type;
 
-    Filter(int type) {
+    public Filter(int type) {
         this.type = type;
     }
 
     /**
      * @return true si le devoir correspond au filtre
      */
-    abstract boolean correspond(Work w);
+    public abstract boolean correspond(Work w);
 
-    int getType() {
+    public int getType() {
         return this.type;
     }
 }

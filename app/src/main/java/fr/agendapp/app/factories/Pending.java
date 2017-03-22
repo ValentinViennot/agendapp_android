@@ -25,6 +25,7 @@ public abstract class Pending {
         PendCOMM.initList(context);
         PendALERT.initList(context);
         PendMERGE.initList(context);
+        PendADD.initList(context);
     }
 
     /**
@@ -39,6 +40,7 @@ public abstract class Pending {
         PendCOMM.saveList(context);
         PendALERT.saveList(context);
         PendMERGE.saveList(context);
+        PendADD.saveList(context);
     }
 
     /**
@@ -54,6 +56,7 @@ public abstract class Pending {
         PendCOMM.clearList(context);
         PendALERT.clearList(context);
         PendMERGE.clearList(context);
+        PendADD.clearList(context);
     }
 
     /**

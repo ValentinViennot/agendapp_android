@@ -22,6 +22,7 @@ import java.util.Locale;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.factories.PendDO;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -52,7 +53,7 @@ public class Work {
     /** Nombre de marqué comme faits */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    private boolean fait;
+    private int fait;
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
@@ -63,6 +64,13 @@ public class Work {
     public Work() {
     }
 
+    /**
+     * Devoirs à venir
+     *
+     * @param context Android Context
+     * @param json    Représentation JSON de la liste de devoirs
+     * @param version Chaine de version
+     */
     public static void setComingwork(Context context, String json, String version) {
         comingwork = ParseFactory.parseWork(json);
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
@@ -72,8 +80,14 @@ public class Work {
         editor.apply();
     }
 
-
-    public static void setPastwork(Context context, String json) {
+    /**
+     * Devoirs passés (archives)
+     *
+     * @param context Android Context
+     * @param json    Représentation JSON de la liste de devoirs
+     * @param version Chaine de version
+     */
+    public static void setPastwork(Context context, String json, String version) {
         pastwork = ParseFactory.parseWork(json);
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -83,7 +97,9 @@ public class Work {
     }
 
     public static List<Work> getPastwork(Context activity) {
+        // Si la liste n'est pas définie
         if (pastwork == null) {
+            // On la récupére dans le stockage local de l'appareil
             SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
             pastwork = ParseFactory.parseWork(preferences.getString("archives", "[]"));
         }
@@ -100,11 +116,21 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
-     * @return true si le devoir est marqué comme fait par l'utilisateur, false sinon
      */
-    boolean done() {
-        // TODO
-        return false;
+    void done() {
+        // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
+        this.fait = 1 - this.fait;
+        if (this.isDone()) {
+            // le devoir vient d'être marqué comme fait
+            // On augmente le nombre de marqué comme fait de 1
+            this.nb_fait++;
+        } else {
+            // le devoir vient d'être marqué comme non fait
+            // On diminue le nombre de marqué comme fait de 1
+            this.nb_fait--;
+        }
+        // On ajoute l'action à la liste d'actions en attente
+        new PendDO(this);
     }
 
     // GETTERS
@@ -142,10 +168,6 @@ public class Work {
 
     public String getAuthor() {
         return auteur;
-    }
-
-    public Date getDate() {
-        return date;
     }
 
     public int getUser() {

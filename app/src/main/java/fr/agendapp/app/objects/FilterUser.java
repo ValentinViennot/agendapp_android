@@ -6,12 +6,12 @@ package fr.agendapp.app.objects;
 public class FilterUser extends Filter {
     String txt;
 
-    FilterUser(String txt) {
+    public FilterUser(String txt) {
         super(Filter.USER_TYPE);
         this.txt = txt;
     }
 
-    boolean correspond(Work w) {
+    public boolean correspond(Work w) {
         int i = w.getText().lastIndexOf(txt);
         return i != -1;
     }
