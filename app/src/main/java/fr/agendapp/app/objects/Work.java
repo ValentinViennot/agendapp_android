@@ -119,6 +119,7 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
+     * TODO ne déclenche pas un update immédiat (ni de l'affichage ni de synchro)
      */
     void done() {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
