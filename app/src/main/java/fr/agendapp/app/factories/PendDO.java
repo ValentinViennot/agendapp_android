@@ -9,6 +9,9 @@ import java.util.ListIterator;
 
 import fr.agendapp.app.App;
 
+/**
+ * @author Dylan Habans
+ */
 class PendDO extends Pending {
 
     private static String name = "pendDO";
