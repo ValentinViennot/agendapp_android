@@ -1,12 +1,23 @@
 package fr.agendapp.app.factories;
 
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import fr.agendapp.app.App;
+
+/**
+ * @author Dylan Habans
+ */
 public class PendMERGE extends Pending {
 
     private static List<PendMERGE> pending;
+    private static String name = "pendMERGE";
+
     private int[] ids;
 
     public PendMERGE(int[] ids) {
@@ -26,6 +37,31 @@ public class PendMERGE extends Pending {
         }
         json += "]";
         return json;
+    }
+
+    static void initList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        pending = ParseFactory.parsePendMERGE(preferences.getString(name, "[]"));
+    }
+
+    static void saveList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(name, getList());
+        editor.apply();
+    }
+
+    static void clearList(Context context) {
+        pending = new LinkedList<>();
+        saveList(context);
+    }
+
+    static int size() {
+        return pending.size();
+    }
+
+    public static String getName() {
+        return name;
     }
 
     public String toString() {

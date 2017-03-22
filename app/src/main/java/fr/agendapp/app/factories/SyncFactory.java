@@ -70,6 +70,7 @@ public class SyncFactory {
      * @param t   Token d'identification aux APIs
      */
     public static synchronized void init(Context context, String t) {
+        Pending.init(context);
         if (instance != null)
             instance.setToken(t);
         else

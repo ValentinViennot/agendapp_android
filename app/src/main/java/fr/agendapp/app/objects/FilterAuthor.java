@@ -6,12 +6,12 @@ package fr.agendapp.app.objects;
 public class FilterAuthor extends Filter {
     int user;
 
-    FilterAuthor(int user) {
+    public FilterAuthor(int user) {
         super(Filter.AUTHOR_TYPE);
         this.user = user;
     }
 
-    boolean correspond(Work w) {
+    public boolean correspond(Work w) {
         return (w.getUser()==this.user);
     }
 }

@@ -55,4 +55,6 @@ public class App extends AppCompatActivity {
                 preferences.getString("user", "x").equals("x") || preferences.getString("token", "x").equals("x")
         );
     }
+
+    // TODO on destroy qui vide la liste de requetes http
 }
