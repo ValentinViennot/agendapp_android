@@ -5,8 +5,11 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -131,6 +134,7 @@ public class Work {
         }
         // On ajoute l'action à la liste d'actions en attente
         new PendDO(this);
+        Log.i(App.TAG, "done ID " + this.getId() + " is " + this.isDone());
     }
 
     // GETTERS
@@ -227,6 +231,7 @@ public class Work {
         private ImageButton flag;
         private TextView nbDone;
         private TextView nbComm;
+        private Button done;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.object_work, parent, false));
@@ -238,9 +243,10 @@ public class Work {
             flag = (ImageButton) itemView.findViewById(R.id.card_flag);
             nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
             nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
+            done = (Button) itemView.findViewById(R.id.button_done);
         }
 
-        public void setWork(Work w) {
+        public void setWork(final Work w) {
             // Matière
             subject.setText(w.getSubject());
 //            subject.setTextColor(w.getSubjectColor());
@@ -271,6 +277,13 @@ public class Work {
             nbDone.setText(nb);
             nb = "" + w.getComments().size();
             nbComm.setText(nb);
+
+            done.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    w.done();
+                }
+            });
         }
 
     }

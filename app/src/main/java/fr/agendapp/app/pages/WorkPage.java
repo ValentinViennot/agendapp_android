@@ -97,7 +97,6 @@ public class WorkPage extends Fragment implements SyncListener {
      * Calcule les en-têtes et leur emplacement en fonction de la liste de devoirs
      */
     protected void recalcSections() {
-        Log.i(App.TAG, "test : recalcSection ");
         // Réinitialisation de la liste de devoirs
         setHomeworks();
         // Réinitialisation des listes d'headers
@@ -146,10 +145,6 @@ public class WorkPage extends Fragment implements SyncListener {
         }
         if (month != null) month.setTo(i);
         if (day != null) day.setTo(i);
-        Log.i(App.TAG, "test : headers size : " + headers.size());
-        for (Header h : headers) Log.i(App.TAG, h.getTitle());
-        Log.i(App.TAG, "test : subheaders size : " + subheaders.size());
-        for (Header h : subheaders) Log.i(App.TAG, h.getTitle());
     }
 
     // TODO implémenter le filtrage avant le recalcSection
@@ -239,7 +234,6 @@ public class WorkPage extends Fragment implements SyncListener {
      * Planification d'une prochaine synchronisation dans x secondes
      */
     void planNextSync() {
-        Log.i(App.TAG, "test : plan next sync");
         // TODO Annuler une éventuelle ancienne planification (Pour ne pas accumuler en cas de MAJ forcée)
         // Planification de la mise à jour TODO ajuster la fréquence de synchro
         timer.schedule(new TimerTask() {
@@ -252,7 +246,6 @@ public class WorkPage extends Fragment implements SyncListener {
 
     @Override
     public void onSync() {
-        Log.i(App.TAG, "test : sync reussie");
         // En cas de réception de nouvelles données
         // On met à jour l'affichage de manière asynchrone
         SyncTask st = new SyncTask();
@@ -262,7 +255,6 @@ public class WorkPage extends Fragment implements SyncListener {
 
     @Override
     public void onSyncNotAvailable() {
-        Log.i(App.TAG, "test : sync not available");
         // Quand une synchronisation se termine sans nouvelles données
         onPostSync();
     }

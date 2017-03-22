@@ -82,7 +82,7 @@ public class PendDO extends Pending {
     public String toString() {
         String json = "{";
         json += "\"id\":" + id + ",";
-        json += "\"done\":" + (done ? "true" : "false");
+        json += "\"done\":" + (done ? 1 : 0);
         json += "}";
         return json;
     }

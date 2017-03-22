@@ -1,7 +1,9 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.util.Log;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.pages.SyncListener;
 
 /**
@@ -67,6 +69,7 @@ public abstract class Pending {
         String json = toJson();
         // S'il y a des actions en attente
         if (json != null) {
+            Log.i(App.TAG, "send JSON : " + json);
             // On les sauvegarde dans l'attente de l'envoi
             save(context);
             // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
@@ -87,7 +90,7 @@ public abstract class Pending {
         // Nombre d'actions en attente
         int size = 0;
         // Début du tableau de listes d'actions
-        String json = "[";
+        String json = "{";
         // Liste de devoirs marqués comme fait/non fait
         if (PendDO.size() > 0) {
             // On n'ajoute la liste que si elle contient des actions
@@ -149,7 +152,7 @@ public abstract class Pending {
             json += "\"" + PendMERGE.getName() + "\":" + PendMERGE.getList();
             // Cette liste est forcément la dernière si elle est ajoutée
         }
-        json+="]";
+        json += "}";
         return size > 0 ? json : null;
     }
 
