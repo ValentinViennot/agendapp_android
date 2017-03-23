@@ -6,12 +6,12 @@ package fr.agendapp.app.objects;
 public class FilterDone extends Filter {
     boolean done;
 
-    FilterDone(boolean done) {
+    public FilterDone(boolean done) {
         super(Filter.DONE_TYPE);
         this.done = done;
     }
 
-    boolean correspond(Work w) {
-        return (w.isDone() == this.done);
+    public boolean correspond(Work w) {
+        return (w.isDone()==this.done);
     }
 }

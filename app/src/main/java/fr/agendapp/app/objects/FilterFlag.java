@@ -6,12 +6,12 @@ package fr.agendapp.app.objects;
 public class FilterFlag extends Filter {
     int flag;
 
-    FilterFlag(int flag) {
+    public FilterFlag(int flag) {
         super(Filter.FLAG_TYPE);
         this.flag = flag;
     }
 
-    boolean correspond(Work w) {
-        return (w.getFlag() == this.flag);
+    public boolean correspond(Work w) {
+        return (w.getFlag()==this.flag);
     }
 }
