@@ -79,6 +79,7 @@ public abstract class Pending {
             // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
             SyncFactory.getInstance(context).synchronize(syncListener, context, json);
         } else {
+            Log.i(App.TAG, "Pas d'action en attente");
             // Lorsqu'il n'y a pas d'actions en attente
             // On se contente de demander la nouvelle version des devoirs
             // Mais on ne souhaite pas le faire aussi souvent que l'envoi des listes d'attente (pour économiser le réseau)
@@ -91,6 +92,8 @@ public abstract class Pending {
                 lifetime[i] = VERSION_LIFETIME;
                 // Lance une synchronisation
                 SyncFactory.getInstance(context).getVersion(syncListener, context);
+            } else {
+                syncListener.onSyncNotAvailable();
             }
         }
     }

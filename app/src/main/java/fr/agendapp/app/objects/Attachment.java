@@ -79,12 +79,12 @@ public class Attachment {
         );
     }
 
-    static class AttachmentAdapter extends BaseAdapter {
+    public static class AttachmentAdapter extends BaseAdapter {
 
         private List<Attachment> attachments;
         private LayoutInflater inflater;
 
-        AttachmentAdapter(List<Attachment> attachments, LayoutInflater inflater) {
+        public AttachmentAdapter(List<Attachment> attachments, LayoutInflater inflater) {
             this.attachments = attachments;
             this.inflater = inflater;
         }

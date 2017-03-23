@@ -155,22 +155,23 @@ public class SyncFactory {
      * @param version      Version requise des données
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version) {
-        Log.i(App.TAG, "test : GetWork ");
-        req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Ecrire la réponse au localStorage (SharedPreferences)
-                        if (syncListener.isArchives()) {
-                            Work.setPastwork(context, response, version);
-                        } else {
-                            Work.setComingwork(context, response, version);
+        if (context != null) {
+            req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // Ecrire la réponse au localStorage (SharedPreferences)
+                            if (syncListener.isArchives()) {
+                                Work.setPastwork(context, response, version);
+                            } else {
+                                Work.setComingwork(context, response, version);
+                            }
+                            // Notification qu'une nouvelle version des données a été synchronisée
+                            syncListener.onSync();
                         }
-                        // Notification qu'une nouvelle version des données a été synchronisée
-                        syncListener.onSync();
                     }
-                }
-        );
+            );
+        }
     }
 
     /**
@@ -180,26 +181,28 @@ public class SyncFactory {
      * @param context      Android Context
      */
     void getVersion(final SyncListener syncListener, final Context context) {
-        // Nom de la version à controler (Archives ou Devoirs)
-        final String name = "version" + (syncListener.isArchives() ? "A" : "D");
-        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        // Récupération de la version locale des données
-        final String version = preferences.getString(name, "0");
-        Log.i(App.TAG, "Version des données (" + (syncListener.isArchives() ? "A" : "D") + ") : " + version);
-        // Requete de la version distante
-        req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if (response.equals(version)) {
-                    // Si la version n'a pas changée, on notifie le SyncListener qui a appelé la mise à jour
-                    syncListener.onSyncNotAvailable();
-                } else {
-                    // Une nouvelle version des données est disponible
-                    Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
-                    getWork(syncListener, context, response);
+        if (context != null) {
+            // Nom de la version à controler (Archives ou Devoirs)
+            final String name = "version" + (syncListener.isArchives() ? "A" : "D");
+            SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+            // Récupération de la version locale des données
+            final String version = preferences.getString(name, "0");
+            Log.i(App.TAG, "Version des données (" + (syncListener.isArchives() ? "A" : "D") + ") : " + version);
+            // Requete de la version distante
+            req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (response.equals(version)) {
+                        // Si la version n'a pas changée, on notifie le SyncListener qui a appelé la mise à jour
+                        syncListener.onSyncNotAvailable();
+                    } else {
+                        // Une nouvelle version des données est disponible
+                        Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
+                        getWork(syncListener, context, response);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     /**
@@ -212,70 +215,76 @@ public class SyncFactory {
      * @param json Liste de requêtes à envoyer au format JSON
      */
     synchronized void synchronize(final SyncListener syncListener, final Context context, String json) {
-        // Si un envoi n'est pas déjà en cours
-        if (!lockpending) {
-            // On bloque l'envoi de listes d'actions
-            setLockpending(true);
-            // On commence par envoyer les actions en attente au serveur
-            req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // La liste de requêtes est bien parvenue au serveur
-                    // On nettoie la liste locale de requetes
-                    Pending.clear(context);
-                    // On débloque l'envoi de listes d'actions
-                    setLockpending(false);
-                    // On récupère les nouveaux devoirs si nécessaire (si des actions viennent d'être effectuées, cela le sera)
-                    getVersion(syncListener, context);
-                }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // En cas d'erreur d'envoi de la liste de requête
-                    // On débloque l'envoi de listes d'actions
-                    setLockpending(false);
-                    // On fait appel à la gestion d'erreur par défaut de SyncFactory
-                    errorListener.onErrorResponse(error);
-                }
-            });
+        if (context != null) {
+            // Si un envoi n'est pas déjà en cours
+            if (!lockpending) {
+                // On bloque l'envoi de listes d'actions
+                setLockpending(true);
+                // On commence par envoyer les actions en attente au serveur
+                req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // La liste de requêtes est bien parvenue au serveur
+                        // On nettoie la liste locale de requetes
+                        Pending.clear(context);
+                        // On débloque l'envoi de listes d'actions
+                        setLockpending(false);
+                        // On récupère les nouveaux devoirs si nécessaire (si des actions viennent d'être effectuées, cela le sera)
+                        getVersion(syncListener, context);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // En cas d'erreur d'envoi de la liste de requête
+                        // On débloque l'envoi de listes d'actions
+                        setLockpending(false);
+                        // On fait appel à la gestion d'erreur par défaut de SyncFactory
+                        errorListener.onErrorResponse(error);
+                    }
+                });
+            } else {
+                syncListener.onSyncNotAvailable();
+            }
         }
     }
 
     private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener, Response.ErrorListener errorListener) {
-        // créé la requête
-        Request req = new StringRequest(
-                // GET, POST, PUT, DELETE...
-                method,
-                // URL d'accès à l'API
-                baseUrl + api,
-                // Response Listener (classe contenant une méthode de callback en cas de succes)
-                listener,
-                // Error Listener : Que faire en cas d'erreur
-                errorListener
-        ) {
-            // Passage du token d'authentification en header de la requete HTTP
-            // Définition du format de transfert des données (JSON)
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                headers.put("Authorization", token);
-                return headers;
-            }
+        if (context != null) {
+            // créé la requête
+            Request req = new StringRequest(
+                    // GET, POST, PUT, DELETE...
+                    method,
+                    // URL d'accès à l'API
+                    baseUrl + api,
+                    // Response Listener (classe contenant une méthode de callback en cas de succes)
+                    listener,
+                    // Error Listener : Que faire en cas d'erreur
+                    errorListener
+            ) {
+                // Passage du token d'authentification en header de la requete HTTP
+                // Définition du format de transfert des données (JSON)
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Authorization", token);
+                    return headers;
+                }
 
-            // PostData
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
-            }
+                // PostData
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return postData.getBytes();
+                }
 
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-        };
-        // Ajout de la requête au "Thread HTTP"
-        getRequestQueue(context).add(req);
+                @Override
+                public String getBodyContentType() {
+                    return "application/json";
+                }
+            };
+            // Ajout de la requête au "Thread HTTP"
+            getRequestQueue(context).add(req);
+        }
     }
 
     /**

@@ -4,6 +4,7 @@
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
+    <string name="nav_archives">Archives</string>
 
     <!-- Mois de l'année -->
     <string name="janvier">Janvier</string>

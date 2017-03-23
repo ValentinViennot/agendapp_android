@@ -3,16 +3,7 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.support.v7.widget.CardView;
-import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -22,7 +13,6 @@ import java.util.List;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
-import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.factories.PendDO;
 
@@ -63,8 +53,13 @@ public class Work {
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
+    /**
+     * Constructeur par défaut (utilisé par Gson)
+     */
     public Work() {
     }
+
+    // STATIC RESOURCES
 
     /**
      * Devoirs à venir
@@ -116,11 +111,13 @@ public class Work {
         return comingwork;
     }
 
+    // SETTERS
+
     /**
      * Marque comme fait/non fait selon le statut actuel
      * TODO Déclencher update immédiat (ni de l'affichage ni de synchro)
      */
-    void done() {
+    public void done(Context context) {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
         this.fait = 1 - this.fait;
         if (this.isDone()) {
@@ -133,25 +130,27 @@ public class Work {
             this.nb_fait--;
         }
         // On ajoute l'action à la liste d'actions en attente
-        new PendDO(this);
+        new PendDO(context, this);
+        // DEBUG
+        Log.i(App.TAG, "ID " + this.getId() + " is " + this.isDone());
     }
-
-    // GETTERS
 
     /**
      * Supprime le devoir
+     * L'utilisateur doit en être le propriétaire
      * @return true si le devoir est supprimé par l'utilisateur, false sinon
      */
-    boolean delete() {
+    public boolean delete() {
         // TODO
         return false;
     }
 
     /**
      * Signale le devoir au modérateur
+     * L'utilisateur ne peut pas en être le propriétaire
      * @return true si le devoir est signalé par l'utilisateur, false sinon
      */
-    boolean report() {
+    public boolean report() {
         //TODO
         return false;
     }
@@ -160,10 +159,12 @@ public class Work {
      * @param c Commentaire à ajouter au devoir
      * @return true en cas de succes
      */
-    boolean addComment(Comment c) {
+    public boolean addComment(Comment c) {
         // TODO
         return false;
     }
+
+    // GETTERS
 
     public int getId() {
         return id;
@@ -175,6 +176,13 @@ public class Work {
 
     public int getUser() {
         return user;
+    }
+
+    /**
+     * @return true si l'utilisateur connecté est l'auteur du devoir
+     */
+    public boolean isUser() {
+        return user == User.getInstance().getId();
     }
 
     public String getSubject() {
@@ -214,76 +222,5 @@ public class Work {
         return pjs;
     }
 
-    /**
-     * Définition de l'affichage d'un devoir (UI)
-     * Quels widgets sont nécessaires pour l'affichage ?
-     * Comment sont affichées les données ? etc
-     */
-    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        LayoutInflater inflater;
-
-        private CardView card;
-        private RelativeLayout cardHeader;
-        private TextView subject;
-        private TextView text;
-        private ImageButton flag;
-        private TextView nbDone;
-        private TextView nbComm;
-        private Button done;
-
-        public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.object_work, parent, false));
-            this.inflater = inflater;
-            card = (CardView) itemView.findViewById(R.id.card_view);
-            cardHeader = (RelativeLayout) itemView.findViewById(R.id.card_header);
-            subject = (TextView) itemView.findViewById(R.id.card_subject);
-            text = (TextView) itemView.findViewById(R.id.card_text);
-            flag = (ImageButton) itemView.findViewById(R.id.card_flag);
-            nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
-            nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
-            done = (Button) itemView.findViewById(R.id.button_done);
-        }
-
-        public void setWork(final Work w) {
-            // Matière
-            subject.setText(w.getSubject());
-//            subject.setTextColor(w.getSubjectColor());
-            cardHeader.setBackgroundColor(w.getSubjectColor());
-            // Texte du devoir
-            text.setText(w.getText());
-            // Drapeau / Marqueur
-            int color;
-            switch (w.getFlag()) {
-                case 1:
-                    color = Color.parseColor("#4178BE");
-                    break;
-                case 2:
-                    color = Color.parseColor("#FF7832");
-                    break;
-                case 3:
-                    color = Color.parseColor("#E71D32");
-                    break;
-                default:
-                    color = Color.parseColor("#999999");
-            }
-            flag.setColorFilter(color);
-            // Pièces jointes
-            GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
-            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
-            // Footer
-            String nb = "" + w.getNbDone();
-            nbDone.setText(nb);
-            nb = "" + w.getComments().size();
-            nbComm.setText(nb);
-
-            done.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    w.done();
-                }
-            });
-        }
-
-    }
 }

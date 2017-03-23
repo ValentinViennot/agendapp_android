@@ -46,6 +46,7 @@ public class MainPage extends AppCompatActivity {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         // On ajoute la vue "WorkPage" à cette activité (MainPage)
         adapter.addFragment(new WorkPage(), getResources().getString(R.string.nav_devoirs));
+        adapter.addFragment(new ArchivesPage(), getResources().getString(R.string.nav_archives));
         // TODO page archives
         // adapter.addFragment(new WorkPage(), getResources().getString(R.string.nav_devoirs));
         viewPager.setAdapter(adapter);
