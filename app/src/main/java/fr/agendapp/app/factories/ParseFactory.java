@@ -35,8 +35,44 @@ public class ParseFactory {
         return gson.fromJson(json, collectionType);
     }
 
+    static List<PendDEL> parsePendDEL(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendDEL>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendDELc> parsePendDELc(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendDELc>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
     static List<PendFLAG> parsePendFLAG(String json) {
         Type collectionType = new TypeToken<LinkedList<PendFLAG>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendCOMM> parsePendCOMM(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendCOMM>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendALERT> parsePendALERT(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendALERT>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendADD> parsePendADD(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendADD>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    static List<PendMERGE> parsePendMERGE(String json) {
+        Type collectionType = new TypeToken<LinkedList<PendMERGE>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
