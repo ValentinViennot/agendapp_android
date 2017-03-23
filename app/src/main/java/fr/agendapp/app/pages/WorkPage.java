@@ -234,14 +234,13 @@ public class WorkPage extends Fragment implements SyncListener {
      * Planification d'une prochaine synchronisation dans x secondes
      */
     void planNextSync() {
-        // TODO Annuler une éventuelle ancienne planification (Pour ne pas accumuler en cas de MAJ forcée)
         // Planification de la mise à jour TODO ajuster la fréquence de synchro
         timer.schedule(new TimerTask() {
             @Override
             public void run() {
                 sync();
             }
-        }, 5000);
+        }, 2000);
     }
 
     @Override
@@ -292,7 +291,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * Cette classe interne permet de créer un processus séparé du processus principal dans lequel
      * seront retriées les nouvelles listes de données, les headers, etc.
      */
-    protected class SyncTask extends AsyncTask<Void, Integer, Void> {
+    private class SyncTask extends AsyncTask<Void, Integer, Void> {
 
         // Fenetre de dialogue de "chargement"/"loading"/spinner
         ProgressDialog progressDialog;

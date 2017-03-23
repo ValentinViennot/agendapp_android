@@ -40,6 +40,11 @@ public class SyncFactory {
     /** Callback universel en cas d'erreur avec une requête http */
     private Response.ErrorListener errorListener;
 
+    /**
+     * True si la liste de pending est en cours d'envoi
+     */
+    private boolean lockpending = false;
+
     // TODO gestion de l'hors connexion ?
 
     /**
@@ -79,7 +84,7 @@ public class SyncFactory {
 
     // Remarque : le mot clé "synchronized" permet de signifier que cette méthode ne peut pas être appelée deux fois en même temps
     // (Pendant son exécution un "verrou" permet d'empêcher une deuxième exécution)
-    public static synchronized SyncFactory getInstance(Context context) {
+    static synchronized SyncFactory getInstance(Context context) {
         if (instance == null)
             init(context,null);
         return instance;
@@ -174,8 +179,7 @@ public class SyncFactory {
      * @param syncListener Service à notifier en cas de changement de version
      * @param context      Android Context
      */
-    public void getVersion(final SyncListener syncListener, final Context context) {
-        Log.i(App.TAG, "test : GetVersion ");
+    void getVersion(final SyncListener syncListener, final Context context) {
         // Nom de la version à controler (Archives ou Devoirs)
         final String name = "version" + (syncListener.isArchives() ? "A" : "D");
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
@@ -198,22 +202,46 @@ public class SyncFactory {
         });
     }
 
+    /**
+     * Le mot clé 'synchronized' permet d'éviter que cette méthode soit exécutée deux fois simultanément, et donc d'envoyer
+     * deux fois la même liste d'actions au serveur.
+     * Comme cette méthode met en réalité une requête en attente elle est exécutée rapidement et ce n'est pas suffisant
+     * C'est pourquoi on passe par un attribut booleen pour tester si un envoi est en cours via cette instance de SyncFactory
+     * @param syncListener Callback
+     * @param context Android Context
+     * @param json Liste de requêtes à envoyer au format JSON
+     */
     synchronized void synchronize(final SyncListener syncListener, final Context context, String json) {
-        Log.i(App.TAG, "test : Synchronize ");
-        // On commence par envoyer les actions en attente au serveur
-        req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // La liste de requêtes est bien parvenue au serveur
-                // On nettoie la liste de requetes
-                Pending.clear(context);
-                // On récupère les nouveaux devoirs si nécessaire
-                getVersion(syncListener, context);
-            }
-        });
+        // Si un envoi n'est pas déjà en cours
+        if (!lockpending) {
+            // On bloque l'envoi de listes d'actions
+            setLockpending(true);
+            // On commence par envoyer les actions en attente au serveur
+            req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // La liste de requêtes est bien parvenue au serveur
+                    // On nettoie la liste locale de requetes
+                    Pending.clear(context);
+                    // On débloque l'envoi de listes d'actions
+                    setLockpending(false);
+                    // On récupère les nouveaux devoirs si nécessaire (si des actions viennent d'être effectuées, cela le sera)
+                    getVersion(syncListener, context);
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // En cas d'erreur d'envoi de la liste de requête
+                    // On débloque l'envoi de listes d'actions
+                    setLockpending(false);
+                    // On fait appel à la gestion d'erreur par défaut de SyncFactory
+                    errorListener.onErrorResponse(error);
+                }
+            });
+        }
     }
 
-    private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener) {
+    private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener, Response.ErrorListener errorListener) {
         // créé la requête
         Request req = new StringRequest(
                 // GET, POST, PUT, DELETE...
@@ -251,6 +279,13 @@ public class SyncFactory {
     }
 
     /**
+     * Ajoute une requête avec le ErrorListener par défaut
+     */
+    private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener) {
+        req(context, api, method, postData, listener, errorListener);
+    }
+
+    /**
      * @param context Contexte depuis lequel sera récupéré l'ApplicationContext
      * @return File d'attente HTTP
      */
@@ -260,5 +295,9 @@ public class SyncFactory {
             mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return mRequestQueue;
+    }
+
+    private void setLockpending(boolean b) {
+        lockpending=b;
     }
 }

@@ -26,10 +26,14 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<Work.ViewHolder> implemen
     private List<Header> subheaders;
 
     DoubleHeaderAdapter(WorkPage wp) {
-        updateList(wp);
+        this.homeworks = wp.getHomeworks();
+        this.headers = wp.getHeaders();
+        this.subheaders = wp.getSubheaders();
     }
 
     void updateList(WorkPage wp) {
+        // TODO utiliser la méthode d'update de this.homeworks seulement où il y a eu des changements
+        // TODO exécuter cette méthode dans un thread
         this.homeworks = wp.getHomeworks();
         this.headers = wp.getHeaders();
         this.subheaders = wp.getSubheaders();

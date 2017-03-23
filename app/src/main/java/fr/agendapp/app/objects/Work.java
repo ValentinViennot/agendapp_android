@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -119,7 +118,7 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
-     * TODO ne déclenche pas un update immédiat (ni de l'affichage ni de synchro)
+     * TODO Déclencher update immédiat (ni de l'affichage ni de synchro)
      */
     void done() {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
@@ -135,7 +134,6 @@ public class Work {
         }
         // On ajoute l'action à la liste d'actions en attente
         new PendDO(this);
-        Log.i(App.TAG, "done ID " + this.getId() + " is " + this.isDone());
     }
 
     // GETTERS
