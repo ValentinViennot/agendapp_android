@@ -1,15 +1,21 @@
 package fr.agendapp.app.factories;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.TimeZone;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.objects.Work;
 
 class PendADD extends Pending {
 
     private static List<PendADD> pending;
+    private static String name = "pendADD";
 
     private String date;
     private String text;
@@ -42,6 +48,31 @@ class PendADD extends Pending {
         }
         json += "]";
         return json;
+    }
+
+    static void initList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        pending = ParseFactory.parsePendADD(preferences.getString(name, "[]"));
+    }
+
+    static void saveList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(name, getList());
+        editor.apply();
+    }
+
+    static void clearList(Context context) {
+        pending = new LinkedList<>();
+        saveList(context);
+    }
+
+    static int size() {
+        return pending.size();
+    }
+
+    public static String getName() {
+        return name;
     }
 
     /**

@@ -5,8 +5,11 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.RelativeLayout;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.factories.PendDO;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -48,7 +52,7 @@ public class Work {
     /** Nombre de marqué comme faits */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
-    private boolean fait;
+    private int fait;
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
@@ -59,6 +63,13 @@ public class Work {
     public Work() {
     }
 
+    /**
+     * Devoirs à venir
+     *
+     * @param context Android Context
+     * @param json    Représentation JSON de la liste de devoirs
+     * @param version Chaine de version
+     */
     public static void setComingwork(Context context, String json, String version) {
         comingwork = ParseFactory.parseWork(json);
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
@@ -68,8 +79,14 @@ public class Work {
         editor.apply();
     }
 
-
-    public static void setPastwork(Context context, String json) {
+    /**
+     * Devoirs passés (archives)
+     *
+     * @param context Android Context
+     * @param json    Représentation JSON de la liste de devoirs
+     * @param version Chaine de version
+     */
+    public static void setPastwork(Context context, String json, String version) {
         pastwork = ParseFactory.parseWork(json);
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -79,7 +96,9 @@ public class Work {
     }
 
     public static List<Work> getPastwork(Context activity) {
+        // Si la liste n'est pas définie
         if (pastwork == null) {
+            // On la récupére dans le stockage local de l'appareil
             SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
             pastwork = ParseFactory.parseWork(preferences.getString("archives", "[]"));
         }
@@ -96,11 +115,23 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
-     * @return true si le devoir est marqué comme fait par l'utilisateur, false sinon
+     * TODO ne déclenche pas un update immédiat (ni de l'affichage ni de synchro)
      */
-    boolean done() {
-        // TODO
-        return false;
+    void done() {
+        // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
+        this.fait = 1 - this.fait;
+        if (this.isDone()) {
+            // le devoir vient d'être marqué comme fait
+            // On augmente le nombre de marqué comme fait de 1
+            this.nb_fait++;
+        } else {
+            // le devoir vient d'être marqué comme non fait
+            // On diminue le nombre de marqué comme fait de 1
+            this.nb_fait--;
+        }
+        // On ajoute l'action à la liste d'actions en attente
+        new PendDO(this);
+        Log.i(App.TAG, "done ID " + this.getId() + " is " + this.isDone());
     }
 
     // GETTERS
@@ -138,10 +169,6 @@ public class Work {
 
     public String getAuthor() {
         return auteur;
-    }
-
-    public Date getDate() {
-        return date;
     }
 
     public int getUser() {
@@ -201,6 +228,7 @@ public class Work {
         private ImageButton flag;
         private TextView nbDone;
         private TextView nbComm;
+        private Button done;
 
         public ViewHolder(LayoutInflater inflater, ViewGroup parent) {
             super(inflater.inflate(R.layout.object_work, parent, false));
@@ -212,9 +240,10 @@ public class Work {
             flag = (ImageButton) itemView.findViewById(R.id.card_flag);
             nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
             nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
+            done = (Button) itemView.findViewById(R.id.button_done);
         }
 
-        public void setWork(Work w) {
+        public void setWork(final Work w) {
             // Matière
             subject.setText(w.getSubject());
 //            subject.setTextColor(w.getSubjectColor());
@@ -245,6 +274,13 @@ public class Work {
             nbDone.setText(nb);
             nb = "" + w.getComments().size();
             nbComm.setText(nb);
+
+            done.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    w.done();
+                }
+            });
         }
 
     }

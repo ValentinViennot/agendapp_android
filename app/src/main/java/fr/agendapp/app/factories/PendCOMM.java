@@ -1,11 +1,22 @@
 package fr.agendapp.app.factories;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import fr.agendapp.app.App;
+
+/**
+ * @author Dylan Habans
+ */
 public class PendCOMM extends Pending {
 
     private static List<PendCOMM> pending;
+    private static String name = "pendCOMM";
+
     private int id;
     private String comment;
 
@@ -33,6 +44,31 @@ public class PendCOMM extends Pending {
         }
         json += "]";
         return json;
+    }
+
+    static void initList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        pending = ParseFactory.parsePendCOMM(preferences.getString(name, "[]"));
+    }
+
+    static void saveList(Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString(name, getList());
+        editor.apply();
+    }
+
+    static void clearList(Context context) {
+        pending = new LinkedList<>();
+        saveList(context);
+    }
+
+    static int size() {
+        return pending.size();
+    }
+
+    public static String getName() {
+        return name;
     }
 
     /**
