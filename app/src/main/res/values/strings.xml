@@ -33,6 +33,19 @@
     <string name="button_moreCard">Menu</string>
     <string name="button_flag">Drapeau</string>
     <string name="button_delete">Supprimer</string>
+    <string name="button_alert">Signaler</string>
     <string name="button_done">Marquer comme fait</string>
-    <string name="button_undone">Marquer comme à faire</string>
+    <string name="button_undone">Marquer à faire</string>
+    <string name="img_done">ont fait</string>
+    <string name="img_comm">commentaire(s)</string>
+
+
+    <!-- Flags -->
+    <string name="flags_title">Définir un marqueur…</string>
+    <array name="flags">
+        <item>Gris</item>
+        <item>Bleu</item>
+        <item>Orange</item>
+        <item>Rouge</item>
+    </array>
 </resources>

@@ -1,15 +1,22 @@
 package fr.agendapp.app.pages;
 
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.graphics.Color;
-import android.support.v7.widget.CardView;
+import android.graphics.Paint;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.List;
@@ -147,40 +154,55 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
 
         LayoutInflater inflater;
 
-        private CardView card;
-        private RelativeLayout cardHeader;
+
         private TextView subject;
         private TextView text;
         private ImageButton flag;
         private TextView nbDone;
         private TextView nbComm;
         private Button done;
+        private ImageButton menu;
 
         ViewHolder(LayoutInflater inflater, ViewGroup parent) {
 
             super(inflater.inflate(R.layout.object_work, parent, false));
             this.inflater = inflater;
 
-            card = (CardView) itemView.findViewById(R.id.card_view);
-            cardHeader = (RelativeLayout) itemView.findViewById(R.id.card_header);
             subject = (TextView) itemView.findViewById(R.id.card_subject);
             text = (TextView) itemView.findViewById(R.id.card_text);
             flag = (ImageButton) itemView.findViewById(R.id.card_flag);
             nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
             nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
             done = (Button) itemView.findViewById(R.id.button_done);
+            menu = (ImageButton) itemView.findViewById(R.id.more_button);
 
         }
 
+        /**
+         * Méthode appelée à chaque fois qu'un devoir est affiché / actualisé
+         * Code exécuté dans le Thread UI
+         * (d'où la necessité de ne pas mettre à jour toute la liste à chaque MAJ)
+         *
+         * @param w Devoir
+         */
         public void setWork(final Work w) {
+
+            final Context context = inflater.getContext();
+            final Resources r = context.getResources();
 
             // Matière
             subject.setText(w.getSubject());
-//            subject.setTextColor(w.getSubjectColor());
-            cardHeader.setBackgroundColor(w.getSubjectColor());
+            if (w.isDone())
+                subject.setPaintFlags(subject.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+            else subject.setPaintFlags(text.getPaintFlags());
+            subject.setTextColor(w.getSubjectColor());
 
             // Texte du devoir
-            text.setText(w.getText());
+            text.setText(Html.fromHtml(w.getText()));
+
+            // Pièces jointes
+            GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
+            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
 
             // Drapeau / Marqueur
             int color;
@@ -199,9 +221,55 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
             }
             flag.setColorFilter(color);
 
-            // Pièces jointes
-            GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
-            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
+            // Sélection d'un marqueur
+            flag.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle(R.string.flags_title)
+                            .setItems(R.array.flags, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    w.setFlag(context, which);
+                                }
+                            });
+                    builder.create().show();
+                }
+            });
+
+            // Menu
+            menu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popup = new PopupMenu(context, v);
+                    MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.work_menu, popup.getMenu());
+                    MenuItem done = popup.getMenu().findItem(R.id.menu_done);
+                    done.setTitle(w.isDone() ? R.string.button_undone : R.string.button_done);
+                    MenuItem delete = popup.getMenu().findItem(R.id.menu_delete);
+                    delete.setTitle(w.isUser() ? R.string.button_delete : R.string.button_alert);
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.menu_done:
+                                    w.done(context);
+                                    notifyItemChanged(getAdapterPosition());
+                                    return true;
+                                case R.id.menu_delete:
+                                    if (w.isUser())
+                                        w.delete(context);
+                                    else
+                                        w.report(context);
+                                    notifyItemRemoved(getAdapterPosition());
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    popup.show();
+                }
+            });
 
             // Footer
             String nb = "" + w.getNbDone();
@@ -209,11 +277,16 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
             nb = "" + w.getComments().size();
             nbComm.setText(nb);
 
+            if (w.isDone())
+                done.setText(r.getString(R.string.button_undone));
+            else
+                done.setText(r.getString(R.string.button_done));
+
             // Boutons
             done.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    w.done(inflater.getContext());
+                    w.done(context);
                     notifyItemChanged(getAdapterPosition());
                 }
             });

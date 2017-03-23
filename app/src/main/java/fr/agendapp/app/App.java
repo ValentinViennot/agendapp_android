@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.objects.User;
 import fr.agendapp.app.pages.LoginPage;
 import fr.agendapp.app.pages.MainPage;
 
@@ -31,7 +32,8 @@ public class App extends AppCompatActivity {
         // On vérifie que les données nécessaires au démarrage sont bien présentes
         if (isLogged(preferences)) {
             Log.i(TAG, "isLogged TRUE");
-            // TODO Initialisser l'objet User pareil que Sync
+            // Initialise l'objet Utilisateur courant
+            User.init(this);
             // Initialise le service de communication avec le serveur d'APIs
             SyncFactory.init(this, preferences.getString("token", "x"));
             // redirige vers la page des devoirs

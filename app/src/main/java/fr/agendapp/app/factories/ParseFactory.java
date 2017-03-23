@@ -77,7 +77,7 @@ public class ParseFactory {
         return gson.fromJson(json, collectionType);
     }
 
-    static User parseUser(String json) {
+    public static User parseUser(String json) {
         return gson.fromJson(json, User.class);
     }
 

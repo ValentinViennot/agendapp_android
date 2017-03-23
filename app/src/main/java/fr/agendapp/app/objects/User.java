@@ -1,6 +1,10 @@
 package fr.agendapp.app.objects;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+
+import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 
 /**
  * TODO
@@ -30,15 +34,15 @@ public class User {
     /**
      * Notifications pour les ajouts
      */
-    private boolean rappels;
+    private int rappels;
     /**
      * Recevoir des notifications par email ?
      */
-    private boolean mail;
+    private int mail;
     /**
      * L'utilisateur peut il modifier son prenom et son nom ?
      */
-    private boolean fake_identity;
+    private int fake_identity;
     /**
      * Dossier racine de l'utilisateur
      */
@@ -69,9 +73,14 @@ public class User {
      * Initialise l'utilisateur actuel
      */
     public static void init(Context context) {
-        // TODO
-        // init from local storage
-        // get a new version from server
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        String json = preferences.getString("user", "x");
+        if (json.equals("x")) {
+            user = null;
+        } else {
+            user = ParseFactory.parseUser(json);
+        }
+        // TODO get a new version from server et refresh en callback
     }
 
     /**
@@ -107,7 +116,7 @@ public class User {
     }
 
     public void setPrenom(String prenom) {
-        if (fake_identity) this.prenom = prenom;
+        if (this.canFakeIdentity()) this.prenom = prenom;
     }
 
     public String getNom() {
@@ -115,7 +124,7 @@ public class User {
     }
 
     public void setNom(String nom) {
-        if (fake_identity) this.nom = nom;
+        if (this.canFakeIdentity()) this.nom = nom;
     }
 
     public String getEmail() {
@@ -135,23 +144,23 @@ public class User {
     }
 
     public boolean isRappels() {
-        return rappels;
+        return rappels > 0;
     }
 
     public void setRappels(boolean rappels) {
-        this.rappels = rappels;
+        this.rappels = rappels ? 1 : 0;
     }
 
     public boolean isMail() {
-        return mail;
+        return mail > 0;
     }
 
     public void setMail(boolean mail) {
-        this.mail = mail;
+        this.mail = mail ? 1 : 0;
     }
 
     public boolean canFakeIdentity() {
-        return fake_identity;
+        return fake_identity > 0;
     }
 
     public int getRoot() {
