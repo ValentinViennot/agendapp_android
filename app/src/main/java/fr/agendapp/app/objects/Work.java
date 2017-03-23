@@ -115,7 +115,6 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
-     * TODO Déclencher update immédiat (ni de l'affichage ni de synchro)
      */
     public void done(Context context) {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
@@ -138,30 +137,28 @@ public class Work {
     /**
      * Supprime le devoir
      * L'utilisateur doit en être le propriétaire
-     * @return true si le devoir est supprimé par l'utilisateur, false sinon
      */
-    public boolean delete() {
+    public void delete(Context context) {
         // TODO
-        return false;
     }
 
     /**
      * Signale le devoir au modérateur
      * L'utilisateur ne peut pas en être le propriétaire
-     * @return true si le devoir est signalé par l'utilisateur, false sinon
      */
-    public boolean report() {
+    public void report(Context context) {
         //TODO
-        return false;
     }
 
     /**
      * @param c Commentaire à ajouter au devoir
-     * @return true en cas de succes
      */
-    public boolean addComment(Comment c) {
+    public void addComment(Context context, Comment c) {
         // TODO
-        return false;
+    }
+
+    public void setFlag(Context context, int flag) {
+        // TODO
     }
 
     // GETTERS
