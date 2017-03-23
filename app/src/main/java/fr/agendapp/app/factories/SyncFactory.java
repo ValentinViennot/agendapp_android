@@ -40,6 +40,11 @@ public class SyncFactory {
     /** Callback universel en cas d'erreur avec une requête http */
     private Response.ErrorListener errorListener;
 
+    /**
+     * True si la liste de pending est en cours d'envoi
+     */
+    private boolean lockpending = false;
+
     // TODO gestion de l'hors connexion ?
 
     /**
@@ -79,7 +84,7 @@ public class SyncFactory {
 
     // Remarque : le mot clé "synchronized" permet de signifier que cette méthode ne peut pas être appelée deux fois en même temps
     // (Pendant son exécution un "verrou" permet d'empêcher une deuxième exécution)
-    public static synchronized SyncFactory getInstance(Context context) {
+    static synchronized SyncFactory getInstance(Context context) {
         if (instance == null)
             init(context,null);
         return instance;
@@ -150,22 +155,23 @@ public class SyncFactory {
      * @param version      Version requise des données
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version) {
-        Log.i(App.TAG, "test : GetWork ");
-        req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        // Ecrire la réponse au localStorage (SharedPreferences)
-                        if (syncListener.isArchives()) {
-                            Work.setPastwork(context, response, version);
-                        } else {
-                            Work.setComingwork(context, response, version);
+        if (context != null) {
+            req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            // Ecrire la réponse au localStorage (SharedPreferences)
+                            if (syncListener.isArchives()) {
+                                Work.setPastwork(context, response, version);
+                            } else {
+                                Work.setComingwork(context, response, version);
+                            }
+                            // Notification qu'une nouvelle version des données a été synchronisée
+                            syncListener.onSync();
                         }
-                        // Notification qu'une nouvelle version des données a été synchronisée
-                        syncListener.onSync();
                     }
-                }
-        );
+            );
+        }
     }
 
     /**
@@ -174,80 +180,118 @@ public class SyncFactory {
      * @param syncListener Service à notifier en cas de changement de version
      * @param context      Android Context
      */
-    public void getVersion(final SyncListener syncListener, final Context context) {
-        Log.i(App.TAG, "test : GetVersion ");
-        // Nom de la version à controler (Archives ou Devoirs)
-        final String name = "version" + (syncListener.isArchives() ? "A" : "D");
-        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        // Récupération de la version locale des données
-        final String version = preferences.getString(name, "0");
-        Log.i(App.TAG, "Version des données (" + (syncListener.isArchives() ? "A" : "D") + ") : " + version);
-        // Requete de la version distante
-        req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if (response.equals(version)) {
-                    // Si la version n'a pas changée, on notifie le SyncListener qui a appelé la mise à jour
-                    syncListener.onSyncNotAvailable();
-                } else {
-                    // Une nouvelle version des données est disponible
-                    Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
-                    getWork(syncListener, context, response);
+    void getVersion(final SyncListener syncListener, final Context context) {
+        if (context != null) {
+            // Nom de la version à controler (Archives ou Devoirs)
+            final String name = "version" + (syncListener.isArchives() ? "A" : "D");
+            SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+            // Récupération de la version locale des données
+            final String version = preferences.getString(name, "0");
+            Log.i(App.TAG, "Version des données (" + (syncListener.isArchives() ? "A" : "D") + ") : " + version);
+            // Requete de la version distante
+            req(context, "version/", Request.Method.GET, "", new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (response.equals(version)) {
+                        // Si la version n'a pas changée, on notifie le SyncListener qui a appelé la mise à jour
+                        syncListener.onSyncNotAvailable();
+                    } else {
+                        // Une nouvelle version des données est disponible
+                        Log.i(App.TAG, "Une nouvelle version des données est disponible : " + response);
+                        getWork(syncListener, context, response);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
+    /**
+     * Le mot clé 'synchronized' permet d'éviter que cette méthode soit exécutée deux fois simultanément, et donc d'envoyer
+     * deux fois la même liste d'actions au serveur.
+     * Comme cette méthode met en réalité une requête en attente elle est exécutée rapidement et ce n'est pas suffisant
+     * C'est pourquoi on passe par un attribut booleen pour tester si un envoi est en cours via cette instance de SyncFactory
+     * @param syncListener Callback
+     * @param context Android Context
+     * @param json Liste de requêtes à envoyer au format JSON
+     */
     synchronized void synchronize(final SyncListener syncListener, final Context context, String json) {
-        Log.i(App.TAG, "test : Synchronize ");
-        // On commence par envoyer les actions en attente au serveur
-        req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                // La liste de requêtes est bien parvenue au serveur
-                // On nettoie la liste de requetes
-                Pending.clear(context);
-                // On récupère les nouveaux devoirs si nécessaire
-                getVersion(syncListener, context);
+        if (context != null) {
+            // Si un envoi n'est pas déjà en cours
+            if (!lockpending) {
+                // On bloque l'envoi de listes d'actions
+                setLockpending(true);
+                // On commence par envoyer les actions en attente au serveur
+                req(context, "pending/", Request.Method.POST, json, new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // La liste de requêtes est bien parvenue au serveur
+                        // On nettoie la liste locale de requetes
+                        Pending.clear(context);
+                        // On débloque l'envoi de listes d'actions
+                        setLockpending(false);
+                        // On récupère les nouveaux devoirs si nécessaire (si des actions viennent d'être effectuées, cela le sera)
+                        getVersion(syncListener, context);
+                    }
+                }, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // En cas d'erreur d'envoi de la liste de requête
+                        // On débloque l'envoi de listes d'actions
+                        setLockpending(false);
+                        // On fait appel à la gestion d'erreur par défaut de SyncFactory
+                        errorListener.onErrorResponse(error);
+                    }
+                });
+            } else {
+                syncListener.onSyncNotAvailable();
             }
-        });
+        }
     }
 
+    private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener, Response.ErrorListener errorListener) {
+        if (context != null) {
+            // créé la requête
+            Request req = new StringRequest(
+                    // GET, POST, PUT, DELETE...
+                    method,
+                    // URL d'accès à l'API
+                    baseUrl + api,
+                    // Response Listener (classe contenant une méthode de callback en cas de succes)
+                    listener,
+                    // Error Listener : Que faire en cas d'erreur
+                    errorListener
+            ) {
+                // Passage du token d'authentification en header de la requete HTTP
+                // Définition du format de transfert des données (JSON)
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Content-Type", "application/json");
+                    headers.put("Authorization", token);
+                    return headers;
+                }
+
+                // PostData
+                @Override
+                public byte[] getBody() throws AuthFailureError {
+                    return postData.getBytes();
+                }
+
+                @Override
+                public String getBodyContentType() {
+                    return "application/json";
+                }
+            };
+            // Ajout de la requête au "Thread HTTP"
+            getRequestQueue(context).add(req);
+        }
+    }
+
+    /**
+     * Ajoute une requête avec le ErrorListener par défaut
+     */
     private void req(Context context, String api, int method, final String postData, Response.Listener<String> listener) {
-        // créé la requête
-        Request req = new StringRequest(
-                // GET, POST, PUT, DELETE...
-                method,
-                // URL d'accès à l'API
-                baseUrl + api,
-                // Response Listener (classe contenant une méthode de callback en cas de succes)
-                listener,
-                // Error Listener : Que faire en cas d'erreur
-                errorListener
-        ) {
-            // Passage du token d'authentification en header de la requete HTTP
-            // Définition du format de transfert des données (JSON)
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> headers = new HashMap<>();
-                headers.put("Content-Type", "application/json");
-                headers.put("Authorization", token);
-                return headers;
-            }
-
-            // PostData
-            @Override
-            public byte[] getBody() throws AuthFailureError {
-                return postData.getBytes();
-            }
-
-            @Override
-            public String getBodyContentType() {
-                return "application/json";
-            }
-        };
-        // Ajout de la requête au "Thread HTTP"
-        getRequestQueue(context).add(req);
+        req(context, api, method, postData, listener, errorListener);
     }
 
     /**
@@ -260,5 +304,9 @@ public class SyncFactory {
             mRequestQueue = Volley.newRequestQueue(context.getApplicationContext());
         }
         return mRequestQueue;
+    }
+
+    private void setLockpending(boolean b) {
+        lockpending=b;
     }
 }

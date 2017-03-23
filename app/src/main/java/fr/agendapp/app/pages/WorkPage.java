@@ -37,6 +37,7 @@ import fr.agendapp.app.objects.Work;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
+    protected final int SYNC_DELAY = 2000;
     // Nombre de filtre maximal par catégorie de filtre
     private final int MAX_FILTERS = 5;
     // Liste d'en tetes (mois) liée à la liste de devoirs
@@ -49,7 +50,7 @@ public class WorkPage extends Fragment implements SyncListener {
     protected DoubleHeaderAdapter adapter;
     // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
     // Timer utilisé pour l'actualisation régulière des données
-    protected Timer timer = new Timer();
+    protected Timer timer;
     // tableau 2D de filtres
     // Filter[] chaque case de ce tableau doit être vérifiée
     // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
@@ -82,15 +83,37 @@ public class WorkPage extends Fragment implements SyncListener {
     @Override // Au démarrage de l'activité (ou sa reprise)
     public void onStart() {
         super.onStart();
+        Log.i(App.TAG, "onStart (" + (isArchives() ? "A" : "D") + ")");
         // On actualise l'affichage des devoirs à partir des données disponibles localement
         // dès le démarrage pour un affichage aussi rapide que possible
-        SyncTask st = new SyncTask();
-        st.execute();
-        // Lance une synchronisation des devoirs depuis le serveur
-        // La planification est inclue dans le callback onSync
+        this.refresh();
+        // Lance une première synchronisation forcée
         this.sync();
     }
-    //TODO onStop qui arrête le timer
+
+    @Override // Lorsque l'onglet est fait visible (true) ou masqué (false)
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            timer = new Timer();
+            // Lance une synchronisation des devoirs depuis le serveur
+            // La planification est inclue dans le callback onSync
+            this.sync();
+        } else {
+            if (timer != null) {
+                timer.cancel();
+                timer = null;
+            }
+        }
+    }
+
+    /**
+     * Recalculer l'affichage dans un Thread séparé puis le mettre à jour
+     */
+    private void refresh() {
+        SyncTask st = new SyncTask();
+        st.execute();
+    }
 
     /**
      * TODO : Problème soit dans le calcul des en tetes soit dans le calcul de l'ID d'en tete
@@ -223,7 +246,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
-        Log.i(App.TAG, "Synchronisation...");
+        Log.i(App.TAG, "sync (" + (isArchives() ? "A" : "D") + ")...");
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
         Pending.send(this, this.getContext());
@@ -233,24 +256,31 @@ public class WorkPage extends Fragment implements SyncListener {
     /**
      * Planification d'une prochaine synchronisation dans x secondes
      */
-    void planNextSync() {
-        // TODO Annuler une éventuelle ancienne planification (Pour ne pas accumuler en cas de MAJ forcée)
-        // Planification de la mise à jour TODO ajuster la fréquence de synchro
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sync();
-            }
-        }, 5000);
+    protected void planNextSync() {
+        planNextSync(SYNC_DELAY);
+    }
+
+    /**
+     * @param delay Delai entre chaque synchronisation
+     */
+    protected void planNextSync(int delay) {
+        if (timer != null) {
+            // Planification de la mise à jour TODO ajuster la fréquence de synchro
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    sync();
+                }
+            }, delay);
+        }
     }
 
     @Override
     public void onSync() {
         // En cas de réception de nouvelles données
         // On met à jour l'affichage de manière asynchrone
-        SyncTask st = new SyncTask();
-        st.execute();
-        onPostSync();
+        this.refresh();
+        this.onPostSync();
     }
 
     @Override
@@ -292,7 +322,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * Cette classe interne permet de créer un processus séparé du processus principal dans lequel
      * seront retriées les nouvelles listes de données, les headers, etc.
      */
-    protected class SyncTask extends AsyncTask<Void, Integer, Void> {
+    private class SyncTask extends AsyncTask<Void, Integer, Void> {
 
         // Fenetre de dialogue de "chargement"/"loading"/spinner
         ProgressDialog progressDialog;

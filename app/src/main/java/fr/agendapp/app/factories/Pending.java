@@ -15,6 +15,10 @@ import fr.agendapp.app.pages.SyncListener;
  */
 public abstract class Pending {
 
+
+    private static final int VERSION_LIFETIME = 5;
+    private static int[] lifetime = {0, 0};
+
     /**
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
@@ -75,9 +79,22 @@ public abstract class Pending {
             // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
             SyncFactory.getInstance(context).synchronize(syncListener, context, json);
         } else {
+            Log.i(App.TAG, "Pas d'action en attente");
             // Lorsqu'il n'y a pas d'actions en attente
             // On se contente de demander la nouvelle version des devoirs
-            SyncFactory.getInstance(context).getVersion(syncListener, context);
+            // Mais on ne souhaite pas le faire aussi souvent que l'envoi des listes d'attente (pour économiser le réseau)
+            int i = syncListener.isArchives() ? 1 : 0;
+            // On décrémente le "temps de vie" d'une version
+            lifetime[i]--;
+            // Si le temps de vie est expiré
+            if (lifetime[i] < 0) {
+                // On le remet à "zéro"
+                lifetime[i] = VERSION_LIFETIME;
+                // Lance une synchronisation
+                SyncFactory.getInstance(context).getVersion(syncListener, context);
+            } else {
+                syncListener.onSyncNotAvailable();
+            }
         }
     }
 
