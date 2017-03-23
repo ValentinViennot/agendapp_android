@@ -63,6 +63,7 @@ public class Section {
      * Transforme une liste de devoirs (déjà triée) en une liste de sections
      * Une liste de section ne doit pas changer l'ordre des devoirs
      * Une liste de section doit séparer les devoirs par date en faisant apparaitre le mois si différent du précédent (sinon , vaut null)
+     *
      * @return Liste de sections transformée
      */
     static List<Section> getSections(Context context, List<Work> liste) {
@@ -192,4 +193,6 @@ public class Section {
     public void add(Work w) {
         this.homeworks.add(w);
     }
+
 }
+

@@ -33,7 +33,7 @@ public class App extends AppCompatActivity {
             Log.i(TAG, "isLogged TRUE");
             // TODO Initialisser l'objet User pareil que Sync
             // Initialise le service de communication avec le serveur d'APIs
-            SyncFactory.init(preferences.getString("token", "x"));
+            SyncFactory.init(this, preferences.getString("token", "x"));
             // redirige vers la page des devoirs
             page = new Intent(App.this, MainPage.class);
         } else {
@@ -47,15 +47,14 @@ public class App extends AppCompatActivity {
 
     /**
      * Les données nécessaires au lancement sont le token d'identification aux APIs et un objet User
-     *
      * @param preferences LocalStorage
-     * @return True si les données nécessaires au démarrage sont présentes
+     * @return True si les données nécessaires au démarrage sont présentes, False sinon
      */
     private boolean isLogged(SharedPreferences preferences) {
-        // TODO SharedPreferences non conservées entre chaque redémarrage ?
-        return (
-                !preferences.getString("user", "x").equals("x")
-                        && !preferences.getString("token", "x").equals("x")
+        return !(
+                preferences.getString("user", "x").equals("x") || preferences.getString("token", "x").equals("x")
         );
     }
+
+    // TODO on destroy qui vide la liste de requetes http
 }

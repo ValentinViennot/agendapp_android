@@ -1,42 +1,35 @@
 package fr.agendapp.app.objects;
 
-import java.util.List;
+public abstract class Filter {
 
-/**
- * Created by Charline on 14/03/2017.
- */
-public class Filter {
+    public static final int NB_TYPES = 6;
 
-    private List<String> matieres;
-    private List<Integer> flag;
-    private boolean fait;
-    private String research;
-    private String auteur;
+    // Chaine de caractère contenue dans le texte du devoir
+    static final int USER_TYPE = 0;
+    // Drapeau correspond
+    static final int FLAG_TYPE = 1;
+    // Matière correspond
+    static final int SUBJECT_TYPE = 2;
+    // Fait/pas Fait correspond
+    static final int DONE_TYPE =3;
+    //Autheur correspond
+    static final int AUTHOR_TYPE = 4;
+    //Date correspond
+    static final int DATE_TYPE = 5;
 
-    public Filter(){
-        this.matieres=null;
-        this.flag=null;
-        this.fait=false;
-        this.research=null;
+    // Permet de regrouper les filtres de même types dans une même condition ET
+    int type;
+
+    public Filter(int type) {
+        this.type = type;
     }
 
-    public List<String> getMatieres() {
-        return matieres;
-    }
+    /**
+     * @return true si le devoir correspond au filtre
+     */
+    public abstract boolean correspond(Work w);
 
-    public List<Integer> getFlag() {
-        return flag;
-    }
-
-    public boolean isFait() {
-        return fait;
-    }
-
-    public String getResearch() {
-        return research;
-    }
-
-    public String getAuteur() {
-        return auteur;
+    public int getType() {
+        return this.type;
     }
 }
