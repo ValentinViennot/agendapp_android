@@ -2,13 +2,12 @@ package fr.agendapp.app.objects;
 
 import android.content.Context;
 import android.content.res.Resources;
+import fr.agendapp.app.R;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedList;
 import java.util.List;
-
-import fr.agendapp.app.R;
 
 /**
  * @author Dylan Habans

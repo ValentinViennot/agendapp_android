@@ -4,12 +4,9 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
-
 import fr.agendapp.app.pages.AskListener;
 
-import static android.content.DialogInterface.BUTTON_NEGATIVE;
-import static android.content.DialogInterface.BUTTON_NEUTRAL;
-import static android.content.DialogInterface.BUTTON_POSITIVE;
+import static android.content.DialogInterface.*;
 
 /**
  * Service de gestion des notifications et des fenetres de dialogue

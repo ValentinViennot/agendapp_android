@@ -4,13 +4,12 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.List;
-import java.util.ListIterator;
-
 import fr.agendapp.app.R;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
+
+import java.util.List;
+import java.util.ListIterator;
 
 /**
  * Adapteur pour l'affichage de la liste de devoirs
