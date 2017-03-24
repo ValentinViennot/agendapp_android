@@ -1,5 +1,6 @@
 package fr.agendapp.app.pages;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
@@ -23,7 +24,9 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.objects.Attachment;
+import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
 
@@ -33,17 +36,22 @@ import fr.agendapp.app.objects.Work;
 class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewHolder> implements
         ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<DoubleHeaderAdapter.HeaderHolder, DoubleHeaderAdapter.SubHeaderHolder> {
 
+    private Activity activity;
     // Liste de devoirs utilisée par l'adapter
     private List<Work> homeworks;
     // Liste de headers utilisée par l'adapter
     private List<Header> headers;
     // Liste d'en tetes de jour utilisée par l'adapter
     private List<Header> subheaders;
+    // Lien vers la liste de fusion
+    private FusionList fusionList;
 
     DoubleHeaderAdapter(WorkPage wp) {
         this.homeworks = wp.getHomeworks();
         this.headers = wp.getHeaders();
         this.subheaders = wp.getSubheaders();
+        this.fusionList = wp.fusions;
+        this.activity = wp.getActivity();
     }
 
     void updateList(WorkPage wp) {
@@ -152,7 +160,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
      */
     class ViewHolder extends RecyclerView.ViewHolder {
 
-        LayoutInflater inflater;
+        private LayoutInflater inflater;
 
 
         private TextView subject;
@@ -208,15 +216,19 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
             int color;
             switch (w.getFlag()) {
                 case 1:
+                    // Bleu
                     color = Color.parseColor("#4178BE");
                     break;
                 case 2:
+                    // Orange
                     color = Color.parseColor("#FF7832");
                     break;
                 case 3:
+                    // Rouge
                     color = Color.parseColor("#E71D32");
                     break;
                 default:
+                    // Gris
                     color = Color.parseColor("#999999");
             }
             flag.setColorFilter(color);
@@ -241,7 +253,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                 @Override
                 public void onClick(View v) {
                     PopupMenu popup = new PopupMenu(context, v);
-                    MenuInflater inflater = popup.getMenuInflater();
+                    final MenuInflater inflater = popup.getMenuInflater();
                     inflater.inflate(R.menu.work_menu, popup.getMenu());
                     MenuItem done = popup.getMenu().findItem(R.id.menu_done);
                     done.setTitle(w.isDone() ? R.string.button_undone : R.string.button_done);
@@ -261,6 +273,11 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                                     else
                                         w.report(context);
                                     notifyItemRemoved(getAdapterPosition());
+                                    return true;
+                                case R.id.menu_fusion:
+                                    if (!fusionList.add(w)) {
+                                        NotificationFactory.add(activity, 1, r.getString(R.string.msg_impossible), r.getString(R.string.msg_fusionimpossible));
+                                    }
                                     return true;
                                 default:
                                     return false;

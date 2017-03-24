@@ -5,12 +5,14 @@ import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -26,6 +28,7 @@ import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.Pending;
 import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
 
@@ -37,15 +40,16 @@ import fr.agendapp.app.objects.Work;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
-    protected final int SYNC_DELAY = 2000;
     // Nombre de filtre maximal par catégorie de filtre
     private final int MAX_FILTERS = 5;
+    public FusionList fusions;
+    // Liste de devoirs
+    protected List<Work> homeworks;
     // Liste d'en tetes (mois) liée à la liste de devoirs
     protected List<Header> headers;
     // Liste d'en tetes (jour) liée à la liste de devoirs
     protected List<Header> subheaders;
-    // Liste de devoirs
-    protected List<Work> homeworks;
+
     // Adapter permettant l'affichage de la liste de devoirs
     protected DoubleHeaderAdapter adapter;
     // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
@@ -62,9 +66,20 @@ public class WorkPage extends Fragment implements SyncListener {
         headers = new LinkedList<>();
         subheaders = new LinkedList<>();
         homeworks = new LinkedList<>();
-        // On récupère la vue dans laquelle seront affiché les devoirs
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-                R.layout.recycler_view, container, false);
+
+        // On récupère la vue de la liste de devoirs
+        View view = inflater.inflate(R.layout.activity_work, container, false);
+
+        // Section contenant la liste de fusion
+        fusions = new FusionList(
+                (CardView) view.findViewById(R.id.fusion_view),
+                (TextView) view.findViewById(R.id.fusion_1),
+                (TextView) view.findViewById(R.id.fusion_2),
+                (TextView) view.findViewById(R.id.fusion_3)
+        );
+
+        // Section contenant la liste en elle même
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         // Instancie l'adapter permettant l'affichage de la liste de devoirs
         adapter = new DoubleHeaderAdapter(this);
         // "Decoration" = en tetes
@@ -77,7 +92,7 @@ public class WorkPage extends Fragment implements SyncListener {
         recyclerView.setAdapter(adapter);
 
         // Retourne la vue initialisée
-        return recyclerView;
+        return view;
     }
 
     @Override // Au démarrage de l'activité (ou sa reprise)
@@ -257,6 +272,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * Planification d'une prochaine synchronisation dans x secondes
      */
     protected void planNextSync() {
+        int SYNC_DELAY = 2000;
         planNextSync(SYNC_DELAY);
     }
 

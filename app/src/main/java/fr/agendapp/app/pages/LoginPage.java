@@ -16,7 +16,7 @@ public class LoginPage extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // TODO Layout / Vue correspondant à cette activité
-        setContentView(R.layout.activity_work);
+        setContentView(R.layout.activity_main);
         Log.i(App.TAG, "LoginPage created");
         // TODO formulaire
         SyncFactory.login(this, "test@agendapp.fr", "test");

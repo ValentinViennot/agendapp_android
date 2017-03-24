@@ -24,7 +24,7 @@ public class App extends AppCompatActivity {
         // Méthode déclenchée à la création de l'application (=ouverture)
         super.onCreate(savedInstanceState);
         // Affiche le SplashScreen
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.splashscreen);
         // Page où rediriger l'utilisateur
         Intent page;
         // Stockage local (mémoire interne)

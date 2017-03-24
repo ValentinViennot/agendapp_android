@@ -27,7 +27,7 @@ public class MainPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Layout / Vue correspondant à cette activité
-        setContentView(R.layout.activity_work);
+        setContentView(R.layout.activity_main);
         Log.i(App.TAG, "MainPage created");
         // Ajoute une barre de menu
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
