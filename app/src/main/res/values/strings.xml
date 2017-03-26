@@ -43,6 +43,8 @@
     <string name="img_comm">Commentaires</string>
     <string name="button_confirm">Confirmer</string>
     <string name="button_cancel">Annuler</string>
+    <string name="button_yes">Oui</string>
+    <string name="button_no">Non</string>
 
     <!-- Flags -->
     <string name="flags_title">Définir un marqueur…</string>
@@ -57,4 +59,8 @@
     <!-- Messages -->
     <string name="msg_impossible">Impossible</string>
     <string name="msg_fusionimpossible">Maximum 3 devoirs de la même matière et pour la même date.</string>
+
+
+    <!-- Textes à trou -->
+    <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>
 </resources>

@@ -1,4 +1,6 @@
-package fr.agendapp.app.objects;
+package fr.agendapp.app.utils;
+
+import fr.agendapp.app.objects.Work;
 
 /**
  * Created by Charline on 21/03/2017.

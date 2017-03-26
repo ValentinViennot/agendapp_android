@@ -20,9 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.listeners.ClassicListener;
+import fr.agendapp.app.listeners.SyncListener;
+import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
-import fr.agendapp.app.pages.SyncListener;
 
 public class SyncFactory {
 
@@ -61,6 +63,8 @@ public class SyncFactory {
         errorListener = new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
+                // TODO Notification?
+                // TODO + gestion du mode hors ligne / server non disponible
                 Log.e(App.TAG, "response error \n" + error.networkResponse.statusCode);
             }
         };
@@ -84,7 +88,7 @@ public class SyncFactory {
 
     // Remarque : le mot clé "synchronized" permet de signifier que cette méthode ne peut pas être appelée deux fois en même temps
     // (Pendant son exécution un "verrou" permet d'empêcher une deuxième exécution)
-    static synchronized SyncFactory getInstance(Context context) {
+    public static synchronized SyncFactory getInstance(Context context) {
         if (instance == null)
             init(context,null);
         return instance;
@@ -145,6 +149,42 @@ public class SyncFactory {
 
     private void setToken(String t) {
         token = t;
+    }
+
+
+    public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite) {
+        req(context, "invitations/?id=" + invite.getId(), Request.Method.POST,
+                "{\"groupe\":" + invite.getGroupeid() + "}",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        classicListener.onCallBackListener();
+                        Log.i(App.TAG, "Invitation acceptee");
+                    }
+                });
+    }
+
+    public void declineInvite(Context context, final ClassicListener classicListener, Invite invite) {
+        req(context, "invitations/?id=" + invite.getId(), Request.Method.DELETE, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                classicListener.onCallBackListener();
+                Log.i(App.TAG, "Invitation refusee");
+            }
+        });
+    }
+
+    public void getInvites(Context context, final ClassicListener classicListener) {
+        // Récupère les invitations depuis le serveur
+        req(context, "invitations/", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // Récupère la liste d'invitations depuis le format JSON
+                Invite.setInvites(ParseFactory.parseInvites(response));
+                // Appel du callback
+                classicListener.onCallBackListener();
+            }
+        });
     }
 
     /**

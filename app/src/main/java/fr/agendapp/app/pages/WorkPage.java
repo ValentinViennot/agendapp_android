@@ -27,10 +27,14 @@ import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.Pending;
-import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.listeners.ClassicListener;
+import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Header;
+import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
+import fr.agendapp.app.utils.Filter;
 
 /**
  * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)
@@ -49,7 +53,6 @@ public class WorkPage extends Fragment implements SyncListener {
     protected List<Header> headers;
     // Liste d'en tetes (jour) liée à la liste de devoirs
     protected List<Header> subheaders;
-
     // Adapter permettant l'affichage de la liste de devoirs
     protected DoubleHeaderAdapter adapter;
     // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
@@ -60,6 +63,10 @@ public class WorkPage extends Fragment implements SyncListener {
     // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
     // Il suffit qu'une seule condition j de Filter[i][j] soit validée pour que la condition i soit validée
     Filter[][] filters = new Filter[Filter.NB_TYPES][MAX_FILTERS];
+    // Affichage de la zone "invitations"
+    private RecyclerView inviteView;
+    // Affichage de la liste d'invitations
+    private Invite.InviteAdapter inviteAdapter;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,6 +84,13 @@ public class WorkPage extends Fragment implements SyncListener {
                 (TextView) view.findViewById(R.id.fusion_2),
                 (TextView) view.findViewById(R.id.fusion_3)
         );
+
+        // Section contenant les invitations à des groupes
+        inviteView = (RecyclerView) view.findViewById(R.id.view_invitations);
+        inviteAdapter = new Invite.InviteAdapter();
+        inviteView.setHasFixedSize(false);
+        inviteView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        inviteView.setAdapter(inviteAdapter);
 
         // Section contenant la liste en elle même
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
@@ -104,6 +118,8 @@ public class WorkPage extends Fragment implements SyncListener {
         this.refresh();
         // Lance une première synchronisation forcée
         this.sync();
+        // TODO premier appel non efficace (nécessite de re rentrer dans la vue, même choe pour sync ? :o )
+        getInvites();
     }
 
     @Override // Lorsque l'onglet est fait visible (true) ou masqué (false)
@@ -120,6 +136,21 @@ public class WorkPage extends Fragment implements SyncListener {
                 timer = null;
             }
         }
+    }
+
+    private void getInvites() {
+        // On masque la vue en attendant de , peut être, recevoir les invitations
+        inviteView.setVisibility(View.GONE);
+        // Récupère les invitations
+        SyncFactory.getInstance(getContext()).getInvites(getContext(), new ClassicListener() {
+            @Override
+            public void onCallBackListener() {
+                Log.i(App.TAG, "invitations reçues");
+                inviteAdapter.notifyDataSetChanged();
+                if (inviteAdapter.getItemCount() > 0)
+                    inviteView.setVisibility(View.VISIBLE);
+            }
+        });
     }
 
     /**
@@ -261,7 +292,6 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
-        Log.i(App.TAG, "sync (" + (isArchives() ? "A" : "D") + ")...");
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
         Pending.send(this, this.getContext());

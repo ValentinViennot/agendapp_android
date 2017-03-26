@@ -1,4 +1,6 @@
-package fr.agendapp.app.objects;
+package fr.agendapp.app.utils;
+
+import fr.agendapp.app.objects.Work;
 
 public abstract class Filter {
 
