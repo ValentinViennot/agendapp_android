@@ -4,7 +4,9 @@ package fr.agendapp.app.pages;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,8 +20,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
@@ -57,7 +57,7 @@ public class WorkPage extends Fragment implements SyncListener {
     protected DoubleHeaderAdapter adapter;
     // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
     // Timer utilisé pour l'actualisation régulière des données
-    protected Timer timer;
+    //protected Timer timer;
     // tableau 2D de filtres
     // Filter[] chaque case de ce tableau doit être vérifiée
     // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
@@ -67,6 +67,12 @@ public class WorkPage extends Fragment implements SyncListener {
     private RecyclerView inviteView;
     // Affichage de la liste d'invitations
     private Invite.InviteAdapter inviteAdapter;
+
+    private boolean canSync = false;
+
+    private void setCanSync(boolean b) {
+        canSync = b;
+    }
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -91,6 +97,25 @@ public class WorkPage extends Fragment implements SyncListener {
         inviteView.setHasFixedSize(false);
         inviteView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         inviteView.setAdapter(inviteAdapter);
+
+        final SwipeRefreshLayout refresher = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        refresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                SyncFactory.getInstance(WorkPage.this.getContext())
+                        .getVersion(WorkPage.this, WorkPage.this.getContext());
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresher.setRefreshing(false);
+                    }
+                }, 2000);
+            }
+        });
+        refresher.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent),
+                getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(R.color.colorPrimaryDark));
 
         // Section contenant la liste en elle même
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
@@ -126,15 +151,12 @@ public class WorkPage extends Fragment implements SyncListener {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            timer = new Timer();
+            setCanSync(true);
             // Lance une synchronisation des devoirs depuis le serveur
             // La planification est inclue dans le callback onSync
             this.sync();
         } else {
-            if (timer != null) {
-                timer.cancel();
-                timer = null;
-            }
+            setCanSync(false);
         }
     }
 
@@ -292,10 +314,12 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
+        Log.i(App.TAG, "SYNC " + (isArchives() ? "A" : "D"));
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
         Pending.send(this, this.getContext());
         // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
+        planNextSync();
     }
 
     /**
@@ -310,14 +334,17 @@ public class WorkPage extends Fragment implements SyncListener {
      * @param delay Delai entre chaque synchronisation
      */
     protected void planNextSync(int delay) {
-        if (timer != null) {
-            // Planification de la mise à jour TODO ajuster la fréquence de synchro
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {
-                    sync();
-                }
-            }, delay);
+        if (canSync) {
+            setCanSync(false);
+            new Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            setCanSync(true);
+                            sync();
+                        }
+                    }, delay
+            );
         }
     }
 
@@ -325,8 +352,8 @@ public class WorkPage extends Fragment implements SyncListener {
     public void onSync() {
         // En cas de réception de nouvelles données
         // On met à jour l'affichage de manière asynchrone
-        this.refresh();
-        this.onPostSync();
+        refresh();
+        onPostSync();
     }
 
     @Override
@@ -336,7 +363,7 @@ public class WorkPage extends Fragment implements SyncListener {
     }
 
     protected void onPostSync() {
-        planNextSync();
+
     }
 
     @Override

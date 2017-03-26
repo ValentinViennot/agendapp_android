@@ -220,7 +220,7 @@ public class SyncFactory {
      * @param syncListener Service à notifier en cas de changement de version
      * @param context      Android Context
      */
-    void getVersion(final SyncListener syncListener, final Context context) {
+    public void getVersion(final SyncListener syncListener, final Context context) {
         if (context != null) {
             // Nom de la version à controler (Archives ou Devoirs)
             final String name = "version" + (syncListener.isArchives() ? "A" : "D");
