@@ -11,14 +11,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
@@ -28,6 +20,8 @@ import fr.agendapp.app.factories.Pending;
 import fr.agendapp.app.objects.Filter;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
+
+import java.util.*;
 
 /**
  * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)
@@ -56,6 +50,30 @@ public class WorkPage extends Fragment implements SyncListener {
     // Il suffit qu'une seule condition j de Filter[i][j] soit validée pour que la condition i soit validée
     Filter[][] filters = new Filter[Filter.NB_TYPES][MAX_FILTERS];
 
+    //Methode qui permet d'ajouter des éléments dans un liste sans en modifier l'ordre
+    //trié en fonction de la date
+    public void addInOrder( Work w){
+        int i=0;
+        while (w.getDate().after(this.getHomeworks().get(i).getDate())){
+            i++;
+        }
+        this.getHomeworks().add(i,w);
+
+
+        //Methode qui compare deux LinkedList de devoirs et met à jour l'ancienne à partir de la nouvelle
+    public void updateWorks(LinkedList<Work> liste){
+        for (Work w : liste ){
+            if (!w.appearsIn(this.getHomeworks())) {
+                this.addInOrder(w);
+            }
+        }
+        for (Work w2 : getHomeworks()){
+            if (!w2.appearsIn(liste)){
+                getHomeworks().remove(getHomeworks().indexOf(w2));
+            }
+        }
+
+    }
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         headers = new LinkedList<>();

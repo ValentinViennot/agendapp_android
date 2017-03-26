@@ -1,21 +1,15 @@
 package fr.agendapp.app.factories;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParseException;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import fr.agendapp.app.objects.User;
+import fr.agendapp.app.objects.Work;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-
-import fr.agendapp.app.objects.User;
-import fr.agendapp.app.objects.Work;
 
 public class ParseFactory {
 

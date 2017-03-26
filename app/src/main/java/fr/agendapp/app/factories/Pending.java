@@ -2,7 +2,6 @@ package fr.agendapp.app.factories;
 
 import android.content.Context;
 import android.util.Log;
-
 import fr.agendapp.app.App;
 import fr.agendapp.app.pages.SyncListener;
 
