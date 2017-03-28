@@ -18,6 +18,12 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
  */
 public class NotificationFactory {
 
+    private Activity activity;
+
+    public NotificationFactory(Activity activity) {
+        this.activity = activity;
+    }
+
     /**
      * Ajoute une 'notification' à l'écran de l'utilisateur
      *
@@ -81,6 +87,10 @@ public class NotificationFactory {
         });
         // Affiche la fenetre de dialogue
         alertDialog.show();
+    }
+
+    public void add(int priority, String title, String message) {
+        add(activity, priority, title, message);
     }
 
 }

@@ -80,7 +80,8 @@ public class Invite {
                                             deleteItem(holder.getAdapterPosition());
                                         }
                                     },
-                                    invite
+                                    invite,
+                                    null // TODO NotificationFactory ? Nécessite acces a Activity
                             );
                         }
                     }
@@ -98,7 +99,8 @@ public class Invite {
                                             deleteItem(holder.getAdapterPosition());
                                         }
                                     },
-                                    invite
+                                    invite,
+                                    null // TODO
                             );
                         }
                     }

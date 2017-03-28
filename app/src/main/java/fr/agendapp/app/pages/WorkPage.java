@@ -68,10 +68,10 @@ public class WorkPage extends Fragment implements SyncListener {
     // Affichage de la liste d'invitations
     private Invite.InviteAdapter inviteAdapter;
 
-    private boolean canSync = false;
+    private int planSync = 0;
 
-    private void setCanSync(boolean b) {
-        canSync = b;
+    private void addSync() {
+        planSync++;
     }
 
     @Override // A la création de la Vue (page)
@@ -103,7 +103,7 @@ public class WorkPage extends Fragment implements SyncListener {
             @Override
             public void onRefresh() {
                 SyncFactory.getInstance(WorkPage.this.getContext())
-                        .getVersion(WorkPage.this, WorkPage.this.getContext());
+                        .getVersion(WorkPage.this, WorkPage.this.getContext(), new NotificationFactory(WorkPage.this.getActivity()));
                 new Handler().postDelayed(new Runnable() {
                     @Override
                     public void run() {
@@ -151,12 +151,12 @@ public class WorkPage extends Fragment implements SyncListener {
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
         if (isVisibleToUser) {
-            setCanSync(true);
+            planSync = 0;
             // Lance une synchronisation des devoirs depuis le serveur
             // La planification est inclue dans le callback onSync
             this.sync();
         } else {
-            setCanSync(false);
+            planSync++;
         }
     }
 
@@ -317,7 +317,7 @@ public class WorkPage extends Fragment implements SyncListener {
         Log.i(App.TAG, "SYNC " + (isArchives() ? "A" : "D"));
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
-        Pending.send(this, this.getContext());
+        Pending.send(this, this.getContext(), new NotificationFactory(this.getActivity()));
         // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
         planNextSync();
     }
@@ -334,13 +334,13 @@ public class WorkPage extends Fragment implements SyncListener {
      * @param delay Delai entre chaque synchronisation
      */
     protected void planNextSync(int delay) {
-        if (canSync) {
-            setCanSync(false);
+        if (planSync == 0) {
+            planSync++;
             new Handler().postDelayed(
                     new Runnable() {
                         @Override
                         public void run() {
-                            setCanSync(true);
+                            planSync--;
                             sync();
                         }
                     }, delay

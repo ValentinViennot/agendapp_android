@@ -1,6 +1,7 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import fr.agendapp.app.App;
@@ -70,9 +71,13 @@ public abstract class Pending {
     }
 
     /**
-     * Envoie la pendingList au serveur pour traitement
+     * Envoie les listes d'actions en attente au serveur pour traitement si elles ne sont pas vides
+     * Sinon lance régulièrement une synchronisation des devoirs
+     * @param syncListener Callback post synchronisation
+     * @param context Android Context
+     * @param notificationFactory Ajout de notifications en cas d'erreur
      */
-    public static void send(SyncListener syncListener, Context context) {
+    public static void send(SyncListener syncListener, Context context, @Nullable NotificationFactory notificationFactory) {
         if (context != null) {
             // Récupération des actions en attente au format JSON
             String json = toJson();
@@ -82,7 +87,7 @@ public abstract class Pending {
                 // On les sauvegarde dans l'attente de l'envoi
                 save(context);
                 // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
-                SyncFactory.getInstance(context).synchronize(syncListener, context, json);
+                SyncFactory.getInstance(context).synchronize(syncListener, context, json, notificationFactory);
             } else {
                 // Lorsqu'il n'y a pas d'actions en attente
                 // On se contente de demander la nouvelle version des devoirs
@@ -95,7 +100,7 @@ public abstract class Pending {
                     // On le remet à "zéro"
                     lifetime[i] = VERSION_LIFETIME;
                     // Lance une synchronisation
-                    SyncFactory.getInstance(context).getVersion(syncListener, context);
+                    SyncFactory.getInstance(context).getVersion(syncListener, context, notificationFactory);
                 } else {
                     syncListener.onSyncNotAvailable();
                 }
