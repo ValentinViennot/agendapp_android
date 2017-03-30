@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".pages.UserPage">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:text="@string/title_userInformation"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorDarkText"
+                android:textSize="22sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/useremail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/field_email"
+                    android:inputType="textEmailAddress" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/userprenom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/field_prenom" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/usernom"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/field_nom" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:text="@string/title_userNotifications"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorDarkText"
+                android:textSize="22sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/usermail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/field_notifsmail" />
+
+            <android.support.v7.widget.AppCompatCheckBox
+                android:id="@+id/userrappel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/field_rappels" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".70"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/md_keylines"
+                    android:paddingLeft="@dimen/md_keylines"
+                    android:paddingRight="@dimen/md_keylines"
+                    android:paddingStart="@dimen/md_keylines"
+                    android:text="@string/field_notifs"
+                    android:textColor="@color/colorDarkText" />
+
+                <Spinner
+                    android:id="@+id/usernotifs"
+                    style="@style/Widget.AppCompat.Spinner.DropDown"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".20"
+                    android:background="@color/background"
+                    android:entries="@array/field_notifsValues"
+                    android:padding="5dp"
+                    android:spinnerMode="dialog"
+                    android:textColor="@color/colorDarkText" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <Button
+                android:id="@+id/usersave"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="@string/button_save" />
+
+            <Button
+                android:id="@+id/userlogout"
+                style="@style/Widget.AppCompat.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="@string/button_logout" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

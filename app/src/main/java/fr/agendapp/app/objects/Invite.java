@@ -81,7 +81,7 @@ public class Invite {
                                         }
                                     },
                                     invite,
-                                    null // TODO NotificationFactory ? Nécessite acces a Activity
+                                    null // TODO Passage d'une instance de NotificationFactory
                             );
                         }
                     }

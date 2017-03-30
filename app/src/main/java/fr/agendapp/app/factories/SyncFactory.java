@@ -25,6 +25,7 @@ import fr.agendapp.app.App;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.Invite;
+import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
 
@@ -153,25 +154,62 @@ public class SyncFactory {
         token = t;
     }
 
+    public void getUser(final Context context, final ClassicListener classicListener, @Nullable NotificationFactory notifs) {
+        req(context, "user/", Request.Method.GET, "",
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        // Une fois l'utilisateur récupéré
+                        // On met à jour l'utilisateur actif avec les données récupérées du serveur
+                        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putString("user", response);
+                        editor.apply();
+                        // On actualise l'instance de User
+                        User.init(context);
+                        // On appelle la méthode de callback passée en paramètre
+                        classicListener.onCallBackListener();
+                    }
+                }
+                , notifs);
+    }
 
-    public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite, NotificationFactory notifs) {
+    public void saveUser(final Context context, final ClassicListener classicListener, final NotificationFactory notifs, String json) {
+        req(context, "user/", Request.Method.POST, json,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        getUser(context, classicListener, notifs);
+                    }
+                }
+                , notifs);
+    }
+
+    /**
+     * Déconnexion de l'utilisateur (sécurité) = effacement du token
+     */
+    public void logout(Context context) {
+        req(context, "logout/", Request.Method.GET, "", null, (NotificationFactory) null);
+    }
+
+    public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite, final NotificationFactory notifs) {
         req(context, "invitations/?id=" + invite.getId(), Request.Method.POST,
                 "{\"groupe\":" + invite.getGroupeid() + "}",
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
                         classicListener.onCallBackListener();
-                        Log.i(App.TAG, "Invitation acceptee");
+                        if (notifs != null) notifs.add(0, "Invitation acceptée", "");
                     }
                 }, notifs);
     }
 
-    public void declineInvite(Context context, final ClassicListener classicListener, Invite invite, NotificationFactory notifs) {
+    public void declineInvite(Context context, final ClassicListener classicListener, Invite invite, final NotificationFactory notifs) {
         req(context, "invitations/?id=" + invite.getId(), Request.Method.DELETE, "", new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 classicListener.onCallBackListener();
-                Log.i(App.TAG, "Invitation refusee");
+                if (notifs != null) notifs.add(0, "Invitation refusée", "");
             }
         }, notifs);
     }
@@ -198,6 +236,7 @@ public class SyncFactory {
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version, NotificationFactory notifs) {
         if (context != null) {
+            Log.i(App.TAG, "test : getWork");
             req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                     new Response.Listener<String>() {
                         @Override

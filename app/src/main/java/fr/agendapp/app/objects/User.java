@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.listeners.ClassicListener;
 
 /**
  * TODO
@@ -53,34 +55,46 @@ public class User {
     private Subject[] courses;
 
     public User() {
+    }
 
+    public static void clear() {
+        user = new User();
     }
 
     /**
-     * Déconnecte l'utilisateur actif
-     * - Suppression des données locales
-     * - Appel à l'API logout
-     * - user=null;
-     * - Redirection vers MainActivity
-     *
-     * @param b Déconnexion de partout ? (toutes les sessions)
+     * Initialise l'utilisateur actuel avec les données locales
      */
-    public static void logout(boolean b) {
-        // TODO
+    public static void init(final Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        String json = preferences.getString("user", "x");
+        if (json.equals("x")) {
+            // Evitons un NullPointer
+            user = new User();
+        } else {
+            // Si les données sont valides, on utilise les données locales
+            // Celles distantes seront récupérées plus tard, si besoin
+            user = ParseFactory.parseUser(json);
+        }
     }
 
     /**
      * Initialise l'utilisateur actuel
+     *
+     * @param b True s'il faut lancer une synchronisation silencieuse de l'utilisateur
      */
-    public static void init(Context context) {
-        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        String json = preferences.getString("user", "x");
-        if (json.equals("x")) {
-            user = null;
-        } else {
-            user = ParseFactory.parseUser(json);
+    public static void init(final Context context, boolean b) {
+        if (b) {
+            // On tente de récupérer une version récente depuis le serveur
+            SyncFactory.getInstance(context).getUser(context, new ClassicListener() {
+                @Override
+                public void onCallBackListener() {
+                    // Une fois la version récente récupérée, on initialisera avec les nouvelles données
+                    init(context);
+                }
+            }, null);
         }
-        // TODO get a new version from server et refresh en callback
+        // En attendant, on initialise avec les données locales
+        init(context);
     }
 
     /**

@@ -2,7 +2,9 @@
     <!-- Nom de l'application -->
     <string name="app_name">Agendapp</string>
 
+    <!-- Titres -->
     <string name="title_fusion">Liste de fusion</string>
+    <string name="title_user">Paramètres</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -41,6 +43,8 @@
     <string name="button_fusion">Fusionner</string>
     <string name="img_done">ont fait</string>
     <string name="img_comm">Commentaires</string>
+    <string name="button_save">Enregistrer</string>
+    <string name="button_logout">Déconnexion</string>
     <string name="button_confirm">Confirmer</string>
     <string name="button_cancel">Annuler</string>
     <string name="button_yes">Oui</string>
@@ -55,12 +59,50 @@
         <item>Rouge</item>
     </array>
 
-
     <!-- Messages -->
     <string name="msg_impossible">Impossible</string>
     <string name="msg_fusionimpossible">Maximum 3 devoirs de la même matière et pour la même date.</string>
-
+    <string name="msg_wait">Quelques instants</string>
+    <string name="msg_updating">Mise à jour en cours…</string>
 
     <!-- Textes à trou -->
     <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>
+
+    <!-- UserPage -->
+    <string name="title_userInformation">Mon compte</string>
+    <string name="field_email">Adresse email</string>
+    <string name="field_prenom">Prénom</string>
+    <string name="field_nom">Nom</string>
+    <string name="title_userNotifications">Notifications</string>
+    <string name="field_notifsmail">Notifications par mail</string>
+    <string name="field_rappels">À l\'ajout d\'un devoir</string>
+    <string name="field_notifs">Rappel des devoirs non faits à…</string>
+
+    <string-array name="field_notifsValues">
+        <item>NON</item>
+        <item>00H</item>
+        <item>1H</item>
+        <item>2H</item>
+        <item>3H</item>
+        <item>4H</item>
+        <item>5H</item>
+        <item>6H</item>
+        <item>7H</item>
+        <item>8H</item>
+        <item>9H</item>
+        <item>10H</item>
+        <item>11H</item>
+        <item>12H</item>
+        <item>13H</item>
+        <item>14H</item>
+        <item>15H</item>
+        <item>16H</item>
+        <item>17H</item>
+        <item>18H</item>
+        <item>19H</item>
+        <item>20H</item>
+        <item>21H</item>
+        <item>22H</item>
+        <item>23H</item>
+    </string-array>
 </resources>

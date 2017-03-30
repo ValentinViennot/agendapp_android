@@ -115,6 +115,7 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
+     * TODO enregistrer les modifications au localStorage (implémenter sur les autres méthodes)
      */
     public void done(Context context) {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)

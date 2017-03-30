@@ -49,7 +49,7 @@ public class NotificationFactory {
             alertDialog.show();
         } else {
             // On affiche un Toast plus ou moins longtemps selon la priorité
-            Toast.makeText(activity, titre + " - " + message, priority > 0 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, titre + (message.length() > 0 ? " - " : "") + message, priority > 0 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
         }
     }
 

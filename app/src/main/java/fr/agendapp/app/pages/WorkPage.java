@@ -419,7 +419,11 @@ public class WorkPage extends Fragment implements SyncListener {
         protected void onPreExecute() {
             super.onPreExecute();
             // Affiche une fenetre de chargement
-            progressDialog = ProgressDialog.show(WorkPage.this.getContext(), "Quelques instants", "Mise à jour en cours...");
+            progressDialog = ProgressDialog.show(
+                    WorkPage.this.getContext(),
+                    WorkPage.this.getContext().getResources().getString(R.string.msg_wait),
+                    WorkPage.this.getContext().getResources().getString(R.string.msg_updating)
+            );
         }
 
         @Override
