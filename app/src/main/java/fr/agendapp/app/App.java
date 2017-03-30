@@ -4,13 +4,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.pages.LoginPage;
 import fr.agendapp.app.pages.MainPage;
-import fr.agendapp.app.pages.UserPage;
 
 /**
  * Classe d'entrée (MAIN) dans l'applicartion = point de départ
@@ -44,12 +42,7 @@ public class App extends AppCompatActivity {
             // redirige vers la page des devoirs
             page = new Intent(App.this, MainPage.class);
 
-            // TODO DEBUG delete
-            Log.i(TAG, "isLogged TRUE");
-            page = new Intent(App.this, UserPage.class);
-
         } else {
-            Log.i(TAG, "isLogged FALSE");
             // redirige vers la page d'identification
             page = new Intent(App.this, LoginPage.class);
         }

@@ -44,8 +44,7 @@ import fr.agendapp.app.utils.Filter;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
-    // Nombre de filtre maximal par catégorie de filtre
-    private final int MAX_FILTERS = 5;
+    // Affichage de la liste de devoirs à fusionner entre eux
     public FusionList fusions;
     // Liste de devoirs
     protected List<Work> homeworks;
@@ -55,24 +54,13 @@ public class WorkPage extends Fragment implements SyncListener {
     protected List<Header> subheaders;
     // Adapter permettant l'affichage de la liste de devoirs
     protected DoubleHeaderAdapter adapter;
-    // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
-    // Timer utilisé pour l'actualisation régulière des données
-    //protected Timer timer;
-    // tableau 2D de filtres
-    // Filter[] chaque case de ce tableau doit être vérifiée
-    // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
-    // Il suffit qu'une seule condition j de Filter[i][j] soit validée pour que la condition i soit validée
-    Filter[][] filters = new Filter[Filter.NB_TYPES][MAX_FILTERS];
     // Affichage de la zone "invitations"
     private RecyclerView inviteView;
     // Affichage de la liste d'invitations
     private Invite.InviteAdapter inviteAdapter;
 
+    // Nombre de synchronisations en attente
     private int planSync = 0;
-
-    private void addSync() {
-        planSync++;
-    }
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -190,10 +178,13 @@ public class WorkPage extends Fragment implements SyncListener {
     protected void recalcSections() {
         // Réinitialisation de la liste de devoirs
         setHomeworks();
+        // Application des filtres à la liste de devoirs
+        this.homeworks = Filter.applyFilters(this.homeworks);
         // Réinitialisation des listes d'headers
         headers = new LinkedList<>();
         subheaders = new LinkedList<>();
         // Cas où la liste de devoirs est vide
+        // TODO Affichage d'un message
         if (homeworks.size() == 0) return;
         // Récupére une instance de Calendrier
         // Pour la date de la section en cours
@@ -236,72 +227,6 @@ public class WorkPage extends Fragment implements SyncListener {
         }
         if (month != null) month.setTo(i);
         if (day != null) day.setTo(i);
-    }
-
-    // TODO implémenter le filtrage avant le recalcSection
-    // TODO crée une vue permettant de filtrer puis bouton ==> recalc affichage
-    /*List<Work> applyFilters2() {
-        List<Work> r;
-        // Pour chaque devoir
-        for (Work w : homeworks) {
-            if (validateFilters(w)) r.add(w);
-        }
-    }*/
-
-    /**
-     * @return true si le devoir valide les conditions Filter[][]
-     */
-    boolean validateFilters(Work w) {
-        // Pour chaque groupe de filtres
-        for (int i = 0; i < filters.length; ++i) {
-            if (filters[i] != null) {
-                // Le devoir doit correspondre à au moins un filtre du groupe
-                // On suppose que c'est faux
-                boolean b = false;
-                int j = 0;
-                // Tant que c'est faux, on continue d'essayer de le montrer
-                // Jusqu'à avoir testé tous les filtres du groupe
-                while (!b && j < filters[i].length) {
-                    // Si le devoir correspond au filtre
-                    // b vaudra true
-                    // la boucle s'arrêtera
-                    // et on testera le groupe suivant
-                    if (filters[i][j] != null)
-                        b = filters[i][j].correspond(w);
-                    // Filtre suivant
-                    j++;
-                }
-                // Si ce groupe de filtre n'est pas validé, rien ne sert de tester les suivants
-                // le devoir ne correspond pas
-                if (!b) return false;
-            }
-        }
-        // Si la méthode n'a jamais renvoyé false, alors le devoir correspond
-        return true;
-    }
-
-    /**
-     * Ajout d'un filtre
-     * Exemple d'utilisation :
-     * addFilter(new FilterFlag(2))
-     * pour filter sur les devoirs possédant un drapeau de couleur 2
-     */
-    void addFilter(Filter filter) {
-        // Pour le type de filtre demandé
-        for (int i = 0; i < filters[filter.getType()].length; ++i) {
-            // On cherche la première case nulle
-            if (filters[filter.getType()][i] == null) {
-                // On y ajoute le filtre
-                filters[filter.getType()][i] = filter;
-                // Quitte la méthode
-                return;
-            }
-        }
-        NotificationFactory.add(this.getActivity(), 1, "Impossible", "Trop de filtres appliqués !");
-    }
-
-    void clearFilter(Filter filter) {
-        filter = null;
     }
 
     /**
@@ -361,6 +286,8 @@ public class WorkPage extends Fragment implements SyncListener {
         // Quand une synchronisation se termine sans nouvelles données
         onPostSync();
     }
+
+    // TODO : Pas mal de méthodes vides par ici...
 
     protected void onPostSync() {
 
