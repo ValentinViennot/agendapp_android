@@ -1,10 +1,11 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import fr.agendapp.app.App;
-import fr.agendapp.app.pages.SyncListener;
+import fr.agendapp.app.listeners.SyncListener;
 
 /**
  * Gestion de la synchronisation usuelle avec le serveur Agendapp
@@ -14,6 +15,10 @@ import fr.agendapp.app.pages.SyncListener;
  * @author Valentin Viennot
  */
 public abstract class Pending {
+
+
+    private static final int VERSION_LIFETIME = 5;
+    private static int[] lifetime = {0, 0};
 
     /**
      * Récupérer l'ancienne pending list du stockage local
@@ -35,14 +40,16 @@ public abstract class Pending {
      * (à appeler à la fermeture ou après chaque send)
      */
     private static void save(Context context) {
-        PendDO.saveList(context);
-        PendFLAG.saveList(context);
-        PendDEL.saveList(context);
-        PendDELc.saveList(context);
-        PendCOMM.saveList(context);
-        PendALERT.saveList(context);
-        PendMERGE.saveList(context);
-        PendADD.saveList(context);
+        if (context != null) {
+            PendDO.saveList(context);
+            PendFLAG.saveList(context);
+            PendDEL.saveList(context);
+            PendDELc.saveList(context);
+            PendCOMM.saveList(context);
+            PendALERT.saveList(context);
+            PendMERGE.saveList(context);
+            PendADD.saveList(context);
+        }
     }
 
     /**
@@ -51,33 +58,53 @@ public abstract class Pending {
      * @param context Android
      */
     static void clear(Context context) {
-        PendDO.clearList(context);
-        PendFLAG.clearList(context);
-        PendDEL.clearList(context);
-        PendDELc.clearList(context);
-        PendCOMM.clearList(context);
-        PendALERT.clearList(context);
-        PendMERGE.clearList(context);
-        PendADD.clearList(context);
+        if (context != null) {
+            PendDO.clearList(context);
+            PendFLAG.clearList(context);
+            PendDEL.clearList(context);
+            PendDELc.clearList(context);
+            PendCOMM.clearList(context);
+            PendALERT.clearList(context);
+            PendMERGE.clearList(context);
+            PendADD.clearList(context);
+        }
     }
 
     /**
-     * Envoie la pendingList au serveur pour traitement
+     * Envoie les listes d'actions en attente au serveur pour traitement si elles ne sont pas vides
+     * Sinon lance régulièrement une synchronisation des devoirs
+     * @param syncListener Callback post synchronisation
+     * @param context Android Context
+     * @param notificationFactory Ajout de notifications en cas d'erreur
      */
-    public static void send(SyncListener syncListener, Context context) {
-        // Récupération des actions en attente au format JSON
-        String json = toJson();
-        // S'il y a des actions en attente
-        if (json != null) {
-            Log.i(App.TAG, "send JSON : " + json);
-            // On les sauvegarde dans l'attente de l'envoi
-            save(context);
-            // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
-            SyncFactory.getInstance(context).synchronize(syncListener, context, json);
-        } else {
-            // Lorsqu'il n'y a pas d'actions en attente
-            // On se contente de demander la nouvelle version des devoirs
-            SyncFactory.getInstance(context).getVersion(syncListener, context);
+    public static void send(SyncListener syncListener, Context context, @Nullable NotificationFactory notificationFactory) {
+        if (context != null) {
+            // Récupération des actions en attente au format JSON
+            String json = toJson();
+            // S'il y a des actions en attente
+            if (json != null) {
+                Log.i(App.TAG, "send JSON : " + json);
+                // On les sauvegarde dans l'attente de l'envoi
+                save(context);
+                // On envoi les actions en attente (suivi d'une récupération des devoirs au SyncListener)
+                SyncFactory.getInstance(context).synchronize(syncListener, context, json, notificationFactory);
+            } else {
+                // Lorsqu'il n'y a pas d'actions en attente
+                // On se contente de demander la nouvelle version des devoirs
+                // Mais on ne souhaite pas le faire aussi souvent que l'envoi des listes d'attente (pour économiser le réseau)
+                int i = syncListener.isArchives() ? 1 : 0;
+                // On décrémente le "temps de vie" d'une version
+                lifetime[i]--;
+                // Si le temps de vie est expiré
+                if (lifetime[i] < 0) {
+                    // On le remet à "zéro"
+                    lifetime[i] = VERSION_LIFETIME;
+                    // Lance une synchronisation
+                    SyncFactory.getInstance(context).getVersion(syncListener, context, notificationFactory);
+                } else {
+                    syncListener.onSyncNotAvailable();
+                }
+            }
         }
     }
 

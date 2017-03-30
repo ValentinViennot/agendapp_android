@@ -23,13 +23,13 @@ public abstract class Group {
      */
     private int type;
     /** Couleur du groupe (personnalisée) */
-    private Color color;
+    private String color;
     /** True si l'utilisateur est inscrit au groupe */
-    private boolean isUser;
+    private int isUser;
 
     public Group(int type) {
         this.type = type;
-        this.isUser = true;
+        this.isUser = 1;
     }
 
     /**
@@ -88,13 +88,14 @@ public abstract class Group {
         return type;
     }
 
-    public Color getColor() {
-        return color;
+    public int getColor() {
+        if (color == null) color = "#FFFFFF";
+        return Color.parseColor(color);
     }
 
     // Méthodes statiques
 
     public boolean isUser() {
-        return isUser;
+        return isUser > 0;
     }
 }

@@ -1,5 +1,22 @@
 package fr.agendapp.app.objects;
 
+import android.content.res.Resources;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.TextView;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import fr.agendapp.app.App;
+import fr.agendapp.app.R;
+import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.listeners.ClassicListener;
+
 /**
  * Invitation à rejoindre un groupe
  * @author Dylan Habans
@@ -7,6 +24,7 @@ package fr.agendapp.app.objects;
  */
 public class Invite {
 
+    private static List<Invite> invites = new LinkedList<>();
     /** ID dans la base */
     private int id;
     /** Prénom de l'utilisateur qui invite */
@@ -15,39 +33,103 @@ public class Invite {
     private String groupe;
     /** ID du groupe invité */
     private int groupeid;
-
     public Invite() {
-
     }
 
-    /**
-     * Accepte l'invitation (donc rejoins le groupe , API)
-     * @return true si réussite
-     */
-    public boolean accept() {
-        // TODO
-        return false;
+    public static void setInvites(List<Invite> i) {
+        invites = i;
+        Log.i(App.TAG, "Nombre d'invitations : " + invites.size());
     }
-
-    /**
-     * Refuse l'invitation (supprime)
-     * @return true si réussite
-     */
-    public void decline() {
-        // TODO
-    }
-
-    // GETTERS
 
     public int getId() {
         return id;
     }
 
-    public String getDe() {
-        return de;
+    public int getGroupeid() {
+        return groupeid;
     }
 
-    public String getGroupe() {
-        return groupe;
+    public static class InviteAdapter extends RecyclerView.Adapter<InviteAdapter.InviteHolder> {
+        private Resources resources;
+
+        @Override
+        public InviteAdapter.InviteHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            resources = parent.getContext().getResources();
+            return new InviteAdapter.InviteHolder(LayoutInflater.from(parent.getContext()), parent);
+        }
+
+        @Override
+        public void onBindViewHolder(final InviteAdapter.InviteHolder holder, int position) {
+            final Invite invite = invites.get(position);
+            holder.text.setText(
+                    resources.getString(
+                            R.string.invit_text,
+                            invite.de,
+                            invite.groupe
+                    ));
+            holder.confirm.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SyncFactory.getInstance(v.getContext()).acceptInvite(
+                                    v.getContext(),
+                                    new ClassicListener() {
+                                        @Override
+                                        public void onCallBackListener() {
+                                            // Après exécution de la requête
+                                            deleteItem(holder.getAdapterPosition());
+                                        }
+                                    },
+                                    invite,
+                                    null // TODO Passage d'une instance de NotificationFactory
+                            );
+                        }
+                    }
+            );
+            holder.cancel.setOnClickListener(
+                    new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            SyncFactory.getInstance(v.getContext()).declineInvite(
+                                    v.getContext(),
+                                    new ClassicListener() {
+                                        @Override
+                                        public void onCallBackListener() {
+                                            // Après exécution de la requête
+                                            deleteItem(holder.getAdapterPosition());
+                                        }
+                                    },
+                                    invite,
+                                    null // TODO
+                            );
+                        }
+                    }
+            );
+        }
+
+        @Override
+        public int getItemCount() {
+            return invites.size();
+        }
+
+        private void deleteItem(int position) {
+            invites.remove(position);
+            notifyItemRemoved(position);
+        }
+
+        class InviteHolder extends RecyclerView.ViewHolder {
+            TextView text;
+            Button confirm;
+            Button cancel;
+
+            InviteHolder(LayoutInflater inflater, ViewGroup parent) {
+                super(inflater.inflate(R.layout.object_invit, parent, false));
+                this.text = (TextView) itemView.findViewById(R.id.invit_text);
+                this.confirm = (Button) itemView.findViewById(R.id.invit_confirm);
+                this.cancel = (Button) itemView.findViewById(R.id.invit_cancel);
+            }
+
+
+        }
     }
 }

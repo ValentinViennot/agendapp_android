@@ -4,20 +4,22 @@ package fr.agendapp.app.pages;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
@@ -25,9 +27,14 @@ import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.Pending;
-import fr.agendapp.app.objects.Filter;
+import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.listeners.ClassicListener;
+import fr.agendapp.app.listeners.SyncListener;
+import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Header;
+import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
+import fr.agendapp.app.utils.Filter;
 
 /**
  * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)
@@ -37,33 +44,69 @@ import fr.agendapp.app.objects.Work;
  */
 public class WorkPage extends Fragment implements SyncListener {
 
-    // Nombre de filtre maximal par catégorie de filtre
-    private final int MAX_FILTERS = 5;
+    // Affichage de la liste de devoirs à fusionner entre eux
+    public FusionList fusions;
+    // Liste de devoirs
+    protected List<Work> homeworks;
     // Liste d'en tetes (mois) liée à la liste de devoirs
     protected List<Header> headers;
     // Liste d'en tetes (jour) liée à la liste de devoirs
     protected List<Header> subheaders;
-    // Liste de devoirs
-    protected List<Work> homeworks;
     // Adapter permettant l'affichage de la liste de devoirs
     protected DoubleHeaderAdapter adapter;
-    // TODO Timer devrait être déprécié... Remplacer par ScheduledExecutorService (pas urgent)
-    // Timer utilisé pour l'actualisation régulière des données
-    protected Timer timer = new Timer();
-    // tableau 2D de filtres
-    // Filter[] chaque case de ce tableau doit être vérifiée
-    // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
-    // Il suffit qu'une seule condition j de Filter[i][j] soit validée pour que la condition i soit validée
-    Filter[][] filters = new Filter[Filter.NB_TYPES][MAX_FILTERS];
+    // Affichage de la zone "invitations"
+    private RecyclerView inviteView;
+    // Affichage de la liste d'invitations
+    private Invite.InviteAdapter inviteAdapter;
+
+    // Nombre de synchronisations en attente
+    private int planSync = 0;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         headers = new LinkedList<>();
         subheaders = new LinkedList<>();
         homeworks = new LinkedList<>();
-        // On récupère la vue dans laquelle seront affiché les devoirs
-        RecyclerView recyclerView = (RecyclerView) inflater.inflate(
-                R.layout.recycler_view, container, false);
+
+        // On récupère la vue de la liste de devoirs
+        View view = inflater.inflate(R.layout.activity_work, container, false);
+
+        // Section contenant la liste de fusion
+        fusions = new FusionList(
+                (CardView) view.findViewById(R.id.fusion_view),
+                (TextView) view.findViewById(R.id.fusion_1),
+                (TextView) view.findViewById(R.id.fusion_2),
+                (TextView) view.findViewById(R.id.fusion_3)
+        );
+
+        // Section contenant les invitations à des groupes
+        inviteView = (RecyclerView) view.findViewById(R.id.view_invitations);
+        inviteAdapter = new Invite.InviteAdapter();
+        inviteView.setHasFixedSize(false);
+        inviteView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        inviteView.setAdapter(inviteAdapter);
+
+        final SwipeRefreshLayout refresher = (SwipeRefreshLayout) view.findViewById(R.id.swipe_refresh);
+        refresher.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                SyncFactory.getInstance(WorkPage.this.getContext())
+                        .getVersion(WorkPage.this, WorkPage.this.getContext(), new NotificationFactory(WorkPage.this.getActivity()));
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        refresher.setRefreshing(false);
+                    }
+                }, 2000);
+            }
+        });
+        refresher.setColorSchemeColors(
+                getResources().getColor(R.color.colorAccent),
+                getResources().getColor(R.color.colorPrimary),
+                getResources().getColor(R.color.colorPrimaryDark));
+
+        // Section contenant la liste en elle même
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         // Instancie l'adapter permettant l'affichage de la liste de devoirs
         adapter = new DoubleHeaderAdapter(this);
         // "Decoration" = en tetes
@@ -76,21 +119,57 @@ public class WorkPage extends Fragment implements SyncListener {
         recyclerView.setAdapter(adapter);
 
         // Retourne la vue initialisée
-        return recyclerView;
+        return view;
     }
 
     @Override // Au démarrage de l'activité (ou sa reprise)
     public void onStart() {
         super.onStart();
+        Log.i(App.TAG, "onStart (" + (isArchives() ? "A" : "D") + ")");
         // On actualise l'affichage des devoirs à partir des données disponibles localement
         // dès le démarrage pour un affichage aussi rapide que possible
+        this.refresh();
+        // Lance une première synchronisation forcée
+        this.sync();
+        // TODO premier appel non efficace (nécessite de re rentrer dans la vue, même choe pour sync ? :o )
+        getInvites();
+    }
+
+    @Override // Lorsque l'onglet est fait visible (true) ou masqué (false)
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            planSync = 0;
+            // Lance une synchronisation des devoirs depuis le serveur
+            // La planification est inclue dans le callback onSync
+            this.sync();
+        } else {
+            planSync++;
+        }
+    }
+
+    private void getInvites() {
+        // On masque la vue en attendant de , peut être, recevoir les invitations
+        inviteView.setVisibility(View.GONE);
+        // Récupère les invitations
+        SyncFactory.getInstance(getContext()).getInvites(getContext(), new ClassicListener() {
+            @Override
+            public void onCallBackListener() {
+                Log.i(App.TAG, "invitations reçues");
+                inviteAdapter.notifyDataSetChanged();
+                if (inviteAdapter.getItemCount() > 0)
+                    inviteView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
+
+    /**
+     * Recalculer l'affichage dans un Thread séparé puis le mettre à jour
+     */
+    private void refresh() {
         SyncTask st = new SyncTask();
         st.execute();
-        // Lance une synchronisation des devoirs depuis le serveur
-        // La planification est inclue dans le callback onSync
-        this.sync();
     }
-    //TODO onStop qui arrête le timer
 
     /**
      * TODO : Problème soit dans le calcul des en tetes soit dans le calcul de l'ID d'en tete
@@ -99,10 +178,13 @@ public class WorkPage extends Fragment implements SyncListener {
     protected void recalcSections() {
         // Réinitialisation de la liste de devoirs
         setHomeworks();
+        // Application des filtres à la liste de devoirs
+        this.homeworks = Filter.applyFilters(this.homeworks);
         // Réinitialisation des listes d'headers
         headers = new LinkedList<>();
         subheaders = new LinkedList<>();
         // Cas où la liste de devoirs est vide
+        // TODO Affichage d'un message
         if (homeworks.size() == 0) return;
         // Récupére une instance de Calendrier
         // Pour la date de la section en cours
@@ -147,72 +229,6 @@ public class WorkPage extends Fragment implements SyncListener {
         if (day != null) day.setTo(i);
     }
 
-    // TODO implémenter le filtrage avant le recalcSection
-    // TODO crée une vue permettant de filtrer puis bouton ==> recalc affichage
-    /*List<Work> applyFilters2() {
-        List<Work> r;
-        // Pour chaque devoir
-        for (Work w : homeworks) {
-            if (validateFilters(w)) r.add(w);
-        }
-    }*/
-
-    /**
-     * @return true si le devoir valide les conditions Filter[][]
-     */
-    boolean validateFilters(Work w) {
-        // Pour chaque groupe de filtres
-        for (int i = 0; i < filters.length; ++i) {
-            if (filters[i] != null) {
-                // Le devoir doit correspondre à au moins un filtre du groupe
-                // On suppose que c'est faux
-                boolean b = false;
-                int j = 0;
-                // Tant que c'est faux, on continue d'essayer de le montrer
-                // Jusqu'à avoir testé tous les filtres du groupe
-                while (!b && j < filters[i].length) {
-                    // Si le devoir correspond au filtre
-                    // b vaudra true
-                    // la boucle s'arrêtera
-                    // et on testera le groupe suivant
-                    if (filters[i][j] != null)
-                        b = filters[i][j].correspond(w);
-                    // Filtre suivant
-                    j++;
-                }
-                // Si ce groupe de filtre n'est pas validé, rien ne sert de tester les suivants
-                // le devoir ne correspond pas
-                if (!b) return false;
-            }
-        }
-        // Si la méthode n'a jamais renvoyé false, alors le devoir correspond
-        return true;
-    }
-
-    /**
-     * Ajout d'un filtre
-     * Exemple d'utilisation :
-     * addFilter(new FilterFlag(2))
-     * pour filter sur les devoirs possédant un drapeau de couleur 2
-     */
-    void addFilter(Filter filter) {
-        // Pour le type de filtre demandé
-        for (int i = 0; i < filters[filter.getType()].length; ++i) {
-            // On cherche la première case nulle
-            if (filters[filter.getType()][i] == null) {
-                // On y ajoute le filtre
-                filters[filter.getType()][i] = filter;
-                // Quitte la méthode
-                return;
-            }
-        }
-        NotificationFactory.add(this.getActivity(), 1, "Impossible", "Trop de filtres appliqués !");
-    }
-
-    void clearFilter(Filter filter) {
-        filter = null;
-    }
-
     /**
      * Lance une sycnhronisation
      * --> Envoi les listes d'attente au serveur
@@ -223,33 +239,45 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
-        Log.i(App.TAG, "Synchronisation...");
+        Log.i(App.TAG, "SYNC " + (isArchives() ? "A" : "D"));
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
-        Pending.send(this, this.getContext());
+        Pending.send(this, this.getContext(), new NotificationFactory(this.getActivity()));
         // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
+        planNextSync();
     }
 
     /**
      * Planification d'une prochaine synchronisation dans x secondes
      */
-    void planNextSync() {
-        // TODO Annuler une éventuelle ancienne planification (Pour ne pas accumuler en cas de MAJ forcée)
-        // Planification de la mise à jour TODO ajuster la fréquence de synchro
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                sync();
-            }
-        }, 5000);
+    protected void planNextSync() {
+        int SYNC_DELAY = 2000;
+        planNextSync(SYNC_DELAY);
+    }
+
+    /**
+     * @param delay Delai entre chaque synchronisation
+     */
+    protected void planNextSync(int delay) {
+        if (planSync == 0) {
+            planSync++;
+            new Handler().postDelayed(
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            planSync--;
+                            sync();
+                        }
+                    }, delay
+            );
+        }
     }
 
     @Override
     public void onSync() {
         // En cas de réception de nouvelles données
         // On met à jour l'affichage de manière asynchrone
-        SyncTask st = new SyncTask();
-        st.execute();
+        refresh();
         onPostSync();
     }
 
@@ -259,8 +287,10 @@ public class WorkPage extends Fragment implements SyncListener {
         onPostSync();
     }
 
+    // TODO : Pas mal de méthodes vides par ici...
+
     protected void onPostSync() {
-        planNextSync();
+
     }
 
     @Override
@@ -292,7 +322,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * Cette classe interne permet de créer un processus séparé du processus principal dans lequel
      * seront retriées les nouvelles listes de données, les headers, etc.
      */
-    protected class SyncTask extends AsyncTask<Void, Integer, Void> {
+    private class SyncTask extends AsyncTask<Void, Integer, Void> {
 
         // Fenetre de dialogue de "chargement"/"loading"/spinner
         ProgressDialog progressDialog;
@@ -316,7 +346,11 @@ public class WorkPage extends Fragment implements SyncListener {
         protected void onPreExecute() {
             super.onPreExecute();
             // Affiche une fenetre de chargement
-            progressDialog = ProgressDialog.show(WorkPage.this.getContext(), "Quelques instants", "Mise à jour en cours...");
+            progressDialog = ProgressDialog.show(
+                    WorkPage.this.getContext(),
+                    WorkPage.this.getContext().getResources().getString(R.string.msg_wait),
+                    WorkPage.this.getContext().getResources().getString(R.string.msg_updating)
+            );
         }
 
         @Override

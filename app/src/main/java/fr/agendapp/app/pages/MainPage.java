@@ -27,7 +27,7 @@ public class MainPage extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         // Layout / Vue correspondant à cette activité
-        setContentView(R.layout.activity_work);
+        setContentView(R.layout.activity_main);
         Log.i(App.TAG, "MainPage created");
         // Ajoute une barre de menu
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -46,6 +46,7 @@ public class MainPage extends AppCompatActivity {
         Adapter adapter = new Adapter(getSupportFragmentManager());
         // On ajoute la vue "WorkPage" à cette activité (MainPage)
         adapter.addFragment(new WorkPage(), getResources().getString(R.string.nav_devoirs));
+        adapter.addFragment(new ArchivesPage(), getResources().getString(R.string.nav_archives));
         // TODO page archives
         // adapter.addFragment(new WorkPage(), getResources().getString(R.string.nav_devoirs));
         viewPager.setAdapter(adapter);

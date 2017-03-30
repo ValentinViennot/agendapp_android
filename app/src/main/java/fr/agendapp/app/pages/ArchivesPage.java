@@ -17,4 +17,10 @@ public class ArchivesPage extends WorkPage {
         return true;
     }
 
+    @Override
+    protected void planNextSync() {
+        int SYNC_DELAY = 5000;
+        planNextSync(SYNC_DELAY);
+    }
+
 }

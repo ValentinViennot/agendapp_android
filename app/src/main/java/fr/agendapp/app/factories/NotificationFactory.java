@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
-import fr.agendapp.app.pages.AskListener;
+import fr.agendapp.app.listeners.AskListener;
 
 import static android.content.DialogInterface.BUTTON_NEGATIVE;
 import static android.content.DialogInterface.BUTTON_NEUTRAL;
@@ -17,6 +17,12 @@ import static android.content.DialogInterface.BUTTON_POSITIVE;
  * @author Valentin Viennot
  */
 public class NotificationFactory {
+
+    private Activity activity;
+
+    public NotificationFactory(Activity activity) {
+        this.activity = activity;
+    }
 
     /**
      * Ajoute une 'notification' à l'écran de l'utilisateur
@@ -43,7 +49,7 @@ public class NotificationFactory {
             alertDialog.show();
         } else {
             // On affiche un Toast plus ou moins longtemps selon la priorité
-            Toast.makeText(activity, titre + " - " + message, priority > 0 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
+            Toast.makeText(activity, titre + (message.length() > 0 ? " - " : "") + message, priority > 0 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -81,6 +87,10 @@ public class NotificationFactory {
         });
         // Affiche la fenetre de dialogue
         alertDialog.show();
+    }
+
+    public void add(int priority, String title, String message) {
+        add(activity, priority, title, message);
     }
 
 }

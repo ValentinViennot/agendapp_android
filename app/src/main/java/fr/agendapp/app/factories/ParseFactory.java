@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 
@@ -77,7 +78,13 @@ public class ParseFactory {
         return gson.fromJson(json, collectionType);
     }
 
-    static User parseUser(String json) {
+    static List<Invite> parseInvites(String json) {
+        Type collectionType = new TypeToken<LinkedList<Invite>>() {
+        }.getType();
+        return gson.fromJson(json, collectionType);
+    }
+
+    public static User parseUser(String json) {
         return gson.fromJson(json, User.class);
     }
 

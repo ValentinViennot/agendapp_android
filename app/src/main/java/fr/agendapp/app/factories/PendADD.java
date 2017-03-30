@@ -12,27 +12,32 @@ import java.util.TimeZone;
 import fr.agendapp.app.App;
 import fr.agendapp.app.objects.Work;
 
+/**
+ * @author Dylan Habans
+ */
 class PendADD extends Pending {
 
     private static List<PendADD> pending;
     private static String name = "pendADD";
 
+    // TODO vérifier que les champs correspondent à leur nom JSON (sur les autres pending)
     private String date;
-    private String text;
-    private int groupe;
+    private String texte;
+    private int user;
 
     /**
-     * @param date
-     * @param text
-     * @param groupe
-     * @author Dylan Habans
+     * @param date Date d'échéance
+     * @param text Description
+     * @param groupe Matière (ID)
      * Constructeur de PendADD :
      */
     public PendADD(Date date, String text, int groupe) {
         Work.dateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
+        // Décalage d'horaire +2H forcé
         this.date = Work.dateformat.format(date) + "+02:00";
-        this.text = text;
-        this.groupe = groupe;
+        this.texte = text;
+        // l'API est configurée ainsi...
+        this.user = groupe;
         pending.add(this);
     }
 
@@ -81,8 +86,8 @@ class PendADD extends Pending {
     public String toString() {
         String json = "{";
         json += "\"date\":\"" + date + "\",";
-        json += "\"texte\":\"" + text + "\",";
-        json += "\"user\":" + groupe;
+        json += "\"texte\":\"" + texte + "\",";
+        json += "\"user\":" + user;
         json += "}";
         return json;
     }

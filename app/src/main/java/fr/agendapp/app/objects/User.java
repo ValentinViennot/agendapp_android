@@ -1,6 +1,12 @@
 package fr.agendapp.app.objects;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+
+import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.listeners.ClassicListener;
 
 /**
  * TODO
@@ -30,15 +36,15 @@ public class User {
     /**
      * Notifications pour les ajouts
      */
-    private boolean rappels;
+    private int rappels;
     /**
      * Recevoir des notifications par email ?
      */
-    private boolean mail;
+    private int mail;
     /**
      * L'utilisateur peut il modifier son prenom et son nom ?
      */
-    private boolean fake_identity;
+    private int fake_identity;
     /**
      * Dossier racine de l'utilisateur
      */
@@ -49,29 +55,46 @@ public class User {
     private Subject[] courses;
 
     public User() {
+    }
 
+    public static void clear() {
+        user = new User();
     }
 
     /**
-     * Déconnecte l'utilisateur actif
-     * - Suppression des données locales
-     * - Appel à l'API logout
-     * - user=null;
-     * - Redirection vers MainActivity
-     *
-     * @param b Déconnexion de partout ? (toutes les sessions)
+     * Initialise l'utilisateur actuel avec les données locales
      */
-    public static void logout(boolean b) {
-        // TODO
+    public static void init(final Context context) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+        String json = preferences.getString("user", "x");
+        if (json.equals("x")) {
+            // Evitons un NullPointer
+            user = new User();
+        } else {
+            // Si les données sont valides, on utilise les données locales
+            // Celles distantes seront récupérées plus tard, si besoin
+            user = ParseFactory.parseUser(json);
+        }
     }
 
     /**
      * Initialise l'utilisateur actuel
+     *
+     * @param b True s'il faut lancer une synchronisation silencieuse de l'utilisateur
      */
-    public static void init(Context context) {
-        // TODO
-        // init from local storage
-        // get a new version from server
+    public static void init(final Context context, boolean b) {
+        if (b) {
+            // On tente de récupérer une version récente depuis le serveur
+            SyncFactory.getInstance(context).getUser(context, new ClassicListener() {
+                @Override
+                public void onCallBackListener() {
+                    // Une fois la version récente récupérée, on initialisera avec les nouvelles données
+                    init(context);
+                }
+            }, null);
+        }
+        // En attendant, on initialise avec les données locales
+        init(context);
     }
 
     /**
@@ -107,7 +130,7 @@ public class User {
     }
 
     public void setPrenom(String prenom) {
-        if (fake_identity) this.prenom = prenom;
+        if (this.canFakeIdentity()) this.prenom = prenom;
     }
 
     public String getNom() {
@@ -115,7 +138,7 @@ public class User {
     }
 
     public void setNom(String nom) {
-        if (fake_identity) this.nom = nom;
+        if (this.canFakeIdentity()) this.nom = nom;
     }
 
     public String getEmail() {
@@ -135,23 +158,23 @@ public class User {
     }
 
     public boolean isRappels() {
-        return rappels;
+        return rappels > 0;
     }
 
     public void setRappels(boolean rappels) {
-        this.rappels = rappels;
+        this.rappels = rappels ? 1 : 0;
     }
 
     public boolean isMail() {
-        return mail;
+        return mail > 0;
     }
 
     public void setMail(boolean mail) {
-        this.mail = mail;
+        this.mail = mail ? 1 : 0;
     }
 
     public boolean canFakeIdentity() {
-        return fake_identity;
+        return fake_identity > 0;
     }
 
     public int getRoot() {

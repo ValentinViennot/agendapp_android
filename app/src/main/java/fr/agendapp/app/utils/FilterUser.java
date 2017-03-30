@@ -1,10 +1,13 @@
-package fr.agendapp.app.objects;
+package fr.agendapp.app.utils;
+
+import fr.agendapp.app.objects.Work;
 
 /**
  * Created by Charline on 21/03/2017.
  */
 public class FilterUser extends Filter {
-    String txt;
+
+    private String txt;
 
     public FilterUser(String txt) {
         super(Filter.USER_TYPE);
@@ -12,7 +15,7 @@ public class FilterUser extends Filter {
     }
 
     public boolean correspond(Work w) {
-        int i = w.getText().lastIndexOf(txt);
-        return i != -1;
+        return w.getText().contains(txt);
     }
+
 }
