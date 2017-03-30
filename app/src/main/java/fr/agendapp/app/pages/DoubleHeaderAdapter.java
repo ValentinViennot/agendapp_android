@@ -79,16 +79,34 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
         return homeworks.size();
     }
 
+    /**
+     * Détermine l'ID (position dans la liste) d'un en tete à partir de la position du devoir auquel il est associé
+     * Si les devoirs d'id 0,1,2 correspondent à l'en tete d'id 1 alors la méthode devra renvoyer
+     * 1 pour le devoir 0
+     * 1.33 pour le devoir 1
+     * 1.66 pour le devoir 2
+     *
+     * @param position Position du devoir dans la liste
+     * @param headers  Tableau d'en tetes
+     * @return Position de l'en tete associé au devoir dans la liste headers
+     */
     private long getLongId(int position, List<Header> headers) {
-        int i = headers.size(), total;
+        int i = headers.size(), total, oldtotal=1;
         ListIterator<Header> li = headers.listIterator(i);
         // Iteration dans le sens inversé
         while (li.hasPrevious()) {
-            i--;
+            // Récupère la position+1 jusqu'à laquelle cet en tete va
             total = li.previous().getTo();
+            // Si la position du devoir est supérieure ou égale c'est que le devoir appartenant à l'en tete précédent
             if (position >= total) {
-                return i + position / total;
+                // On renvoit donc la position de l'en tete précédent (pas encore décrémenté)
+                // + une fraction correspondant à
+                // (la position du devoir) / ( (la position du dernier devoir de cet en tete ) +1 )
+                return (i + (position) / oldtotal);
             }
+            // Mémorise quel est le total de cet en tete
+            oldtotal = total;
+            i--;
         }
         return 0;
     }

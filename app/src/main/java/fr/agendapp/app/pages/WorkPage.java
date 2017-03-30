@@ -178,6 +178,8 @@ public class WorkPage extends Fragment implements SyncListener {
     protected void recalcSections() {
         // Réinitialisation de la liste de devoirs
         setHomeworks();
+        //TODO
+        //Filter.addFilter(new FilterDone(false));
         // Application des filtres à la liste de devoirs
         this.homeworks = Filter.applyFilters(this.homeworks);
         // Réinitialisation des listes d'headers
