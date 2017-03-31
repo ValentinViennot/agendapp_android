@@ -15,12 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
@@ -35,6 +29,11 @@ import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.utils.Filter;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)
@@ -198,7 +197,19 @@ public class WorkPage extends Fragment implements SyncListener {
         Header day = null;
         // parcours avec iterateur
         int i = 0;
+        HashMap <String, SelectableFilter> filtersubjects = new HashMap<>();
+        HashMap <int, SelectableFilter> filterflags = new HashMap<>();
         for (Work w : homeworks) {
+            if(filtersubjects.containsKey(w.getSubject()){
+            filtersubjects.get(w.getSubject()).inc();}
+                else {
+                filtersubjects.put(w.getSubject(),new SelectableFilter(new FilterSubject(w.getSubject())));
+            }
+            if(filterflags.containsKey(w.getFlag()){
+                filterflags.get(w.getFlag()).inc();}
+                else {
+                filterflags.put(w.getFlag(),new SelectableFilter(new FilterFlag(w.getFlag())));
+            }
             // Date du devoir traité
             cal2.setTime(w.getDate());
             // Si le mois et/ou le jour sont différents
