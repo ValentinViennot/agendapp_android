@@ -51,7 +51,7 @@ public class Comment {
         return auteur;
     }
 
-    public String getTexte() {
+    public String getText() {
         return texte;
     }
 
