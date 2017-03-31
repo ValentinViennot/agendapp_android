@@ -11,6 +11,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -25,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.objects.Attachment;
@@ -176,6 +178,16 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
         subholders[id] = viewholder;
     }
 
+    private void updateHeaders() {
+        for (int i = 0; i < subholders.length; ++i)
+            if (subholders[i] != null)
+                subholders[i].title.setText(subheaders.get(i).getTitle());
+
+        for (int i = 0; i < holders.length; ++i)
+            if (holders[i] != null)
+                holders[i].title.setText(headers.get(i).getTitle());
+    }
+
     /**
      * Vue pour un en tete de mois
      */
@@ -228,7 +240,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
             flag = (ImageButton) itemView.findViewById(R.id.card_flag);
             nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
             nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
-            done = (Button) itemView.findViewById(R.id.button_done);
+            done = (Button) itemView.findViewById(R.id.button_done);//TODO marche pas après 1 synchro au premier clic (pas de MAJ affichage)
             menu = (ImageButton) itemView.findViewById(R.id.more_button);
 
         }
@@ -288,7 +300,9 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                     builder.setTitle(R.string.flags_title)
                             .setItems(R.array.flags, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+                                    Log.i(App.TAG, "flag : " + which);
                                     w.setFlag(context, which);
+                                    notifyItemChanged(getAdapterPosition());
                                 }
                             });
                     builder.create().show();
@@ -319,7 +333,10 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                                         w.delete(context);
                                     else
                                         w.report(context);
+                                    DoubleHeaderAdapter.this.homeworks.remove(w);
                                     notifyItemRemoved(getAdapterPosition());
+                                    // TODO Décalage du devoir suivant celui supprimé dans le header du dessus (problème de bornes, recalcsections)
+                                    updateHeaders();
                                     return true;
                                 case R.id.menu_fusion:
                                     if (!fusionList.add(w)) {
@@ -462,13 +479,25 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                 }
             }
 
-            for (int i = 0; i < subholders.length; ++i)
-                if (subholders[i] != null)
-                    subholders[i].title.setText(subheaders.get(i).getTitle());
+            /// DEBUG
+            /*for (Integer i : removed)
+                Log.i(App.TAG,"removed "+i);
+            for (Integer i : added)
+                Log.i(App.TAG,"added "+i);
+            for (Integer i : changed)
+                Log.i(App.TAG,"changed "+i);
+            for (Integer[] i : moved) {
+                for (Integer[] j : moved) {
+                    if (i[0].equals(j[1]) && j[0].equals(i[1])) {
+                        Log.i(App.TAG,"removed "+i[0]);
+                        Log.i(App.TAG,"removed "+i[1]);
+                        //notifyItemMoved(i[0], i[1]);
+                    }
+                }
+            }*/
 
-            for (int i = 0; i < holders.length; ++i)
-                if (holders[i] != null)
-                    holders[i].title.setText(headers.get(i).getTitle());
+            updateHeaders();
+
         }
     }
 }

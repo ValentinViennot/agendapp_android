@@ -106,8 +106,7 @@ public class FusionList {
             for (int i = 0; i < size; ++i) {
                 merge[i] = works[i].getId();
             }
-            new PendMERGE(merge);
-            // TODO new PendMERGE(context, merge);
+            new PendMERGE(context, merge);
             clear();
         }
         // En cas d'échec

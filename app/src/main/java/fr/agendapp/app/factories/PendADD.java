@@ -2,10 +2,15 @@ package fr.agendapp.app.factories;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
+import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.TimeZone;
+
 import fr.agendapp.app.App;
 import fr.agendapp.app.objects.Work;
-
-import java.util.*;
 
 /**
  * @author Dylan Habans
@@ -26,7 +31,7 @@ public class PendADD extends Pending {
      * @param groupe Matière (ID)
      * Constructeur de PendADD :
      */
-    public PendADD(Context context, Date date, String text, int groupe) {
+    private PendADD(Context context, Date date, String text, int groupe) {
         Work.dateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
         // Décalage d'horaire +2H forcé
         this.date = Work.dateformat.format(date) + "+02:00";

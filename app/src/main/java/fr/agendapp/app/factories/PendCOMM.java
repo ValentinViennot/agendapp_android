@@ -2,12 +2,13 @@ package fr.agendapp.app.factories;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import fr.agendapp.app.App;
-import fr.agendapp.app.objects.Comment;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+
+import fr.agendapp.app.App;
+import fr.agendapp.app.objects.Comment;
 
 /**
  * @author Dylan Habans
@@ -21,12 +22,11 @@ public class PendCOMM extends Pending {
     private String comment;
 
     /**
-     * @param id
-     * @param comment
-     * @author Dylan Habans
+     * @param id ID
+     * @param comment Commentaire
      * Constructeur de PendCOMM
      */
-    public PendCOMM(Context context, int id, String comment) {
+    private PendCOMM(Context context, int id, String comment) {
         this.id = id;
         this.comment = comment;
         pending.add(this);

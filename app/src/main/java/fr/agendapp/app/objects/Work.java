@@ -3,23 +3,29 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.factories.PendALERT;
+import fr.agendapp.app.factories.PendCOMM;
+import fr.agendapp.app.factories.PendDEL;
 import fr.agendapp.app.factories.PendDO;
+import fr.agendapp.app.factories.PendFLAG;
 
 import static android.content.Context.MODE_PRIVATE;
 
 /**
  * Représente un devoir
+ *
  * @author Dylan Habans
  * @author Valentin Viennot
  */
@@ -28,29 +34,53 @@ public class Work {
     public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private static List<Work> comingwork;
     private static List<Work> pastwork;
-    /** ID dans la base */
+    /**
+     * ID dans la base
+     */
     private int id;
-    /** ID de l'auteur */
+    /**
+     * ID de l'auteur
+     */
     private int user;
-    /** "@prenomnom" de l'auteur */
+    /**
+     * "@prenomnom" de l'auteur
+     */
     private String auteur;
-    /** Nom de la matière */
+    /**
+     * Nom de la matière
+     */
     private String matiere;
-    /** Couleur associée la matière */
+    /**
+     * Couleur associée la matière
+     */
     private String matiere_c;
-    /** Texte du devoir */
+    /**
+     * Texte du devoir
+     */
     private String texte;
-    /** Date d'échéance */
+    /**
+     * Date d'échéance
+     */
     private Date date;
-    /** Nombre de marqué comme faits */
+    /**
+     * Nombre de marqué comme faits
+     */
     private int nb_fait;
-    /** Utilisateur a marqué comme fait ? */
+    /**
+     * Utilisateur a marqué comme fait ?
+     */
     private int fait;
-    /** Drapeau attaché par l'utilisateur */
+    /**
+     * Drapeau attaché par l'utilisateur
+     */
     private int flag;
-    /** Liste de commentaires */
+    /**
+     * Liste de commentaires
+     */
     private LinkedList<Comment> commentaires;
-    /** Liste de pièces jointes */
+    /**
+     * Liste de pièces jointes
+     */
     private ArrayList<Attachment> pjs;
 
     /**
@@ -69,7 +99,8 @@ public class Work {
      */
     public Work(User user, Subject subject, String texte, Date date) {
         this.id = 0;
-        this.user = user.getId();
+        // Tout est normal...
+        this.user = subject.getId();
         this.auteur = user.getPrenom() + user.getNom();
         this.texte = texte;
         this.date = date;
@@ -93,6 +124,8 @@ public class Work {
     }
 
     // STATIC RESOURCES
+
+    // TODO sauvegarder tableau local ?
 
     /**
      * Devoirs à venir
@@ -137,7 +170,7 @@ public class Work {
     }
 
     public static List<Work> getComingwork(Context activity) {
-        if (comingwork == null) {
+        if (activity != null && comingwork == null) {
             SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
             comingwork = ParseFactory.parseWork(preferences.getString("devoirs", "[]"));
         }
@@ -164,26 +197,18 @@ public class Work {
         }
         // On ajoute l'action à la liste d'actions en attente
         new PendDO(context, this);
-        // DEBUG
-        Log.i(App.TAG, "ID " + this.getId() + " is " + this.isDone());
     }
 
     /**
      * Supprime le devoir
      * L'utilisateur doit en être le propriétaire
      */
-    public void delete(Context context, Work w) {
-        //TODO
-        int id = comingwork.indexOf(w);
-        if (id < 0) {
-            id = pastwork.indexOf(w);
-            ListIterator<Work> i = pastwork.listIterator(id);
+    public void delete(Context context) {
+        if (comingwork.contains(this)) {
+            comingwork.remove(this);
+        } else {
+            pastwork.remove(this);
         }
-        ListIterator<Work> i = comingwork.listIterator(id);
-
-        i.remove();
-
-
         new PendDEL(context, this);
     }
 
@@ -192,10 +217,6 @@ public class Work {
      * L'utilisateur ne peut pas en être le propriétaire
      */
     public void report(Context context) {
-        //TODO
-        if (this.isUser() == false) {
-
-        }
         new PendALERT(context, this);
     }
 
@@ -203,14 +224,12 @@ public class Work {
      * @param c Commentaire à ajouter au devoir
      */
     public void addComment(Context context, Comment c) {
-        // TODO
-
-
+        this.commentaires.add(c);
         new PendCOMM(context, c);
     }
 
     public void setFlag(Context context, int flag) {
-        // TODO
+        this.flag = flag;
         new PendFLAG(context, this);
     }
 
@@ -290,6 +309,5 @@ public class Work {
                         || (this.getComments().size() != 0 && w.getComments().size() != 0 && this.getComments().getLast().getId() != w.getComments().getLast().getId())
         );
     }
-
 
 }

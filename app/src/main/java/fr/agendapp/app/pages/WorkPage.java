@@ -249,6 +249,7 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
+        setHomeworks();
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
         Pending.send(this, this.getContext(), new NotificationFactory(this.getActivity()));
