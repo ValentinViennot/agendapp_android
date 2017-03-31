@@ -2,17 +2,17 @@ package fr.agendapp.app.factories;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import fr.agendapp.app.App;
+import fr.agendapp.app.objects.Work;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.agendapp.app.App;
-
 /**
  * @author Dylan Habans
  */
-class PendFLAG extends Pending {
+public class PendFLAG extends Pending {
 
     private static List<PendFLAG> pending;
     private static String name = "pendFLAG";
@@ -26,10 +26,15 @@ class PendFLAG extends Pending {
      * @author Dylan Habans
      * Constructeur de PendFLAG
      */
-    public PendFLAG(int id, int flag) {
+    public PendFLAG(Context context, int id, int flag) {
         this.id = id;
         this.flag = flag;
         pending.add(this);
+        PendFLAG.saveList(context);
+    }
+
+    public PendFLAG(Context context, Work w) {
+        this(context, w.getId(), w.getFlag());
     }
 
     /**

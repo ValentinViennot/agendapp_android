@@ -4,17 +4,12 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.util.Log;
+import fr.agendapp.app.App;
+import fr.agendapp.app.factories.*;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import fr.agendapp.app.App;
-import fr.agendapp.app.factories.ParseFactory;
-import fr.agendapp.app.factories.PendDO;
+import java.util.*;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -42,7 +37,9 @@ public class Work {
     private String texte;
     /** Date d'échéance */
     private Date date;
-    /** Nombre de marqué comme faits */
+    /**
+     * Nombre de marqués comme faits
+     */
     private int nb_fait;
     /** Utilisateur a marqué comme fait ? */
     private int fait;
@@ -139,8 +136,19 @@ public class Work {
      * Supprime le devoir
      * L'utilisateur doit en être le propriétaire
      */
-    public void delete(Context context) {
-        // TODO
+    public void delete(Context context, Work w) {
+        //TODO
+        int id = comingwork.indexOf(w);
+        if (id < 0) {
+            id = pastwork.indexOf(w);
+            ListIterator<Work> i = pastwork.listIterator(id);
+        }
+        ListIterator<Work> i = comingwork.listIterator(id);
+
+        i.remove();
+
+
+        new PendDEL(context, this);
     }
 
     /**
@@ -149,6 +157,10 @@ public class Work {
      */
     public void report(Context context) {
         //TODO
+        if (this.isUser() == false) {
+
+        }
+        new PendALERT(context, this);
     }
 
     /**
@@ -156,10 +168,14 @@ public class Work {
      */
     public void addComment(Context context, Comment c) {
         // TODO
+
+
+        new PendCOMM(context, c);
     }
 
     public void setFlag(Context context, int flag) {
         // TODO
+        new PendFLAG(context, this);
     }
 
     // GETTERS
