@@ -236,7 +236,6 @@ public class SyncFactory {
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version, NotificationFactory notifs) {
         if (context != null) {
-            Log.i(App.TAG, "test : getWork");
             req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                     new Response.Listener<String>() {
                         @Override

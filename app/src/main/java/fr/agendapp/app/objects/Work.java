@@ -9,7 +9,9 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
@@ -49,7 +51,7 @@ public class Work {
     /** Drapeau attaché par l'utilisateur */
     private int flag;
     /** Liste de commentaires */
-    private ArrayList<Comment> commentaires;
+    private LinkedList<Comment> commentaires;
     /** Liste de pièces jointes */
     private ArrayList<Attachment> pjs;
 
@@ -57,6 +59,39 @@ public class Work {
      * Constructeur par défaut (utilisé par Gson)
      */
     public Work() {
+    }
+
+    /**
+     * Contruction d'un devoir et ajout à la liste ComingWork dans l'ordre chronologique
+     *
+     * @param user    Auteur
+     * @param subject Matière
+     * @param texte   Texte
+     * @param date    Date d'échéance
+     */
+    public Work(User user, Subject subject, String texte, Date date) {
+        this.id = 0;
+        this.user = user.getId();
+        this.auteur = user.getPrenom() + user.getNom();
+        this.texte = texte;
+        this.date = date;
+        this.matiere = subject.getNom();
+        this.matiere_c = subject.getHex();
+        this.nb_fait = 0;
+        this.fait = 0;
+        this.flag = 0;
+        this.commentaires = new LinkedList<>();
+        this.pjs = new ArrayList<>();
+        insert(this);
+    }
+
+    private static void insert(Work w) {
+        ListIterator<Work> iterator = comingwork.listIterator();
+        while (iterator.hasNext())
+            if (w.getDate().compareTo(iterator.next().getDate()) >= 0) {
+                iterator.add(w);
+                break;
+            }
     }
 
     // STATIC RESOURCES
@@ -212,12 +247,31 @@ public class Work {
         return flag;
     }
 
-    public ArrayList<Comment> getComments() {
+    public LinkedList<Comment> getComments() {
         return commentaires;
     }
 
     public ArrayList<Attachment> getAttachments() {
         return pjs;
+    }
+
+    /**
+     * On cinsidère un devoir comme ayant été modifié si un des paramètres variables a évoluer
+     * La description, la matière, l'auteur... sont tant de paramètres non variables
+     *
+     * @param w Devoir à comparer avec this
+     * @return true si différent
+     */
+    public boolean modified(Work w) {
+        return (
+                this.getId() != w.getId()
+                        || this.getFlag() != w.getFlag()
+                        || this.isDone() != w.isDone()
+                        || this.getSubjectColor() != w.getSubjectColor()
+                        || this.getNbDone() != w.getNbDone()
+                        || this.getComments().size() != w.getComments().size()
+                        || (this.getComments().size() != 0 && w.getComments().size() != 0 && this.getComments().getLast().getId() != w.getComments().getLast().getId())
+        );
     }
 
 

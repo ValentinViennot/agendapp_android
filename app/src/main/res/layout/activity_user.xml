@@ -21,6 +21,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/md_keylines"
+                android:layout_marginStart="@dimen/md_keylines"
                 android:layout_marginTop="@dimen/md_keylines"
                 android:text="@string/title_userInformation"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"
@@ -74,6 +76,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/md_keylines"
+                android:layout_marginStart="@dimen/md_keylines"
                 android:layout_marginTop="@dimen/md_keylines"
                 android:text="@string/title_userNotifications"
                 android:textAppearance="@style/TextAppearance.AppCompat.Title"

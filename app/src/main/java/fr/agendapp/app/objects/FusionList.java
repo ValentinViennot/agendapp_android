@@ -56,6 +56,8 @@ public class FusionList {
                 // Défini le texte associé à la case de fusion sur le texte du devoir
                 String t = (i + 1) + ") " + w.getText();
                 texts[i].setText(t);
+                // On rend visible le champ de texte
+                texts[i].setVisibility(View.VISIBLE);
                 // On rend visible la liste de fusion (car elle n'est plus vide - si elle l'était)
                 card.setVisibility(View.VISIBLE);
                 // Active le bouton de confirmation si au moins 2 devoirs à fusionner
@@ -93,6 +95,9 @@ public class FusionList {
         // Réinitialise la liste de devoirs
         works = new Work[this.texts.length];
         size = 0;
+        // Masque les champs de texte
+        for (TextView t : texts)
+            t.setVisibility(View.GONE);
     }
 
     private boolean confirm(Context context) {

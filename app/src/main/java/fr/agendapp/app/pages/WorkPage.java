@@ -2,9 +2,11 @@ package fr.agendapp.app.pages;
 
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -70,6 +72,14 @@ public class WorkPage extends Fragment implements SyncListener {
 
         // On récupère la vue de la liste de devoirs
         View view = inflater.inflate(R.layout.activity_work, container, false);
+
+        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(WorkPage.this.getActivity(), NewPage.class));
+            }
+        });
 
         // Section contenant la liste de fusion
         fusions = new FusionList(
@@ -178,8 +188,6 @@ public class WorkPage extends Fragment implements SyncListener {
     protected void recalcSections() {
         // Réinitialisation de la liste de devoirs
         setHomeworks();
-        //TODO
-        //Filter.addFilter(new FilterDone(false));
         // Application des filtres à la liste de devoirs
         this.homeworks = Filter.applyFilters(this.homeworks);
         // Réinitialisation des listes d'headers
@@ -241,7 +249,6 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
-        Log.i(App.TAG, "SYNC " + (isArchives() ? "A" : "D"));
         // Envoyer les listes d'actions en attente
         // Enchaine automatiquement sur l'actualisation des données (voir méthode send de Pending)
         Pending.send(this, this.getContext(), new NotificationFactory(this.getActivity()));

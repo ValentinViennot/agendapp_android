@@ -15,7 +15,7 @@ import fr.agendapp.app.objects.Work;
 /**
  * @author Dylan Habans
  */
-class PendADD extends Pending {
+public class PendADD extends Pending {
 
     private static List<PendADD> pending;
     private static String name = "pendADD";

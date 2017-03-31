@@ -26,6 +26,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".pages.MainPage" />
         </activity>
+        <activity
+            android:name=".pages.NewPage"
+            android:label="@string/title_newpage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
     </application>
 
 </manifest>

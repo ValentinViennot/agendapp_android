@@ -33,6 +33,11 @@ public class Invite {
     private String groupe;
     /** ID du groupe invité */
     private int groupeid;
+
+    /**
+     * Constructeur par défaut
+     * Utilisé par Gson. Les attributs sont initialisés par Gson.
+     */
     public Invite() {
     }
 
@@ -50,6 +55,7 @@ public class Invite {
     }
 
     public static class InviteAdapter extends RecyclerView.Adapter<InviteAdapter.InviteHolder> {
+
         private Resources resources;
 
         @Override
@@ -128,7 +134,6 @@ public class Invite {
                 this.confirm = (Button) itemView.findViewById(R.id.invit_confirm);
                 this.cancel = (Button) itemView.findViewById(R.id.invit_cancel);
             }
-
 
         }
     }

@@ -181,5 +181,7 @@ public class User {
         return root;
     }
 
-
+    public Subject[] getSubjects() {
+        return courses;
+    }
 }

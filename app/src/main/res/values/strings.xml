@@ -3,8 +3,9 @@
     <string name="app_name">Agendapp</string>
 
     <!-- Titres -->
-    <string name="title_fusion">Liste de fusion</string>
+    <string name="title_fusion">Fusionner ces devoirs</string>
     <string name="title_user">Paramètres</string>
+    <string name="title_newpage">Ajouter un devoir</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -105,4 +106,11 @@
         <item>22H</item>
         <item>23H</item>
     </string-array>
+
+    <!-- Nouveau Page -->
+    <string name="new_infosprincipales">Infos principales</string>
+    <string name="new_subject">Matière</string>
+    <string name="new_text">Description</string>
+    <string name="new_date">À faire pour le…</string>
+
 </resources>

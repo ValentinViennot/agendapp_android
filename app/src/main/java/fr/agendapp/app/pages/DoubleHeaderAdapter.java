@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.AsyncTask;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +21,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -41,26 +43,47 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
     private List<Work> homeworks;
     // Liste de headers utilisée par l'adapter
     private List<Header> headers;
+    private HeaderHolder[] holders;
     // Liste d'en tetes de jour utilisée par l'adapter
     private List<Header> subheaders;
-    // Lien vers la liste de fusion
+    private SubHeaderHolder[] subholders;
+
+    // Lien vers la liste de fusion (pour interaction avec)
     private FusionList fusionList;
 
     DoubleHeaderAdapter(WorkPage wp) {
+        initData(wp);
+    }
+
+    private void initData(WorkPage wp) {
         this.homeworks = wp.getHomeworks();
+
         this.headers = wp.getHeaders();
         this.subheaders = wp.getSubheaders();
+
         this.fusionList = wp.fusions;
         this.activity = wp.getActivity();
+
+        this.subholders = new SubHeaderHolder[this.subheaders.size()];
+        this.holders = new HeaderHolder[this.headers.size()];
     }
 
     void updateList(WorkPage wp) {
-        // TODO utiliser la méthode d'update de this.homeworks seulement où il y a eu des changements
-        // TODO exécuter cette méthode dans un thread
-        this.homeworks = wp.getHomeworks();
-        this.headers = wp.getHeaders();
-        this.subheaders = wp.getSubheaders();
-        this.notifyDataSetChanged();
+        // Liste avant mise à jour (pour comparaison)
+        List<Work> oldlist = this.homeworks;
+        // holders avant comparaison
+        SubHeaderHolder[] tsh = subholders;
+        HeaderHolder[] th = holders;
+        // Nouvelles données
+        initData(wp);
+        // Récupère les anciennes références aux holders
+        for (int i = 0; i < Math.min(tsh.length, subholders.length); ++i)
+            subholders[i] = tsh[i];
+        for (int i = 0; i < Math.min(th.length, holders.length); ++i)
+            holders[i] = th[i];
+        // Modifie l'affichage uniquement où il a été modifié
+        new NotifyChanges()
+                .execute(oldlist, this.homeworks);
     }
 
     @Override
@@ -91,7 +114,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
      * @return Position de l'en tete associé au devoir dans la liste headers
      */
     private long getLongId(int position, List<Header> headers) {
-        int i = headers.size(), total, oldtotal=1;
+        int i = headers.size(), total, oldtotal = 1;
         ListIterator<Header> li = headers.listIterator(i);
         // Iteration dans le sens inversé
         while (li.hasPrevious()) {
@@ -138,13 +161,19 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
     @Override
     public void onBindHeaderHolder(HeaderHolder viewholder, int position) {
         // Mise à jour de la vue de l'en tete de mois associé au devoir à cette position
-        viewholder.title.setText(headers.get((int) getHeaderId(position)).getTitle());
+        int id = (int) getHeaderId(position);
+        viewholder.title.setText(headers.get(id).getTitle());
+        holders[id] = viewholder;
     }
 
     @Override
     public void onBindSubHeaderHolder(SubHeaderHolder viewholder, int position) {
-        // Mise à jour de la vue de l'en tete de jour associé au devoir à cette position
-        viewholder.title.setText(subheaders.get((int) getSubHeaderId(position)).getTitle());
+        // Récupère l'ID de l'en tete associé au devoir à cette position
+        int id = (int) getSubHeaderId(position);
+        // Met à jour le titre de la vue associée à cette position
+        viewholder.title.setText(subheaders.get(id).getTitle());
+        // Met à jour le lien vers la vue associée à l'en tête
+        subholders[id] = viewholder;
     }
 
     /**
@@ -326,6 +355,117 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                 }
             });
 
+        }
+    }
+
+    private class NotifyChanges extends AsyncTask<List<Work>, Void, Void> {
+
+        private List<Integer> changed;
+        private List<Integer> added;
+        private List<Integer> removed;
+        private List<Integer[]> moved;
+
+        // Partie effectuée dans un autre Thread (Processus)
+        @Override
+        protected Void doInBackground(List<Work>... params) {
+            // Initialisation des listes
+            changed = new LinkedList<>();
+            added = new LinkedList<>();
+            removed = new LinkedList<>();
+            moved = new LinkedList<>();
+            List<Work> oldlist = params[0];
+            List<Work> newlist = params[1];
+            // On compare la liste 1 à la liste 2
+            compare(oldlist, newlist);
+            // Les changements seront notifiés au Thread UI dans le post execute
+            return null;
+        }
+
+        /**
+         * Observe les modifications d'une nouvelle liste de données par rapport à une ancienne
+         *
+         * @param oldlist Ancienne liste
+         * @param newlist Nouvelle liste
+         */
+        private void compare(List<Work> oldlist, List<Work> newlist) {
+            ListIterator<Work> o = oldlist.listIterator();
+            ListIterator<Work> n = newlist.listIterator();
+            // Pour chaque element
+            while (n.hasNext() && o.hasNext()) {
+                Work cur_n = n.next();
+                Work cur_o = o.next();
+                // Si le devoir n'est pas le même que celui dans l'ancienne liste
+                if (cur_n.getId() != cur_o.getId()) {
+                    // On récupère sa position dans l'ancienne liste
+                    int index = indexOf(cur_n, oldlist);
+                    // S'il n'était pas dans l'ancienne liste, il s'agit d'une insertion
+                    if (index < 0) added.add(n.previousIndex());
+                        // Sinon, il s'agit d'un déplacement
+                    else {
+                        if (oldlist.get(index).modified(cur_n)) changed.add(n.previousIndex());
+                        if (index > n.previousIndex())
+                            moved.add(new Integer[]{index, n.previousIndex()});
+                    }
+                    // On vérifie si l'élément de l'ancienne liste a été supprimé
+                    if (indexOf(cur_o, newlist) < 0)
+                        removed.add(o.previousIndex());//TODO o ou n index ?
+                } else {
+                    // Si les devoirs sont égaux on regarde si un des paramètres variable a évolué
+                    if (cur_o.modified(cur_n)) changed.add(n.previousIndex());
+                }
+            }
+            // Pour chaque element restant de l'ancienne liste
+            while (o.hasNext())
+                // On regarde s'il a été supprimé
+                if (indexOf(o.next(), newlist) < 0)
+                    removed.add(o.previousIndex());//TODO o ou n index ?
+            // Pour chaque element restant de la nouvelle liste
+            int index;
+            while (n.hasNext())
+                // On regarde s'il était dans l'ancienne liste
+                if ((index = indexOf(n.next(), oldlist)) < 0)
+                    // si non, alors on insere
+                    added.add(n.previousIndex());
+                else
+                    // si oui, alors on déplace
+                    moved.add(new Integer[]{index, n.previousIndex()});
+        }
+
+        /**
+         * @param list Liste de devoirs (Work)
+         * @param e    Element Work
+         * @return Index du devoir dans la liste (recherche par ID) ou -1 si non présent
+         */
+        private int indexOf(Work e, List<Work> list) {
+            for (Work w : list)
+                if (w.getId() == e.getId())
+                    return list.indexOf(w);
+            return -1;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            for (Integer i : removed)
+                notifyItemRemoved(i);
+            for (Integer i : added)
+                notifyItemInserted(i);
+            for (Integer i : changed)
+                notifyItemChanged(i);
+            for (Integer[] i : moved) {
+                // TODO Faire la double MAJ seulement si croisement
+//                notifyItemChanged(i[0]);
+//                notifyItemChanged(i[1]);
+                //notifyItemMoved(i[0], i[1]);
+            }
+
+            for (int i = 0; i < subholders.length; ++i)
+                if (subholders[i] != null)
+                    subholders[i].title.setText(subheaders.get(i).getTitle());
+
+            for (int i = 0; i < holders.length; ++i)
+                if (holders[i] != null)
+                    holders[i].title.setText(headers.get(i).getTitle());
         }
     }
 }
