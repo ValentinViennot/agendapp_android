@@ -403,7 +403,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                         // Sinon, il s'agit d'un déplacement
                     else {
                         if (oldlist.get(index).modified(cur_n)) changed.add(n.previousIndex());
-                        if (index > n.previousIndex())
+                        //if (index > n.previousIndex())
                             moved.add(new Integer[]{index, n.previousIndex()});
                     }
                     // On vérifie si l'élément de l'ancienne liste a été supprimé
@@ -453,10 +453,13 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
             for (Integer i : changed)
                 notifyItemChanged(i);
             for (Integer[] i : moved) {
-                // TODO Faire la double MAJ seulement si croisement
-//                notifyItemChanged(i[0]);
-//                notifyItemChanged(i[1]);
-                //notifyItemMoved(i[0], i[1]);
+                for (Integer[] j : moved) {
+                    if (i[0].equals(j[1]) && j[0].equals(i[1])) {
+                        notifyItemChanged(i[0]);
+                        notifyItemChanged(i[1]);
+                        //notifyItemMoved(i[0], i[1]);
+                    }
+                }
             }
 
             for (int i = 0; i < subholders.length; ++i)
