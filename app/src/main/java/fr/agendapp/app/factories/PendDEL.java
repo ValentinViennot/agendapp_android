@@ -2,12 +2,12 @@ package fr.agendapp.app.factories;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import fr.agendapp.app.App;
+import fr.agendapp.app.objects.Work;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-
-import fr.agendapp.app.App;
 
 /**
  * @author Dylan Habans
@@ -18,9 +18,14 @@ public class PendDEL extends Pending {
     private static List<PendDEL> pending;
     private int id;
 
-    public PendDEL(int id) {
+    public PendDEL(Context context, int id) {
         this.id = id;
         pending.add(this);
+        PendDEL.saveList(context);
+    }
+
+    public PendDEL(Context context, Work w) {
+        this(context, w.getId());
     }
 
     /**

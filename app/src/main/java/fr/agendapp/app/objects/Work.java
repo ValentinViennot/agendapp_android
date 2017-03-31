@@ -9,9 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
@@ -174,8 +172,19 @@ public class Work {
      * Supprime le devoir
      * L'utilisateur doit en être le propriétaire
      */
-    public void delete(Context context) {
-        // TODO
+    public void delete(Context context, Work w) {
+        //TODO
+        int id = comingwork.indexOf(w);
+        if (id < 0) {
+            id = pastwork.indexOf(w);
+            ListIterator<Work> i = pastwork.listIterator(id);
+        }
+        ListIterator<Work> i = comingwork.listIterator(id);
+
+        i.remove();
+
+
+        new PendDEL(context, this);
     }
 
     /**
@@ -184,6 +193,10 @@ public class Work {
      */
     public void report(Context context) {
         //TODO
+        if (this.isUser() == false) {
+
+        }
+        new PendALERT(context, this);
     }
 
     /**
@@ -191,10 +204,14 @@ public class Work {
      */
     public void addComment(Context context, Comment c) {
         // TODO
+
+
+        new PendCOMM(context, c);
     }
 
     public void setFlag(Context context, int flag) {
         // TODO
+        new PendFLAG(context, this);
     }
 
     // GETTERS
