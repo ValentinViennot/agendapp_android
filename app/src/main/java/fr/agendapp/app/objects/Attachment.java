@@ -1,6 +1,8 @@
 package fr.agendapp.app.objects;
 
-import android.util.Log;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +12,6 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.SyncFactory;
 
@@ -37,18 +38,18 @@ public class Attachment {
     /**
      * Lance le téléchargement de la pièce jointe sur l'appareil de l'utilisateur
      */
-    public void download() {
-        // TODO
+    public void download(Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(this.getLink(SyncFactory.getToken())));
+        context.startActivity(intent);
     }
 
     /**
      * Supprime la pièce jointe de la base de données
      * @return true si la pièce jointe est bien supprimée par l'utilisateur, false sinon
      */
-    public boolean delete() {
-        // TODO
-        // Attention : penser à vérifier que l'utilisateur actuel est bien l'auteur
-        return false;
+    private void delete(Context context) {
+        // La suppression nécessite une connexion à Internet
+        SyncFactory.getInstance(context).deleteAttachment(context, this.getFile());
     }
 
     // GETTERS
@@ -123,7 +124,6 @@ public class Attachment {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            // Dans tous les cas, on récupère le contact téléphonique concerné
             final Attachment a = getItem(position);
             // Si cet élément existe vraiment…
             if (a != null) {
@@ -131,17 +131,21 @@ public class Attachment {
                 holder.title.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        //TODO
-                        Log.i(App.TAG, "Go to : " + a.getLink(SyncFactory.getToken()));
+                        a.download(inflater.getContext());
                     }
                 });
-                holder.delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        //TODO
-                        Log.i(App.TAG, "supprimer " + position + " ? ");
-                    }
-                });
+                if (User.getInstance().getId() == a.getUser()) {
+                    holder.delete.setVisibility(View.VISIBLE);
+                    holder.delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            attachments.remove(a);
+                            notifyDataSetChanged();
+                            a.delete(inflater.getContext());
+                        }
+                    });
+                } else
+                    holder.delete.setVisibility(View.GONE);
             }
             return convertView;
         }

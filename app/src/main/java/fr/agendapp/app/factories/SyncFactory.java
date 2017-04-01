@@ -194,6 +194,15 @@ public class SyncFactory {
         req(context, "logout/", Request.Method.GET, "", null, (NotificationFactory) null);
     }
 
+    public void deleteAttachment(Context context, final String id) {
+        req(context, "cdn/?id=" + id + "&delete", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(App.TAG, "Attchment " + id + " deleted from server");
+            }
+        }, (NotificationFactory) null);
+    }
+
     public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite, final NotificationFactory notifs) {
         req(context, "invitations/?id=" + invite.getId(), Request.Method.POST,
                 "{\"groupe\":" + invite.getGroupeid() + "}",
@@ -241,15 +250,23 @@ public class SyncFactory {
             req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                     new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
-                            // Ecrire la réponse au localStorage (SharedPreferences)
-                            if (syncListener.isArchives()) {
-                                Work.setPastwork(context, response, version);
-                            } else {
-                                Work.setComingwork(context, response, version);
-                            }
-                            // Notification qu'une nouvelle version des données a été synchronisée
-                            syncListener.onSync();
+                        public void onResponse(final String response) {
+                            // L'operation setXXXwork risque d'etre longue, on prefere donc l'executer dans un Thread separe
+                            // Seulement une fois que tout est terminé, on previent le callback
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    // Ecrire la réponse au localStorage (SharedPreferences)
+                                    if (syncListener.isArchives()) {
+                                        Work.setPastwork(context, response, version);
+                                    } else {
+                                        Work.setComingwork(context, response, version);
+                                    }
+                                    // Notification qu'une nouvelle version des données a été synchronisée
+                                    syncListener.onSync();
+                                }
+                            }.run();
                         }
                     }, notifs
             );

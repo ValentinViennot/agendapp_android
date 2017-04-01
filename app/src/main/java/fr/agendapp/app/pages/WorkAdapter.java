@@ -323,7 +323,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                 // Si le devoir n'est pas le même que celui dans l'ancienne liste
                 if (cur_n.getId() != cur_o.getId()) {
                     // On récupère sa position dans l'ancienne liste
-                    int index = indexOf(cur_n, oldlist);
+                    int index = Work.indexOf(cur_n, oldlist);
                     // S'il n'était pas dans l'ancienne liste, il s'agit d'une insertion
                     if (index < 0) added.add(n.previousIndex());
                         // Sinon, il s'agit d'un déplacement
@@ -333,7 +333,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                             moved.add(new Integer[]{index, n.previousIndex()});
                     }
                     // On vérifie si l'élément de l'ancienne liste a été supprimé
-                    if (indexOf(cur_o, newlist) < 0)
+                    if (Work.indexOf(cur_o, newlist) < 0)
                         removed.add(o.previousIndex());// TODO o ou n ?
                 } else {
                     // Si les devoirs sont égaux on regarde si un des paramètres variable a évolué
@@ -343,13 +343,13 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
             // Pour chaque element restant de l'ancienne liste
             while (o.hasNext())
                 // On regarde s'il a été supprimé
-                if (indexOf(o.next(), newlist) < 0)
+                if (Work.indexOf(o.next(), newlist) < 0)
                     removed.add(o.previousIndex()); // TODO o ou n ?
             // Pour chaque element restant de la nouvelle liste
             int index;
             while (n.hasNext())
                 // On regarde s'il était dans l'ancienne liste
-                if ((index = indexOf(n.next(), oldlist)) < 0)
+                if ((index = Work.indexOf(n.next(), oldlist)) < 0)
                     // si non, alors on insere
                     added.add(n.previousIndex());
                 else
@@ -357,17 +357,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                     moved.add(new Integer[]{index, n.previousIndex()});
         }
 
-        /**
-         * @param list Liste de devoirs (Work)
-         * @param e    Element Work
-         * @return Index du devoir dans la liste (recherche par ID) ou -1 si non présent
-         */
-        private int indexOf(Work e, List<Work> list) {
-            for (Work w : list)
-                if (w.getId() == e.getId())
-                    return list.indexOf(w);
-            return -1;
-        }
 
         @Override
         protected void onPostExecute(Void aVoid) {

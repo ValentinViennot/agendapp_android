@@ -6,6 +6,9 @@ import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
@@ -30,6 +33,7 @@ public class ParseFactory {
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Date.class, new DateDeserializer())
+            .registerTypeAdapter(Date.class, new DateSerializer())
             .create();
 
     public static List<Work> parseWork(String json) {
@@ -96,6 +100,10 @@ public class ParseFactory {
         return gson.fromJson(json, User.class);
     }
 
+    public static String workToJson(List<Work> workList) {
+        return gson.toJson(workList);
+    }
+
     /**
      * Lecture des dates depuis le format JSON
      */
@@ -110,12 +118,11 @@ public class ParseFactory {
             }
         }
     }
-    /*private static class WorkDeserializer implements JsonDeserializer<Work> {
-        public Work deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
-                throws JsonParseException {
-            JsonObject jsonObject = json.getAsJsonObject();
-            jsonObject.get("color").getAsString();
-            return object;
+
+    private static class DateSerializer implements JsonSerializer<Date> {
+        @Override
+        public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
+            return new JsonPrimitive(Work.dateformat.format(date) + "+02:00");
         }
-    }*/
+    }
 }

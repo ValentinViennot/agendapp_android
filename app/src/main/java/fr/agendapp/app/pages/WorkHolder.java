@@ -10,7 +10,6 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,7 +21,6 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.objects.Attachment;
@@ -123,8 +121,9 @@ class WorkHolder extends RecyclerView.ViewHolder {
                 builder.setTitle(R.string.flags_title)
                         .setItems(R.array.flags, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                Log.i(App.TAG, "flag : " + which);
+                                // Modification locale + requete au serveur
                                 w.setFlag(context, which);
+                                // On signale à l'adapter qu'on vient de modifier la donnée locale
                                 adapter.notifyItemChanged(getAdapterPosition());
                             }
                         });

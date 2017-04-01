@@ -3,6 +3,7 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -125,7 +126,28 @@ public class Work {
 
     // STATIC RESOURCES
 
-    // TODO sauvegarder tableau local ?
+    public static void saveList(Context context, boolean b) {
+        String json;
+        if (b)
+            json = ParseFactory.workToJson(pastwork);
+        else
+            json = ParseFactory.workToJson(comingwork);
+        Log.i(App.TAG, json);
+        //TODO saveList(context, b, json, "0");
+    }
+
+    public static void saveList(Context context) {
+        saveList(context, true);
+        saveList(context, false);
+    }
+
+    public static void saveList(Context context, boolean b, String json, String version) {
+        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString((b ? "archives" : "devoirs"), json);
+        editor.putString("version" + (b ? "A" : "D"), version);
+        editor.apply();
+    }
 
     /**
      * Devoirs à venir
@@ -135,12 +157,8 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setComingwork(Context context, String json, String version) {
-        comingwork = ParseFactory.parseWork(json);
-        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("devoirs", json);
-        editor.putString("versionD", version);
-        editor.apply();
+        comingwork = updateList(comingwork, ParseFactory.parseWork(json));
+        saveList(context, false, json, version);
     }
 
     /**
@@ -151,12 +169,8 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setPastwork(Context context, String json, String version) {
-        pastwork = ParseFactory.parseWork(json);
-        SharedPreferences preferences = context.getSharedPreferences(App.TAG, MODE_PRIVATE);
-        SharedPreferences.Editor editor = preferences.edit();
-        editor.putString("archives", json);
-        editor.putString("versionA", version);
-        editor.apply();
+        pastwork = updateList(pastwork, ParseFactory.parseWork(json));
+        saveList(context, true, json, version);
     }
 
     public static List<Work> getPastwork(Context activity) {
@@ -179,6 +193,32 @@ public class Work {
 
     // SETTERS
 
+    private static List<Work> updateList(List<Work> o, List<Work> n) {
+        List<Work> res = new LinkedList<>();
+        int index;
+        Work v;
+        for (Work w : n)
+            if ((index = indexOf(w, o)) < 0)
+                res.add(w);
+            else if ((v = o.get(index)).modified(w))
+                res.add(v.copyFrom(w));
+            else
+                res.add(v);
+        return res;
+    }
+
+    /**
+     * @param list Liste de devoirs (Work)
+     * @param e    Element Work
+     * @return Index du devoir dans la liste (recherche par ID) ou -1 si non présent
+     */
+    public static int indexOf(Work e, List<Work> list) {
+        for (Work w : list)
+            if (w.getId() == e.getId())
+                return list.indexOf(w);
+        return -1;
+    }
+
     /**
      * Marque comme fait/non fait selon le statut actuel
      * TODO enregistrer les modifications au localStorage (implémenter sur les autres méthodes)
@@ -197,6 +237,8 @@ public class Work {
         }
         // On ajoute l'action à la liste d'actions en attente
         new PendDO(context, this);
+        // Sauvegarde la liste de devoirs locale
+        saveList(context);
     }
 
     /**
@@ -210,8 +252,12 @@ public class Work {
         // TODO : attribut static haschanged ? (par exemple)
         if (comingwork.contains(this)) {
             comingwork.remove(this);
+            // Sauvegarde la liste de devoirs locale
+            saveList(context, false);
         } else {
             pastwork.remove(this);
+            // Sauvegarde la liste de devoirs locale
+            saveList(context, true);
         }
         new PendDEL(context, this);
     }
@@ -224,20 +270,24 @@ public class Work {
         new PendALERT(context, this);
     }
 
+    // GETTERS
+
     /**
      * @param c Commentaire à ajouter au devoir
      */
     public void addComment(Context context, Comment c) {
         this.commentaires.add(c);
         new PendCOMM(context, this.getId(), c.getText());
+        // Sauvegarde la liste de devoirs locale
+        saveList(context);
     }
 
     public void setFlag(Context context, int flag) {
         this.flag = flag;
         new PendFLAG(context, this);
+        // Sauvegarde la liste de devoirs locale
+        saveList(context);
     }
-
-    // GETTERS
 
     public int getId() {
         return id;
@@ -309,9 +359,20 @@ public class Work {
                         || this.isDone() != w.isDone()
                         || this.getSubjectColor() != w.getSubjectColor()
                         || this.getNbDone() != w.getNbDone()
+                        || this.getAttachments().size() != w.getAttachments().size()
                         || this.getComments().size() != w.getComments().size()
                         || (this.getComments().size() != 0 && w.getComments().size() != 0 && this.getComments().getLast().getId() != w.getComments().getLast().getId())
         );
+    }
+
+    private Work copyFrom(Work w) {
+        this.flag = w.flag;
+        this.fait = w.fait;
+        this.nb_fait = w.nb_fait;
+        this.matiere_c = w.matiere_c;
+        this.commentaires = w.commentaires;
+        this.pjs = w.pjs;
+        return this;
     }
 
 }

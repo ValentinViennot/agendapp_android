@@ -88,6 +88,8 @@ public class Comment {
         w.getComments().remove(this);
         // Requete au serveur
         new PendDELc(context, this);
+        // Sauvegarde la liste de devoirs locale
+        Work.saveList(context);
     }
 
     public int getId() {

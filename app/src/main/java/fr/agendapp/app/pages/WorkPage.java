@@ -130,7 +130,7 @@ public class WorkPage extends Fragment implements SyncListener {
         super.onStart();
         // On actualise l'affichage des devoirs à partir des données disponibles localement
         // dès le démarrage pour un affichage aussi rapide que possible
-        this.refresh();
+        adapter.update();
     }
 
     @Override // Lorsque l'onglet est fait visible (true) ou masqué (false)
@@ -180,13 +180,6 @@ public class WorkPage extends Fragment implements SyncListener {
     }
 
     /**
-     * Recalculer l'affichage dans un Thread séparé puis le mettre à jour
-     */
-    private void refresh() {
-        adapter.update();
-    }
-
-    /**
      * Lance une synchronisation
      * --> Envoi les listes d'attente au serveur
      * --> Récupère la version actuelle des devoirs sur le serveur
@@ -233,7 +226,7 @@ public class WorkPage extends Fragment implements SyncListener {
     public void onSync() {
         // En cas de réception de nouvelles données
         // On met à jour l'affichage de manière asynchrone
-        refresh();
+        adapter.update();
     }
 
     @Override
