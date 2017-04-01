@@ -131,12 +131,14 @@ public class Attachment {
                 holder.title.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //TODO
                         Log.i(App.TAG, "Go to : " + a.getLink(SyncFactory.getToken()));
                     }
                 });
                 holder.delete.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
+                        //TODO
                         Log.i(App.TAG, "supprimer " + position + " ? ");
                     }
                 });

@@ -204,6 +204,10 @@ public class Work {
      * L'utilisateur doit en être le propriétaire
      */
     public void delete(Context context) {
+        // TODO réorganiser les listes pour qu'une seule liste de devoirs subsiste
+        // La liste de l'adapter (filtrée + associée aux headers) doit être maj dès que celle locale a changée
+        // Soit parce que celle locale a été mise à jour avec le serveur, soit parce qu'elle a été modifiée localement
+        // TODO : attribut static haschanged ? (par exemple)
         if (comingwork.contains(this)) {
             comingwork.remove(this);
         } else {
@@ -225,7 +229,7 @@ public class Work {
      */
     public void addComment(Context context, Comment c) {
         this.commentaires.add(c);
-        new PendCOMM(context, c);
+        new PendCOMM(context, this.getId(), c.getText());
     }
 
     public void setFlag(Context context, int flag) {

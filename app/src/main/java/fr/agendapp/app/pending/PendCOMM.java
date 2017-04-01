@@ -9,7 +9,6 @@ import java.util.ListIterator;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
-import fr.agendapp.app.objects.Comment;
 
 /**
  * @author Dylan Habans
@@ -23,19 +22,15 @@ public class PendCOMM extends Pending {
     private String comment;
 
     /**
-     * @param id ID
+     * @param id      ID
      * @param comment Commentaire
-     * Constructeur de PendCOMM
+     *                Constructeur de PendCOMM
      */
-    private PendCOMM(Context context, int id, String comment) {
+    public PendCOMM(Context context, int id, String comment) {
         this.id = id;
         this.comment = comment;
         pending.add(this);
         PendCOMM.saveList(context);
-    }
-
-    public PendCOMM(Context context, Comment c) {
-        this(context, c.getId(), c.getText());
     }
 
     /**
@@ -81,13 +76,12 @@ public class PendCOMM extends Pending {
      * @return représentation JSON de l'action PendCOMM
      */
     public String toString() {
-
         String json = "{";
         json += "\"id\":" + id + ",";
         json += "\"content\": {" +
                 "\"texte\": \"" + comment + "\"";
         json += "}";
-
+        json += "}";
         return json;
     }
 }

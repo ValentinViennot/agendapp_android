@@ -1,6 +1,7 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -382,11 +383,25 @@ public class SyncFactory {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null) {
                     switch (error.networkResponse.statusCode) {
-                        // TODO + use resources
+                        // TODO codes erreur + use resources
+                        // TODO erreur 401 (utiliser notifs.getActivity() )
                         case 404:
                             if (notifs != null)
                                 notifs.add(2, "Ressource indisponible", "Essaie de relancer l'application ou d'actualiser les données à nouveau.");
                             Log.i(App.TAG, "Http 404");
+                            break;
+                        case 401:
+                            if (notifs != null) {
+                                // Efface les données locales de l'utilisateur
+                                SharedPreferences preferences = notifs.getActivity().getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.clear();
+                                editor.apply();
+                                // Ajoute une notification explicative
+                                notifs.add(1, "Identification impossible", "Reconnecte toi...");
+                                // Renvoyer l'utilisateur sur la page d'identification
+                                notifs.getActivity().startActivity(new Intent(notifs.getActivity(), App.class));
+                            }
                             break;
                         default:
                             Log.w(App.TAG, "Code HTTP non géré : " + error.networkResponse.statusCode);

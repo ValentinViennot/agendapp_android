@@ -2,9 +2,11 @@ package fr.agendapp.app.pages;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +25,7 @@ public class CommentPage extends AppCompatActivity {
     private EditText text;
 
     private CommentAdapter adapter;
+    private RecyclerView commentList;
 
     public static void setWork(Work work) {
         w = work;
@@ -35,11 +38,17 @@ public class CommentPage extends AppCompatActivity {
         try {
             // Si l'objet Work w est bien disponible, on peut initialiser (inflate) la vue
             setContentView(R.layout.activity_comment);
+            Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+            setSupportActionBar(toolbar);
+            ActionBar actionBar = getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(true);
+            }
             // Liste de commentaires associés à ce devoir
             // Section contenant les invitations à des groupes
-            RecyclerView commentList = (RecyclerView) findViewById(R.id.commentlist);
+            commentList = (RecyclerView) findViewById(R.id.commentlist);
             adapter = new CommentAdapter();
-            commentList.setHasFixedSize(false);
+            commentList.setHasFixedSize(true);
             commentList.setLayoutManager(new LinearLayoutManager(this));
             commentList.setAdapter(adapter);
             // Texte du nouveau commentaire
@@ -53,6 +62,7 @@ public class CommentPage extends AppCompatActivity {
                         }
                     }
             );
+            this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
         } catch (NullPointerException e) {
             // Si ce n'est pas le cas, on mentionne l'erreur au logcat
             Log.e(App.TAG, "Page commentaire ouverte sans avoir défini de devoir au prealable !");
@@ -64,8 +74,23 @@ public class CommentPage extends AppCompatActivity {
     }
 
     private void sendComment() {
-        String texte = text.getText().toString();
-        Comment c = new Comment();// TODO
+        // vérifions si l'utilisateur a entré un minimum de caractères
+        final int MIN = 3;
+        String text = this.text.getText().toString();
+        if (text.length() > MIN) {
+            // ajoute le commentaire à la liste de commentaires du devoir
+            // et créé une requete au serveur
+            w.addComment(this, new Comment(text));
+            // Notifions l'affichage qu'un commentaire vient d'être ajouté
+            adapter.notifyItemInserted(adapter.getItemCount() - 1);
+            // On nettoie le texte du champ d'ajout
+            this.text.setText("");
+            this.text.clearFocus();
+            this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
+        } else {
+            // TODO resources
+            NotificationFactory.add(this, 1, "Trop court !", "Le commentaire doit contenir au moins " + MIN + " caractères");
+        }
     }
 
 
@@ -84,6 +109,10 @@ public class CommentPage extends AppCompatActivity {
         @Override
         public int getItemCount() {
             return w.getComments().size();
+        }
+
+        public Work getWork() {
+            return w;
         }
     }
 

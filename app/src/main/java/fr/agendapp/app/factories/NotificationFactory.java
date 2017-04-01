@@ -89,6 +89,10 @@ public class NotificationFactory {
         alertDialog.show();
     }
 
+    public Activity getActivity() {
+        return activity;
+    }
+
     public void add(int priority, String title, String message) {
         add(activity, priority, title, message);
     }

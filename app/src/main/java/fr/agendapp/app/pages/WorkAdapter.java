@@ -1,47 +1,37 @@
 package fr.agendapp.app.pages;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.Resources;
-import android.graphics.Color;
-import android.graphics.Paint;
+import android.app.ProgressDialog;
 import android.os.AsyncTask;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
-import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
-import fr.agendapp.app.objects.Attachment;
-import fr.agendapp.app.objects.FusionList;
+import fr.agendapp.app.filters.Filter;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
 
 /**
  * Adapteur pour l'affichage de la liste de devoirs
  */
-class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implements
+class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
         ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<WorkAdapter.HeaderHolder, WorkAdapter.SubHeaderHolder> {
 
-    private Activity activity;
+    // Lien vers la classe qui a instancié cet adapter
+    private WorkPage workPage;
+
     // Liste de devoirs utilisée par l'adapter
+    // Permet d'y appliquer le filtrage sans modifier la liste originelle
     private List<Work> homeworks;
     // Liste de headers utilisée par l'adapter
     private List<Header> headers;
@@ -50,52 +40,100 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
     private List<Header> subheaders;
     private SubHeaderHolder[] subholders;
 
-    // Lien vers la liste de fusion (pour interaction avec)
-    private FusionList fusionList;
-
-    WorkAdapter(WorkPage wp) {
-        initData(wp);
+    /**
+     * Création d'un nouvelle adapter
+     *
+     * @param workPage Classe qui créé cet adapter
+     */
+    WorkAdapter(WorkPage workPage) {
+        // Effectue le lien entre l'adapter et la WorkPage
+        this.workPage = workPage;
+        // Initialise les listes, vides dans un premier temps
+        homeworks = new LinkedList<>();
+        headers = new LinkedList<>();
+        subheaders = new LinkedList<>();
+        // Liste de vues contenant les en tetes
+        setHolders();
     }
 
-    private void initData(WorkPage wp) {
-        this.homeworks = wp.getHomeworks();
-
-        this.headers = wp.getHeaders();
-        this.subheaders = wp.getSubheaders();
-
-        this.fusionList = wp.fusions;
-        this.activity = wp.getActivity();
-
+    /**
+     * Met à jour les vues contenant les en tetes
+     * (utilisées plus tard pour forcer leur mise à jour)
+     */
+    private void setHolders() {
         this.subholders = new SubHeaderHolder[this.subheaders.size()];
         this.holders = new HeaderHolder[this.headers.size()];
     }
 
-    void updateList(WorkPage wp) {
-        // Liste avant mise à jour (pour comparaison)
-        List<Work> oldlist = this.homeworks;
-        // holders avant comparaison
-        SubHeaderHolder[] tsh = subholders;
-        HeaderHolder[] th = holders;
-        // Nouvelles données
-        initData(wp);
-        // Récupère les anciennes références aux holders
-        for (int i = 0; i < Math.min(tsh.length, subholders.length); ++i)
-            subholders[i] = tsh[i];
-        for (int i = 0; i < Math.min(th.length, holders.length); ++i)
-            holders[i] = th[i];
-        // Modifie l'affichage uniquement où il a été modifié
-        new NotifyChanges()
-                .execute(oldlist, this.homeworks);
+    /**
+     * Mise à jour de l'adapter à partir de nouvelles données
+     */
+    void update() {
+        new Refresh().execute();
+    }
+
+    /**
+     * TODO : Problème soit dans le calcul des en tetes soit dans le calcul de l'ID d'en tete
+     * Calcule les en-têtes et leur emplacement en fonction de la liste de devoirs actuelle
+     */
+    private void recalcSections() {
+        // Réinitialisation des listes d'headers
+        headers = new LinkedList<>();
+        subheaders = new LinkedList<>();
+        // Cas où la liste de devoirs est vide
+        NotificationFactory.add(workPage.getActivity(), 0, "Pas de devoir à afficher", "");
+        if (homeworks.size() == 0) return;
+        // Récupére une instance de Calendrier
+        // Pour la date de la section en cours
+        Calendar cal = Calendar.getInstance();
+        // On se place à la date de "The epoch" (car on veut forcément un premier header/subheader)
+        cal.setTime(new Date(0L));
+        // Et une instance pour comparer
+        Calendar cal2 = Calendar.getInstance();
+        // Sections
+        Header month = null;
+        Header day = null;
+        // parcours avec iterateur
+        int i = 0;
+        for (Work w : homeworks) {
+            // Date du devoir traité
+            cal2.setTime(w.getDate());
+            // Si le mois et/ou le jour sont différents
+            if (cal.get(Calendar.MONTH) != cal2.get(Calendar.MONTH) || cal.get(Calendar.DAY_OF_MONTH) != cal2.get(Calendar.DAY_OF_MONTH)) {
+                // Mois différent => En tête de mois
+                if (cal.get(Calendar.MONTH) != cal2.get(Calendar.MONTH)) {
+                    // Termine la section précédente
+                    if (month != null) {
+                        month.setTo(i);
+                    }
+                    // Ouvre une nouvelle section
+                    month = new Header(i, DateFactory.getMonthName(workPage.getContext(), cal2.get(Calendar.MONTH)));
+                    headers.add(month);
+                }
+                // Date différente => En tete de jour
+                // Termine la section précédente
+                if (day != null) {
+                    day.setTo(i);
+                }
+                day = new Header(i, DateFactory.getWeekName(workPage.getContext(), cal2.get(Calendar.DAY_OF_WEEK)) + " " + cal2.get(Calendar.DAY_OF_MONTH));
+                subheaders.add(day);
+                // Met à jour la date de la section en cours
+                cal.setTime(w.getDate());
+            }
+            i++;
+        }
+        if (month != null) month.setTo(i);
+        if (day != null) day.setTo(i);
     }
 
     @Override
-    public WorkAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public WorkHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         // Création d'un modèle de Vue pour les en tetes de mois
-        return new WorkAdapter.ViewHolder(LayoutInflater.from(viewGroup.getContext()), viewGroup);
+        return new WorkHolder(LayoutInflater.from(viewGroup.getContext()), viewGroup, this);
     }
 
     @Override
-    public void onBindViewHolder(WorkAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(WorkHolder holder, int position) {
         holder.setWork(homeworks.get(position));
     }
 
@@ -188,213 +226,84 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
                 holders[i].title.setText(headers.get(i).getTitle());
     }
 
-    /**
-     * Vue pour un en tete de mois
-     */
-    class HeaderHolder extends RecyclerView.ViewHolder {
-        TextView title;
-
-        HeaderHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.object_header, parent, false));
-            title = (TextView) itemView.findViewById(R.id.headertitle);
-        }
+    void remove(Work w) {
+        this.homeworks.remove(w);
     }
 
-    /**
-     * Vue pour un en tete de jour
-     */
-    class SubHeaderHolder extends RecyclerView.ViewHolder {
-        TextView title;
-
-        SubHeaderHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.subheader, parent, false));
-            title = (TextView) itemView.findViewById(R.id.subheadertitle);
-        }
+    Activity getActivity() {
+        return this.workPage.getActivity();
     }
 
-    /**
-     * Définition de l'affichage d'un devoir (UI)
-     * Quels widgets sont nécessaires pour l'affichage ?
-     * Comment sont affichées les données , réactions au clic etc
-     */
-    class ViewHolder extends RecyclerView.ViewHolder {
-
-        private LayoutInflater inflater;
-
-
-        private TextView subject;
-        private TextView text;
-        private ImageButton flag;
-        private TextView nbDone;
-        private TextView nbComm;
-        private Button done;
-        private ImageButton menu;
-
-        ViewHolder(LayoutInflater inflater, ViewGroup parent) {
-
-            super(inflater.inflate(R.layout.object_work, parent, false));
-            this.inflater = inflater;
-
-            subject = (TextView) itemView.findViewById(R.id.card_subject);
-            text = (TextView) itemView.findViewById(R.id.card_text);
-            flag = (ImageButton) itemView.findViewById(R.id.card_flag);
-            nbDone = (TextView) itemView.findViewById(R.id.card_nbDone);
-            nbComm = (TextView) itemView.findViewById(R.id.card_nbComment);
-            done = (Button) itemView.findViewById(R.id.button_done);//TODO marche pas après 1 synchro au premier clic (pas de MAJ affichage)
-            menu = (ImageButton) itemView.findViewById(R.id.more_button);
-
-        }
-
-        /**
-         * Méthode appelée à chaque fois qu'un devoir est affiché / actualisé
-         * Code exécuté dans le Thread UI
-         * (d'où la necessité de ne pas mettre à jour toute la liste à chaque MAJ)
-         *
-         * @param w Devoir
-         */
-        public void setWork(final Work w) {
-
-            final Context context = inflater.getContext();
-            final Resources r = context.getResources();
-
-            // Matière
-            subject.setText(w.getSubject());
-            if (w.isDone())
-                subject.setPaintFlags(subject.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-            else subject.setPaintFlags(text.getPaintFlags());
-            subject.setTextColor(w.getSubjectColor());
-
-            // Texte du devoir
-            text.setText(Html.fromHtml(w.getText()));
-
-            // Pièces jointes
-            GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
-            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
-
-            // Drapeau / Marqueur
-            int color;
-            switch (w.getFlag()) {
-                case 1:
-                    // Bleu
-                    color = Color.parseColor("#4178BE");
-                    break;
-                case 2:
-                    // Orange
-                    color = Color.parseColor("#FF7832");
-                    break;
-                case 3:
-                    // Rouge
-                    color = Color.parseColor("#E71D32");
-                    break;
-                default:
-                    // Gris
-                    color = Color.parseColor("#999999");
-            }
-            flag.setColorFilter(color);
-
-            // Sélection d'un marqueur
-            flag.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                    builder.setTitle(R.string.flags_title)
-                            .setItems(R.array.flags, new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    Log.i(App.TAG, "flag : " + which);
-                                    w.setFlag(context, which);
-                                    notifyItemChanged(getAdapterPosition());
-                                }
-                            });
-                    builder.create().show();
-                }
-            });
-
-            // Menu
-            menu.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    PopupMenu popup = new PopupMenu(context, v);
-                    final MenuInflater inflater = popup.getMenuInflater();
-                    inflater.inflate(R.menu.work_menu, popup.getMenu());
-                    MenuItem done = popup.getMenu().findItem(R.id.menu_done);
-                    done.setTitle(w.isDone() ? R.string.button_undone : R.string.button_done);
-                    MenuItem delete = popup.getMenu().findItem(R.id.menu_delete);
-                    delete.setTitle(w.isUser() ? R.string.button_delete : R.string.button_alert);
-                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.menu_done:
-                                    w.done(context);
-                                    notifyItemChanged(getAdapterPosition());
-                                    return true;
-                                case R.id.menu_delete:
-                                    if (w.isUser())
-                                        w.delete(context);
-                                    else
-                                        w.report(context);
-                                    WorkAdapter.this.homeworks.remove(w);
-                                    notifyItemRemoved(getAdapterPosition());
-                                    // TODO Décalage du devoir suivant celui supprimé dans le header du dessus (problème de bornes, recalcsections)
-                                    updateHeaders();
-                                    return true;
-                                case R.id.menu_fusion:
-                                    if (!fusionList.add(w)) {
-                                        NotificationFactory.add(activity, 1, r.getString(R.string.msg_impossible), r.getString(R.string.msg_fusionimpossible));
-                                    }
-                                    return true;
-                                default:
-                                    return false;
-                            }
-                        }
-                    });
-                    popup.show();
-                }
-            });
-
-            // Footer
-            String nb = "" + w.getNbDone();
-            nbDone.setText(nb);
-            nb = "" + w.getComments().size();
-            nbComm.setText(nb);
-
-            if (w.isDone())
-                done.setText(r.getString(R.string.button_undone));
-            else
-                done.setText(r.getString(R.string.button_done));
-
-            // Boutons
-            done.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    w.done(context);
-                    notifyItemChanged(getAdapterPosition());
-                }
-            });
-
-        }
+    boolean fusion(Work w) {
+        return this.workPage.fusions.add(w);
     }
 
-    private class NotifyChanges extends AsyncTask<List<Work>, Void, Void> {
+    private class Refresh extends AsyncTask<Void, Void, Void> {
 
+        // Fenetre de dialogue de "chargement"
+        ProgressDialog progressDialog;
+
+        // Notifications de données modifiées
         private List<Integer> changed;
         private List<Integer> added;
         private List<Integer> removed;
         private List<Integer[]> moved;
 
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            // Affiche une fenetre de chargement
+            progressDialog = ProgressDialog.show(
+                    workPage.getContext(),
+                    workPage.getContext().getResources().getString(R.string.msg_wait),
+                    workPage.getContext().getResources().getString(R.string.msg_updating)
+            );
+        }
+
         // Partie effectuée dans un autre Thread (Processus)
         @Override
-        protected Void doInBackground(List<Work>... params) {
-            // Initialisation des listes
+        protected Void doInBackground(Void... params) {
+
+            // TODO delete
+            // Rend visible ce moment de calcul, a priori trop rapide pour etre visible
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Liste avant mise à jour (pour comparaison)
+            List<Work> oldlist = homeworks;
+            // holders avant mise à jour
+            SubHeaderHolder[] tsh = subholders;
+            HeaderHolder[] th = holders;
+
+            // Récupère les nouvelles données (liste de devoir à jour = nouvelles références vers les objets devoirs)
+            homeworks = workPage.isArchives() ?
+                    Work.getPastwork(workPage.getActivity()) :
+                    Work.getComingwork(workPage.getActivity());
+
+            // Application des filtres à la liste de devoirs
+            homeworks = Filter.applyFilters(homeworks);
+            // Recalcule les sections en fonction de l'état de la nouvelle liste
+            recalcSections();
+
+            // On récupère des tableaux de holders de la taille des nouveaux tableaux d'en tete
+            setHolders();
+            // Récupère les anciennes références aux holders
+            System.arraycopy(tsh, 0, subholders, 0, Math.min(tsh.length, subholders.length));
+            System.arraycopy(th, 0, holders, 0, Math.min(th.length, holders.length));
+
+            // Initialisation des listes de changements
             changed = new LinkedList<>();
             added = new LinkedList<>();
             removed = new LinkedList<>();
             moved = new LinkedList<>();
-            List<Work> oldlist = params[0];
-            List<Work> newlist = params[1];
-            // On compare la liste 1 à la liste 2
-            compare(oldlist, newlist);
+
+            // On compare l'ancienne liste à la nouvelle, et on note les changements dans les listes créées
+            compare(oldlist, homeworks);
             // Les changements seront notifiés au Thread UI dans le post execute
+
             return null;
         }
 
@@ -425,7 +334,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
                     }
                     // On vérifie si l'élément de l'ancienne liste a été supprimé
                     if (indexOf(cur_o, newlist) < 0)
-                        removed.add(o.previousIndex());//TODO o ou n index ?
+                        removed.add(o.previousIndex());// TODO o ou n ?
                 } else {
                     // Si les devoirs sont égaux on regarde si un des paramètres variable a évolué
                     if (cur_o.modified(cur_n)) changed.add(n.previousIndex());
@@ -435,7 +344,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
             while (o.hasNext())
                 // On regarde s'il a été supprimé
                 if (indexOf(o.next(), newlist) < 0)
-                    removed.add(o.previousIndex());//TODO o ou n index ?
+                    removed.add(o.previousIndex()); // TODO o ou n ?
             // Pour chaque element restant de la nouvelle liste
             int index;
             while (n.hasNext())
@@ -463,6 +372,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
+
             for (Integer i : removed)
                 notifyItemRemoved(i);
             for (Integer i : added)
@@ -498,6 +408,31 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
 
             updateHeaders();
 
+            progressDialog.dismiss();
+        }
+    }
+
+    /**
+     * Vue pour un en tete de mois
+     */
+    class HeaderHolder extends RecyclerView.ViewHolder {
+        TextView title;
+
+        HeaderHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.object_header, parent, false));
+            title = (TextView) itemView.findViewById(R.id.headertitle);
+        }
+    }
+
+    /**
+     * Vue pour un en tete de jour
+     */
+    class SubHeaderHolder extends RecyclerView.ViewHolder {
+        TextView title;
+
+        SubHeaderHolder(LayoutInflater inflater, ViewGroup parent) {
+            super(inflater.inflate(R.layout.subheader, parent, false));
+            title = (TextView) itemView.findViewById(R.id.subheadertitle);
         }
     }
 }

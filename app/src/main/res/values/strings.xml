@@ -66,6 +66,7 @@
     <string name="msg_fusionimpossible">Maximum 3 devoirs de la même matière et pour la même date.</string>
     <string name="msg_wait">Quelques instants</string>
     <string name="msg_updating">Mise à jour en cours…</string>
+    <string name="msg_alert">Devoir signalé au modérateur</string>
 
     <!-- Textes à trou -->
     <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>
@@ -116,5 +117,6 @@
 
     <!-- Comment page -->
     <string name="comment_new">Ajouter un commentaire</string>
+    <string name="comment_meta">\@%1$s \t (%2$s)</string>
 
 </resources>
