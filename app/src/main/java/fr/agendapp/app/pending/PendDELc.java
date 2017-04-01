@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 
 import android.content.Context;
@@ -9,29 +9,33 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Comment;
 
 /**
  * @author Dylan Habans
  */
-public class PendMERGE extends Pending {
+public class PendDELc extends Pending {
 
-    private static List<PendMERGE> pending;
-    private static String name = "pendMERGE";
+    private static final String name = "pendDELc";
+    private static List<PendDELc> pending;
+    private int id;
 
-    private int[] ids;
-
-    public PendMERGE(Context context, int[] ids) {
-        this.ids = ids;
+    private PendDELc(Context context, int id) {
+        this.id = id;
         pending.add(this);
-        PendMERGE.saveList(context);
+        PendDELc.saveList(context);
     }
 
+    public PendDELc(Context context, Comment c) {
+        this(context, c.getId());
+    }
 
     /**
      * @return représentation JSON de la liste d'actions PendDELc
      */
     static String getList() {
-        ListIterator<PendMERGE> i = pending.listIterator();
+        ListIterator<PendDELc> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -43,7 +47,7 @@ public class PendMERGE extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendMERGE(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendDELc(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -66,14 +70,13 @@ public class PendMERGE extends Pending {
         return name;
     }
 
+    /**
+     * @return représentation JSON de l'action PendDELc
+     */
     public String toString() {
-        String json = "[";
-        for (int i = 0; i < ids.length; i++) {
-            json += ids[i];
-            json += ",";
-        }
-        json = json.substring(0, json.length() - 1); // supprime la dernière virgule
-        json += "]";
-        return json;
+        return ("" + id);
     }
+
+
+
 }

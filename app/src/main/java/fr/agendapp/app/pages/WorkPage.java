@@ -28,7 +28,6 @@ import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
-import fr.agendapp.app.factories.Pending;
 import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
@@ -36,6 +35,7 @@ import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
+import fr.agendapp.app.pending.Pending;
 import fr.agendapp.app.utils.Filter;
 
 /**
@@ -55,7 +55,7 @@ public class WorkPage extends Fragment implements SyncListener {
     // Liste d'en tetes (jour) liée à la liste de devoirs
     protected List<Header> subheaders;
     // Adapter permettant l'affichage de la liste de devoirs
-    protected DoubleHeaderAdapter adapter;
+    protected WorkAdapter adapter;
     // Affichage de la zone "invitations"
     private RecyclerView inviteView;
     // Affichage de la liste d'invitations
@@ -118,7 +118,7 @@ public class WorkPage extends Fragment implements SyncListener {
         // Section contenant la liste en elle même
         RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         // Instancie l'adapter permettant l'affichage de la liste de devoirs
-        adapter = new DoubleHeaderAdapter(this);
+        adapter = new WorkAdapter(this);
         // "Decoration" = en tetes
         DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 

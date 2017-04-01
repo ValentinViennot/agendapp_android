@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,6 +10,7 @@ import java.util.ListIterator;
 import java.util.TimeZone;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.objects.Work;
 
 /**

@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,33 +8,33 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendALERT extends Pending {
+public class PendDEL extends Pending {
 
-    private static List<PendALERT> pending;
-    private static String name = "pendALERT";
-
+    private final static String name = "pendDEL";
+    private static List<PendDEL> pending;
     private int id;
 
-    public PendALERT(Context context, int id) {
+    private PendDEL(Context context, int id) {
         this.id = id;
         pending.add(this);
-        PendALERT.saveList(context);
+        PendDEL.saveList(context);
     }
 
-    public PendALERT(Context context, Work w) {
+    public PendDEL(Context context, Work w) {
         this(context, w.getId());
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendALERT
+     * @return représentation JSON de la liste d'actions PendDEL
      */
     static String getList() {
-        ListIterator<PendALERT> i = pending.listIterator();
+        ListIterator<PendDEL> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -46,7 +46,7 @@ public class PendALERT extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendALERT(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendDEL(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -70,11 +70,9 @@ public class PendALERT extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendALERT
+     * @return représentation JSON de l'action PendDEL
      */
     public String toString() {
-        return "" + id;
+        return ("" + id);
     }
-
-
 }

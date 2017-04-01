@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,32 +8,42 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendDEL extends Pending {
+public class PendFLAG extends Pending {
 
-    private final static String name = "pendDEL";
-    private static List<PendDEL> pending;
+    private static List<PendFLAG> pending;
+    private static String name = "pendFLAG";
+
     private int id;
+    private int flag;
 
-    private PendDEL(Context context, int id) {
+    /**
+     * @param id
+     * @param flag
+     * @author Dylan Habans
+     * Constructeur de PendFLAG
+     */
+    public PendFLAG(Context context, int id, int flag) {
         this.id = id;
+        this.flag = flag;
         pending.add(this);
-        PendDEL.saveList(context);
+        PendFLAG.saveList(context);
     }
 
-    public PendDEL(Context context, Work w) {
-        this(context, w.getId());
+    public PendFLAG(Context context, Work w) {
+        this(context, w.getId(), w.getFlag());
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDEL
+     * @return représentation JSON de la liste d'actions PendFLAG
      */
     static String getList() {
-        ListIterator<PendDEL> i = pending.listIterator();
+        ListIterator<PendFLAG> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -45,7 +55,7 @@ public class PendDEL extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendDEL(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendFLAG(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -69,9 +79,13 @@ public class PendDEL extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendDEL
+     * @return représentation JSON de l'action PendFLAG
      */
     public String toString() {
-        return ("" + id);
+        String json = "{";
+        json += "\"id\":" + id + ",";
+        json += "\"flag\":" + flag;
+        json += "}";
+        return json;
     }
 }

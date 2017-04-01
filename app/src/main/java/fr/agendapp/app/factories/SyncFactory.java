@@ -28,6 +28,7 @@ import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
+import fr.agendapp.app.pending.Pending;
 
 public class SyncFactory {
 

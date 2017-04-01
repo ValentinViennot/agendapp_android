@@ -37,8 +37,8 @@ import fr.agendapp.app.objects.Work;
 /**
  * Adapteur pour l'affichage de la liste de devoirs
  */
-class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewHolder> implements
-        ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<DoubleHeaderAdapter.HeaderHolder, DoubleHeaderAdapter.SubHeaderHolder> {
+class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implements
+        ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<WorkAdapter.HeaderHolder, WorkAdapter.SubHeaderHolder> {
 
     private Activity activity;
     // Liste de devoirs utilisée par l'adapter
@@ -53,7 +53,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
     // Lien vers la liste de fusion (pour interaction avec)
     private FusionList fusionList;
 
-    DoubleHeaderAdapter(WorkPage wp) {
+    WorkAdapter(WorkPage wp) {
         initData(wp);
     }
 
@@ -89,13 +89,13 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
     }
 
     @Override
-    public DoubleHeaderAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+    public WorkAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
         // Création d'un modèle de Vue pour les en tetes de mois
-        return new DoubleHeaderAdapter.ViewHolder(LayoutInflater.from(viewGroup.getContext()), viewGroup);
+        return new WorkAdapter.ViewHolder(LayoutInflater.from(viewGroup.getContext()), viewGroup);
     }
 
     @Override
-    public void onBindViewHolder(DoubleHeaderAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(WorkAdapter.ViewHolder holder, int position) {
         holder.setWork(homeworks.get(position));
     }
 
@@ -333,7 +333,7 @@ class DoubleHeaderAdapter extends RecyclerView.Adapter<DoubleHeaderAdapter.ViewH
                                         w.delete(context);
                                     else
                                         w.report(context);
-                                    DoubleHeaderAdapter.this.homeworks.remove(w);
+                                    WorkAdapter.this.homeworks.remove(w);
                                     notifyItemRemoved(getAdapterPosition());
                                     // TODO Décalage du devoir suivant celui supprimé dans le header du dessus (problème de bornes, recalcsections)
                                     updateHeaders();

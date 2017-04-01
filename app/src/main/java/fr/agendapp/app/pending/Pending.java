@@ -1,10 +1,12 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.NotificationFactory;
+import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.listeners.SyncListener;
 
 /**

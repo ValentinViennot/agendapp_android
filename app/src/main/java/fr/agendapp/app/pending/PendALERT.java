@@ -1,5 +1,4 @@
-package fr.agendapp.app.factories;
-
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,32 +8,34 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
-import fr.agendapp.app.objects.Comment;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendDELc extends Pending {
+public class PendALERT extends Pending {
 
-    private static final String name = "pendDELc";
-    private static List<PendDELc> pending;
+    private static List<PendALERT> pending;
+    private static String name = "pendALERT";
+
     private int id;
 
-    private PendDELc(Context context, int id) {
+    public PendALERT(Context context, int id) {
         this.id = id;
         pending.add(this);
-        PendDELc.saveList(context);
+        PendALERT.saveList(context);
     }
 
-    public PendDELc(Context context, Comment c) {
-        this(context, c.getId());
+    public PendALERT(Context context, Work w) {
+        this(context, w.getId());
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDELc
+     * @return représentation JSON de la liste d'actions PendALERT
      */
     static String getList() {
-        ListIterator<PendDELc> i = pending.listIterator();
+        ListIterator<PendALERT> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -46,7 +47,7 @@ public class PendDELc extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendDELc(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendALERT(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -70,12 +71,11 @@ public class PendDELc extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendDELc
+     * @return représentation JSON de l'action PendALERT
      */
     public String toString() {
-        return ("" + id);
+        return "" + id;
     }
-
 
 
 }

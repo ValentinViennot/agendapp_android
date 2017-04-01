@@ -17,6 +17,14 @@ import java.util.List;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
+import fr.agendapp.app.pending.PendADD;
+import fr.agendapp.app.pending.PendALERT;
+import fr.agendapp.app.pending.PendCOMM;
+import fr.agendapp.app.pending.PendDEL;
+import fr.agendapp.app.pending.PendDELc;
+import fr.agendapp.app.pending.PendDO;
+import fr.agendapp.app.pending.PendFLAG;
+import fr.agendapp.app.pending.PendMERGE;
 
 public class ParseFactory {
 
@@ -30,49 +38,49 @@ public class ParseFactory {
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendDO> parsePendDO(String json) {
+    public static List<PendDO> parsePendDO(String json) {
         Type collectionType = new TypeToken<LinkedList<PendDO>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendDEL> parsePendDEL(String json) {
+    public static List<PendDEL> parsePendDEL(String json) {
         Type collectionType = new TypeToken<LinkedList<PendDEL>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendDELc> parsePendDELc(String json) {
+    public static List<PendDELc> parsePendDELc(String json) {
         Type collectionType = new TypeToken<LinkedList<PendDELc>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendFLAG> parsePendFLAG(String json) {
+    public static List<PendFLAG> parsePendFLAG(String json) {
         Type collectionType = new TypeToken<LinkedList<PendFLAG>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendCOMM> parsePendCOMM(String json) {
+    public static List<PendCOMM> parsePendCOMM(String json) {
         Type collectionType = new TypeToken<LinkedList<PendCOMM>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendALERT> parsePendALERT(String json) {
+    public static List<PendALERT> parsePendALERT(String json) {
         Type collectionType = new TypeToken<LinkedList<PendALERT>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendADD> parsePendADD(String json) {
+    public static List<PendADD> parsePendADD(String json) {
         Type collectionType = new TypeToken<LinkedList<PendADD>>() {
         }.getType();
         return gson.fromJson(json, collectionType);
     }
 
-    static List<PendMERGE> parsePendMERGE(String json) {
+    public static List<PendMERGE> parsePendMERGE(String json) {
         Type collectionType = new TypeToken<LinkedList<PendMERGE>>() {
         }.getType();
         return gson.fromJson(json, collectionType);

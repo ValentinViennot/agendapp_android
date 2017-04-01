@@ -6,6 +6,7 @@
     <string name="title_fusion">Fusionner ces devoirs</string>
     <string name="title_user">Paramètres</string>
     <string name="title_newpage">Ajouter un devoir</string>
+    <string name="title_commentpage">Commentaires</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -112,5 +113,8 @@
     <string name="new_subject">Matière</string>
     <string name="new_text">Description</string>
     <string name="new_date">À faire pour le…</string>
+
+    <!-- Comment page -->
+    <string name="comment_new">Ajouter un commentaire</string>
 
 </resources>
