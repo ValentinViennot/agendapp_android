@@ -26,7 +26,7 @@ public abstract class Pending {
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
      */
-    static void init(Context context) {
+    public static void init(Context context) {
         PendDO.initList(context);
         PendFLAG.initList(context);
         PendDEL.initList(context);
@@ -59,7 +59,7 @@ public abstract class Pending {
      * A appeler en cas de réussite d'envoi des actions en attente
      * @param context Android
      */
-    static void clear(Context context) {
+    public static void clear(Context context) {
         if (context != null) {
             PendDO.clearList(context);
             PendFLAG.clearList(context);

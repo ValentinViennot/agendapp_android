@@ -296,7 +296,7 @@ public class SyncFactory {
      * @param json Liste de requêtes à envoyer au format JSON
      * @param notifs Pour ajouter des notifications en cas d'erreur @Nullable
      */
-    synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
+    public synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
         if (context != null) {
             // Si un envoi n'est pas déjà en cours
             if (!lockpending) {

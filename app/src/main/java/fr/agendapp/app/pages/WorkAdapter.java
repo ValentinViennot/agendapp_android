@@ -195,7 +195,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkAdapter.ViewHolder> implement
         TextView title;
 
         HeaderHolder(LayoutInflater inflater, ViewGroup parent) {
-            super(inflater.inflate(R.layout.header, parent, false));
+            super(inflater.inflate(R.layout.object_header, parent, false));
             title = (TextView) itemView.findViewById(R.id.headertitle);
         }
     }
