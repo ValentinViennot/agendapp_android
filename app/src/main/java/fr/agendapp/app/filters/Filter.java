@@ -1,4 +1,4 @@
-package fr.agendapp.app.utils;
+package fr.agendapp.app.filters;
 
 import java.util.LinkedList;
 import java.util.List;

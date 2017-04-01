@@ -29,6 +29,7 @@ import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
+import fr.agendapp.app.filters.Filter;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.FusionList;
@@ -36,7 +37,6 @@ import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pending.Pending;
-import fr.agendapp.app.utils.Filter;
 
 /**
  * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)

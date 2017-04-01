@@ -1,4 +1,4 @@
-package fr.agendapp.app.utils;
+package fr.agendapp.app.filters;
 
 public class SelectableFilter {
 
