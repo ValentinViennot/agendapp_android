@@ -160,6 +160,7 @@ class WorkHolder extends RecyclerView.ViewHolder {
                                 case R.id.menu_delete:
                                     if (w.isUser()) {
                                         w.delete(context);
+                                        Work.notifyItemRemoved(getAdapterPosition(), w);
                                         adapter.update();
                                     } else {
                                         w.report(context);
@@ -218,7 +219,10 @@ class WorkHolder extends RecyclerView.ViewHolder {
             nbComm.setVisibility(View.INVISIBLE);
             imgDone.setVisibility(View.INVISIBLE);
 
-            imgComm.setImageDrawable(r.getDrawable(R.drawable.ic_add_black_24dp));//TODO sync pic
+            done.setOnClickListener(null);
+            imgComm.setOnClickListener(null);
+            imgComm.setImageDrawable(r.getDrawable(R.drawable.ic_cached_black_24dp));//TODO sync pic
+            // TODO resources
             done.setText("Envoi en cours..");
         }
     }

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -14,6 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
@@ -54,6 +56,9 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
         subheaders = new LinkedList<>();
         // Liste de vues contenant les en tetes
         setHolders();
+
+        update();
+        notifyDataSetChanged();
     }
 
     /**
@@ -272,8 +277,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                 e.printStackTrace();
             }
 
-            // Liste avant mise à jour (pour comparaison)
-            List<Work> oldlist = homeworks;
             // holders avant mise à jour
             SubHeaderHolder[] tsh = subholders;
             HeaderHolder[] th = holders;
@@ -294,110 +297,55 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
             System.arraycopy(tsh, 0, subholders, 0, Math.min(tsh.length, subholders.length));
             System.arraycopy(th, 0, holders, 0, Math.min(th.length, holders.length));
 
-            // Initialisation des listes de changements
-            changed = new LinkedList<>();
-            added = new LinkedList<>();
-            removed = new LinkedList<>();
-            moved = new LinkedList<>();
-
-            // On compare l'ancienne liste à la nouvelle, et on note les changements dans les listes créées
-            compare(oldlist, homeworks);
             // Les changements seront notifiés au Thread UI dans le post execute
-
             return null;
         }
-
-        /**
-         * Observe les modifications d'une nouvelle liste de données par rapport à une ancienne
-         *
-         * @param oldlist Ancienne liste
-         * @param newlist Nouvelle liste
-         */
-        private void compare(List<Work> oldlist, List<Work> newlist) {
-            ListIterator<Work> o = oldlist.listIterator();
-            ListIterator<Work> n = newlist.listIterator();
-            // Pour chaque element
-            while (n.hasNext() && o.hasNext()) {
-                Work cur_n = n.next();
-                Work cur_o = o.next();
-                // Si le devoir n'est pas le même que celui dans l'ancienne liste
-                if (cur_n.getId() != cur_o.getId()) {
-                    // On récupère sa position dans l'ancienne liste
-                    int index = Work.indexOf(cur_n, oldlist);
-                    // S'il n'était pas dans l'ancienne liste, il s'agit d'une insertion
-                    if (index < 0) added.add(n.previousIndex());
-                        // Sinon, il s'agit d'un déplacement
-                    else {
-                        if (oldlist.get(index).modified(cur_n)) changed.add(n.previousIndex());
-                        //if (index > n.previousIndex())
-                            moved.add(new Integer[]{index, n.previousIndex()});
-                    }
-                    // On vérifie si l'élément de l'ancienne liste a été supprimé
-                    if (Work.indexOf(cur_o, newlist) < 0)
-                        removed.add(o.previousIndex());// TODO o ou n ?
-                } else {
-                    // Si les devoirs sont égaux on regarde si un des paramètres variable a évolué
-                    if (cur_o.modified(cur_n)) changed.add(n.previousIndex());
-                }
-            }
-            // Pour chaque element restant de l'ancienne liste
-            while (o.hasNext())
-                // On regarde s'il a été supprimé
-                if (Work.indexOf(o.next(), newlist) < 0)
-                    removed.add(o.previousIndex()); // TODO o ou n ?
-            // Pour chaque element restant de la nouvelle liste
-            int index;
-            while (n.hasNext())
-                // On regarde s'il était dans l'ancienne liste
-                if ((index = Work.indexOf(n.next(), oldlist)) < 0)
-                    // si non, alors on insere
-                    added.add(n.previousIndex());
-                else
-                    // si oui, alors on déplace
-                    moved.add(new Integer[]{index, n.previousIndex()});
-        }
-
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
 
-            for (Integer i : removed)
+            for (Integer i : Work.getRemoved(workPage.isArchives()))
                 notifyItemRemoved(i);
-            for (Integer i : added)
+            for (Integer i : Work.getAdded(workPage.isArchives()))
                 notifyItemInserted(i);
-            for (Integer i : changed)
-                notifyItemChanged(i);
-            for (Integer[] i : moved) {
-                for (Integer[] j : moved) {
-                    if (i[0].equals(j[1]) && j[0].equals(i[1])) {
+            for (Integer[] i : Work.getMoved(workPage.isArchives())) {
+                for (Integer[] j : Work.getMoved(workPage.isArchives())) {
+                    if (i[0].equals(j[1]) && j[0].equals(i[1]) && !i[0].equals(i[1])) {
                         notifyItemChanged(i[0]);
                         notifyItemChanged(i[1]);
+                    }
+                }
+            }
+            for (Integer i : Work.getChanged(workPage.isArchives()))
+                notifyItemChanged(i);
+
+            /// DEBUG
+            for (Integer i : Work.getRemoved(workPage.isArchives()))
+                Log.i(App.TAG,"removed "+i);
+            for (Integer i : Work.getAdded(workPage.isArchives()))
+                Log.i(App.TAG,"added "+i);
+            for (Integer[] i : Work.getMoved(workPage.isArchives())) {
+                for (Integer[] j : Work.getMoved(workPage.isArchives())) {
+                    if (i[0].equals(j[1]) && j[0].equals(i[1]) && !i[0].equals(i[1])) {
+                        Log.i(App.TAG, "moved from " + i[0]);
+                        Log.i(App.TAG, "moved to   " + i[1]);
                         //notifyItemMoved(i[0], i[1]);
                     }
                 }
             }
-
-            /// DEBUG
-            /*for (Integer i : removed)
-                Log.i(App.TAG,"removed "+i);
-            for (Integer i : added)
-                Log.i(App.TAG,"added "+i);
-            for (Integer i : changed)
+            for (Integer i : Work.getChanged(workPage.isArchives()))
                 Log.i(App.TAG,"changed "+i);
-            for (Integer[] i : moved) {
-                for (Integer[] j : moved) {
-                    if (i[0].equals(j[1]) && j[0].equals(i[1])) {
-                        Log.i(App.TAG,"removed "+i[0]);
-                        Log.i(App.TAG,"removed "+i[1]);
-                        //notifyItemMoved(i[0], i[1]);
-                    }
-                }
-            }*/
+
+            Work.setChangesApplied(workPage.isArchives());
 
             updateHeaders();
 
             progressDialog.dismiss();
+
+            if (homeworks.size() <= 0)
+                // TODO resources
+                NotificationFactory.add(getActivity(), 1, "Aucun devoir à afficher", "Commence à en ajouter dès maintenant !");
         }
     }
 

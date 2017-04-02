@@ -38,18 +38,14 @@ public class WorkPage extends Fragment implements SyncListener {
 
     // Affichage de la liste de devoirs à fusionner entre eux
     public FusionList fusions;
-    /*    // Liste de devoirs
-        protected List<Work> homeworks;
-        // Liste d'en tetes (mois) liée à la liste de devoirs
-        protected List<Header> headers;
-        // Liste d'en tetes (jour) liée à la liste de devoirs
-        protected List<Header> subheaders;*/
     // Adapter permettant l'affichage de la liste de devoirs
     protected WorkAdapter adapter;
     // Affichage de la zone "invitations"
     private RecyclerView inviteView;
     // Affichage de la liste d'invitations
     private Invite.InviteAdapter inviteAdapter;
+    // liste de devoirs
+    private RecyclerView workList;
 
     private NotificationFactory notificationFactory;
 
@@ -117,17 +113,17 @@ public class WorkPage extends Fragment implements SyncListener {
                 getResources().getColor(R.color.colorPrimaryDark));
 
         // Section contenant la liste en elle même
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        workList = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         // Instancie l'adapter permettant l'affichage de la liste de devoirs
         adapter = new WorkAdapter(this);
         // "Decoration" = en tetes
         DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        workList.setHasFixedSize(true);
+        workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
-        recyclerView.addItemDecoration(decor);
-        recyclerView.setAdapter(adapter);
+        workList.addItemDecoration(decor);
+        workList.setAdapter(adapter);
 
         notificationFactory = new NotificationFactory(this.getActivity());
 
@@ -146,11 +142,12 @@ public class WorkPage extends Fragment implements SyncListener {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            //planSync = 0;
+            if (workList != null) workList.smoothScrollToPosition(0);
             // délai nécessaire au temps d'initialisation de la vue
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    // Autorise la synchronisation
                     planSync = 0;
                     // Lance une synchronisation des devoirs depuis le serveur
                     // La planification est inclue dans le callback onSync
