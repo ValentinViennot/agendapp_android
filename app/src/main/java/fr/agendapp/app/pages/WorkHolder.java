@@ -167,7 +167,6 @@ class WorkHolder extends RecyclerView.ViewHolder {
                                                         Work.notifyItemRemoved(getAdapterPosition(), w);
                                                         adapter.update();
                                                     }
-
                                                     @Override
                                                     public void onAskCancel() {
                                                         // Ne rien faire

@@ -28,7 +28,6 @@ import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.pending.Pending;
 
 /**
- * TODO passer les protected qui le peuvent en private (rappel : protected donne la visibilité à la classe et des classes filles)
  * Page (Vue) d'affichage des devoirs à faire
  * Une Vue est un composant affichable dans une activité
  * Cette Vue est un "Fragment" car elle est utilisée dans une vue de type "ViewPager" (onglets)
@@ -46,6 +45,8 @@ public class WorkPage extends Fragment implements SyncListener {
     private Invite.InviteAdapter inviteAdapter;
     // liste de devoirs
     private RecyclerView workList;
+    // message en cas de hors connexion
+    private TextView msgoffline;
 
     private NotificationFactory notificationFactory;
 
@@ -107,6 +108,7 @@ public class WorkPage extends Fragment implements SyncListener {
                 }, 2000);
             }
         });
+        //noinspection deprecation : Compatibilité Android 4+
         refresher.setColorSchemeColors(
                 getResources().getColor(R.color.colorAccent),
                 getResources().getColor(R.color.colorPrimary),
@@ -126,6 +128,8 @@ public class WorkPage extends Fragment implements SyncListener {
         workList.setAdapter(adapter);
 
         notificationFactory = new NotificationFactory(this.getActivity());
+
+        msgoffline = (TextView) view.findViewById(R.id.offlinemsg);
 
         // Retourne la vue initialisée
         return view;
@@ -195,11 +199,26 @@ public class WorkPage extends Fragment implements SyncListener {
      * onSync() si de nouvelles données, onSyncNotAvailable() si pas de nouvelles données (ou pas internet)
      */
     void sync() {
-        // Envoyer les listes d'actions en attente
-        // Enchaine automatiquement sur l'actualisation des données (voir méthode Pending.send())
-        Pending.send(this, this.getContext(), notificationFactory);
-        // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
-        planNextSync();
+        if (SyncFactory.isOffline() || SyncFactory.getServererror() != null) {
+            msgoffline.setVisibility(View.VISIBLE);
+            if (SyncFactory.isOffline())
+                msgoffline.setText(R.string.code_offline);
+            else
+                msgoffline.setText(SyncFactory.getServererror());
+            SyncFactory.checkServerStatus(this.getContext(), new ClassicListener() {
+                @Override
+                public void onCallBackListener() {
+                    planNextSync();
+                }
+            });
+        } else {
+            msgoffline.setVisibility(View.GONE);
+            // Envoyer les listes d'actions en attente
+            // Enchaine automatiquement sur l'actualisation des données (voir méthode Pending.send())
+            Pending.send(this, this.getContext(), notificationFactory);
+            // Les méthodes de callback onSync ou onSyncNotAvailable seront ensuite appelées
+            planNextSync();
+        }
     }
 
     /**

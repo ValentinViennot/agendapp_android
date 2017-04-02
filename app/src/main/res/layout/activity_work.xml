@@ -10,6 +10,16 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
+        <TextView
+            android:id="@+id/offlinemsg"
+            style="@style/TextAppearance.AppCompat.Notification"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/flag_red"
+            android:padding="8dp"
+            android:text="@string/code_offline"
+            android:textColor="@color/colorText" />
+
         <android.support.v7.widget.CardView
             android:id="@+id/fusion_view"
             android:layout_width="match_parent"

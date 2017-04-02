@@ -1,6 +1,8 @@
+<!DOCTYPE resources [<!ENTITY appname "Agendapp"><!ENTITY contactmail "contact@agendapp.fr"><!ENTITY website "https://agendapp.fr/"><!ENTITY version "4.0.0-ALPHA">]>
+
 <resources>
     <!-- Nom de l'application -->
-    <string name="app_name">Agendapp</string>
+    <string name="app_name">&appname;</string>
 
     <!-- Titres -->
     <string name="title_fusion">Fusionner ces devoirs</string>
@@ -71,6 +73,13 @@
     <!-- Codes erreurs http -->
     <string name="code_404_title">Ressource indisponible</string>
     <string name="code_404_message">Essaie de relancer l\'application ou d\'actualiser les données à nouveau.</string>
+    <string name="code_400_title">Syntaxe de la requête erronée</string>
+    <string name="code_400_message">Merci de signaler cette erreur à &contactmail;</string>
+    <string name="code_503_title">Erreur serveur</string>
+    <string name="code_503_message">Merci de signaler cette erreur à &contactmail;</string>
+    <string name="code_0_title">Erreur de connexion</string>
+    <string name="code_0_message">Essaie de fermer puis de réouvrir l\'application</string>
+    <string name="code_offline">Hors connexion. La synchronisation sera effectuée lorsqu\'une connexion à Internet sera détectée.</string>
 
     <!-- Textes à trou -->
     <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>

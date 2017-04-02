@@ -35,6 +35,8 @@ import fr.agendapp.app.pending.Pending;
 public class SyncFactory {
 
     private static final String baseUrl = "https://apis.agendapp.fr/";
+    private static boolean offline = false;
+    private static String servererror = null;
     /**
      * Instance active du service de synchronisation
      */
@@ -51,9 +53,6 @@ public class SyncFactory {
      * True si la liste de pending est en cours d'envoi
      */
     private boolean lockpending = false;
-
-    // TODO gestion de l'hors connexion ?
-
     /**
      * Création d'une nouvelle instance du service de synchronisation
      *
@@ -69,11 +68,19 @@ public class SyncFactory {
         Pending.init(context);
     }
 
+    public static boolean isOffline() {
+        return offline;
+    }
+
+    public static String getServererror() {
+        return servererror;
+    }
+
     /**
      * Initialisation du service de discussion avec le serveur d'APIs
      *
      * @param context APPLICATION Context
-     * @param t   Token d'identification aux APIs
+     * @param t       Token d'identification aux APIs
      */
     public static synchronized void init(Context context, String t) {
         // Initialisation des lites d'actions en attente
@@ -96,7 +103,7 @@ public class SyncFactory {
      */
     public static synchronized SyncFactory getInstance(Context context) {
         if (instance == null)
-            init(context,null);
+            init(context, null);
         return instance;
     }
 
@@ -137,7 +144,7 @@ public class SyncFactory {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // TODO
+                            checkServerStatus(lp, null);
                             error.printStackTrace();
                         }
                     }
@@ -155,6 +162,44 @@ public class SyncFactory {
 
     private void setToken(String t) {
         token = t;
+    }
+
+    public static void checkServerStatus(final Context context, @Nullable final ClassicListener classicListener) {
+        JsonObjectRequest req = new JsonObjectRequest(
+                Request.Method.GET,
+                baseUrl + "status/",
+                new JSONObject(),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (response.has("message")) {
+                                servererror = response.getString("message");
+                            } else {
+                                servererror = null;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            servererror = context.getResources().getString(R.string.code_0_message);
+                        } finally {
+                            offline = false;
+                            if (classicListener != null)
+                                classicListener.onCallBackListener();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        servererror = null;
+                        offline = true;
+                        if (classicListener != null)
+                            classicListener.onCallBackListener();
+                    }
+                }
+        );
+        // Execution de la requete
+        getInstance(context).getRequestQueue(context).add(req);
     }
 
     public void getUser(final Context context, final ClassicListener classicListener, @Nullable NotificationFactory notifs) {
@@ -236,7 +281,7 @@ public class SyncFactory {
                 // Appel du callback
                 classicListener.onCallBackListener();
             }
-        }, (NotificationFactory)null );
+        }, (NotificationFactory) null);
     }
 
     /**
@@ -310,10 +355,11 @@ public class SyncFactory {
      * deux fois la même liste d'actions au serveur.
      * Comme cette méthode met en réalité une requête en attente elle est exécutée rapidement et ce n'est pas suffisant
      * C'est pourquoi on passe par un attribut booleen pour tester si un envoi est en cours via cette instance de SyncFactory
+     *
      * @param syncListener Callback
-     * @param context Android Context
-     * @param json Liste de requêtes à envoyer au format JSON
-     * @param notifs Pour ajouter des notifications en cas d'erreur @Nullable
+     * @param context      Android Context
+     * @param json         Liste de requêtes à envoyer au format JSON
+     * @param notifs       Pour ajouter des notifications en cas d'erreur @Nullable
      */
     public synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
         if (context != null && syncListener != null) {
@@ -340,7 +386,7 @@ public class SyncFactory {
                         // On débloque l'envoi de listes d'actions
                         setLockpending(false);
                         // On fait appel à la gestion d'erreur par défaut de SyncFactory
-                        // TODO
+                        getErrorListener(notifs).onErrorResponse(error);
                     }
                 });
             } else {
@@ -401,8 +447,9 @@ public class SyncFactory {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null) {
                     switch (error.networkResponse.statusCode) {
-                        // TODO codes erreur + use resources
-                        // TODO erreur 401 (utiliser notifs.getActivity() )
+                        case 400:
+                            if (notifs != null)
+                                notifs.add(2, R.string.code_400_title, R.string.code_400_message);
                         case 404:
                             if (notifs != null)
                                 notifs.add(2, R.string.code_404_title, R.string.code_404_message);
@@ -421,11 +468,18 @@ public class SyncFactory {
                                 notifs.getActivity().startActivity(new Intent(notifs.getActivity(), App.class));
                             }
                             break;
+                        case 503:
+                            if (notifs != null)
+                                notifs.add(2, R.string.code_503_title, R.string.code_503_message);
                         default:
+                            if (notifs != null)
+                                notifs.add(1, R.string.code_0_title, R.string.code_0_message);
                             Log.w(App.TAG, "Code HTTP non géré : " + error.networkResponse.statusCode);
                     }
                 } else {
-                    Log.e(App.TAG, "Erreur réseau non renseignée...");
+                    // On teste la connexion au serveur grâce à une API spéciale
+                    Log.i(App.TAG, "Test de connexion au serveur...");
+                    if (notifs != null) checkServerStatus(notifs.getActivity(), null);
                 }
             }
         };
@@ -444,6 +498,6 @@ public class SyncFactory {
     }
 
     private void setLockpending(boolean b) {
-        lockpending=b;
+        lockpending = b;
     }
 }
