@@ -22,6 +22,7 @@ import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.objects.Subject;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
+import fr.agendapp.app.pending.PendADD;
 
 public class NewPage extends AppCompatActivity implements ClassicListener {
 
@@ -90,14 +91,18 @@ public class NewPage extends AppCompatActivity implements ClassicListener {
         final int MIN_TEXT = 3;
         String text = this.text.getText().toString();
         if (text.length() > MIN_TEXT) {
+            user = User.getInstance();
             Calendar c = Calendar.getInstance();
             c.set(date.getYear(), date.getMonth(), date.getDayOfMonth(), 18, 0);
-            new Work(user, user.getSubjects()[subject.getSelectedItemPosition()], text, c.getTime());
-            startActivity(new Intent(this, MainPage.class));
+            new PendADD(this,
+                    new Work(user, user.getSubjects()[subject.getSelectedItemPosition()], text, c.getTime())
+            );
+            Intent page = new Intent(this, MainPage.class);
+            page.putExtra("delay", 2000);
+            startActivity(page);
         } else {
             // TODO resources
             NotificationFactory.add(this, 1, "Trop court", "La description du devoir doit faire plus de " + MIN_TEXT + " caractères.");
         }
-        // TODO new PendADD
     }
 }

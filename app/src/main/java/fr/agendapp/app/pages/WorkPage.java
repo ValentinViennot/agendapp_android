@@ -10,12 +10,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
@@ -36,28 +38,32 @@ public class WorkPage extends Fragment implements SyncListener {
 
     // Affichage de la liste de devoirs à fusionner entre eux
     public FusionList fusions;
-    /*    // Liste de devoirs
-        protected List<Work> homeworks;
-        // Liste d'en tetes (mois) liée à la liste de devoirs
-        protected List<Header> headers;
-        // Liste d'en tetes (jour) liée à la liste de devoirs
-        protected List<Header> subheaders;*/
     // Adapter permettant l'affichage de la liste de devoirs
     protected WorkAdapter adapter;
     // Affichage de la zone "invitations"
     private RecyclerView inviteView;
     // Affichage de la liste d'invitations
     private Invite.InviteAdapter inviteAdapter;
+    // liste de devoirs
+    private RecyclerView workList;
 
     private NotificationFactory notificationFactory;
 
     // Nombre de synchronisations en attente
     private int planSync = 0;
+    private int first_sync_delay = 500;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // On récupère la vue de la liste de devoirs que l'on va retourner
         View view = inflater.inflate(R.layout.activity_work, container, false);
+
+        Bundle extras = getActivity().getIntent().getExtras();
+        if (extras != null) {
+            first_sync_delay = extras.getInt("delay");
+        }
+
+        Log.i(App.TAG, "first sync delay : " + first_sync_delay);
 
         // Remplissage de la vue
 
@@ -107,17 +113,17 @@ public class WorkPage extends Fragment implements SyncListener {
                 getResources().getColor(R.color.colorPrimaryDark));
 
         // Section contenant la liste en elle même
-        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.my_recycler_view);
+        workList = (RecyclerView) view.findViewById(R.id.my_recycler_view);
         // Instancie l'adapter permettant l'affichage de la liste de devoirs
         adapter = new WorkAdapter(this);
         // "Decoration" = en tetes
         DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        workList.setHasFixedSize(true);
+        workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
-        recyclerView.addItemDecoration(decor);
-        recyclerView.setAdapter(adapter);
+        workList.addItemDecoration(decor);
+        workList.setAdapter(adapter);
 
         notificationFactory = new NotificationFactory(this.getActivity());
 
@@ -125,11 +131,9 @@ public class WorkPage extends Fragment implements SyncListener {
         return view;
     }
 
-    @Override // Au démarrage de l'activité (ou sa reprise)
+    @Override
     public void onStart() {
         super.onStart();
-        // On actualise l'affichage des devoirs à partir des données disponibles localement
-        // dès le démarrage pour un affichage aussi rapide que possible
         adapter.update();
     }
 
@@ -138,18 +142,20 @@ public class WorkPage extends Fragment implements SyncListener {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            planSync = 0;
-            // Lance une synchronisation des devoirs depuis le serveur
-            // La planification est inclue dans le callback onSync
-            this.sync();
-            // Invitations (délai nécessaire au temps d'initialisation de la vue des invitations)
+            if (workList != null) workList.smoothScrollToPosition(0);
+            // délai nécessaire au temps d'initialisation de la vue
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    // Autorise la synchronisation
+                    planSync = 0;
+                    // Lance une synchronisation des devoirs depuis le serveur
+                    // La planification est inclue dans le callback onSync
+                    sync();
                     // Récupère les invitations aux nouveaux groupes
                     getInvites();
                 }
-            }, 100);
+            }, first_sync_delay);
         } else {
             // Rend impossible le lancement d'autres instances de synchronisation
             planSync++;

@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
@@ -35,6 +34,14 @@ public class Work {
     public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
     private static List<Work> comingwork;
     private static List<Work> pastwork;
+    private static List<Integer> changed_A = new LinkedList<>();
+    private static List<Integer> added_A = new LinkedList<>();
+    private static List<Integer> removed_A = new LinkedList<>();
+    private static List<Integer[]> moved_A = new LinkedList<>();
+    private static List<Integer> changed_D = new LinkedList<>();
+    private static List<Integer> added_D = new LinkedList<>();
+    private static List<Integer> removed_D = new LinkedList<>();
+    private static List<Integer[]> moved_D = new LinkedList<>();
     /**
      * ID dans la base
      */
@@ -63,6 +70,8 @@ public class Work {
      * Date d'échéance
      */
     private Date date;
+
+    // STATIC RESOURCES
     /**
      * Nombre de marqué comme faits
      */
@@ -115,16 +124,17 @@ public class Work {
         insert(this);
     }
 
+    // SETTERS
+
     private static void insert(Work w) {
-        ListIterator<Work> iterator = comingwork.listIterator();
-        while (iterator.hasNext())
-            if (w.getDate().compareTo(iterator.next().getDate()) >= 0) {
-                iterator.add(w);
+        int index = comingwork.size();
+        for (Work a : comingwork)
+            if (w.getDate().compareTo(a.getDate()) <= 0) {
+                index = comingwork.indexOf(a);
                 break;
             }
+        comingwork.add(index, w);
     }
-
-    // STATIC RESOURCES
 
     public static void saveList(Context context, boolean b) {
         String json;
@@ -132,8 +142,7 @@ public class Work {
             json = ParseFactory.workToJson(pastwork);
         else
             json = ParseFactory.workToJson(comingwork);
-        Log.i(App.TAG, json);
-        //TODO saveList(context, b, json, "0");
+        saveList(context, b, json, "0");
     }
 
     public static void saveList(Context context) {
@@ -157,7 +166,7 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setComingwork(Context context, String json, String version) {
-        comingwork = updateList(comingwork, ParseFactory.parseWork(json));
+        comingwork = updateList(getComingwork(context), ParseFactory.parseWork(json), false);
         saveList(context, false, json, version);
     }
 
@@ -169,7 +178,7 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setPastwork(Context context, String json, String version) {
-        pastwork = updateList(pastwork, ParseFactory.parseWork(json));
+        pastwork = updateList(getPastwork(context), ParseFactory.parseWork(json), true);
         saveList(context, true, json, version);
     }
 
@@ -191,20 +200,106 @@ public class Work {
         return comingwork;
     }
 
-    // SETTERS
-
-    private static List<Work> updateList(List<Work> o, List<Work> n) {
+    /**
+     * Observe les modifications entre deux listes, une "ancienne" et une "nouvelle"
+     *
+     * @param o        Ancienne liste de devoirs
+     * @param n        Nouvelle liste de devoirs
+     * @param archives True si archives, false si devoirs
+     * @return Ancienne liste mise à jour à partir de la nouvelle
+     */
+    private static List<Work> updateList(List<Work> o, List<Work> n, boolean archives) {
+        Log.i(App.TAG, "updateList");
+        // Récupère le bon objet pour les listes de modifications
+        List<Integer> changed = archives ? changed_A : changed_D;
+        List<Integer> added = archives ? added_A : added_D;
+        List<Integer> removed = archives ? removed_A : removed_D;
+        List<Integer[]> moved = archives ? moved_A : moved_D;
+        // Liste de retour
         List<Work> res = new LinkedList<>();
         int index;
         Work v;
-        for (Work w : n)
-            if ((index = indexOf(w, o)) < 0)
+        int count = 0;
+        // Pour chaque element de la nouvelle liste
+        for (Work w : n) {
+            // S'il n'était pas dans l'ancienne
+            if ((index = indexOf(w, o)) < 0) {
+                // On ajoute la référence vers ce nouvel objet à la liste
                 res.add(w);
-            else if ((v = o.get(index)).modified(w))
+                // On signale l'insertion d'un nouvel élément à cet endroit de la liste
+                added.add(count);
+            }
+            // S'il y était déjà mais qu'il a été modifié
+            else if ((v = o.get(index)).modified(w)) {
+                // On y ajoute la référence vers l'ancien objet après avoir mis à jour ce dernier
                 res.add(v.copyFrom(w));
-            else
+                // On signale la modification d'un élément à cette position
+                changed.add(count);
+            }
+            // Sinon, l'élément y était déjà et n'a pas été modifié
+            else {
+                // On se contente de replacer la référence à l'objet au nouvel endroit dans la liste
                 res.add(v);
+                // Si la nouvelle position n'est pas la même que l'ancienne, on signale un déplacement
+                moved.add(new Integer[]{index, count});
+            }
+            count++;
+        }
+        // Pour chaque élément de l'ancienne liste
+        count = 0;
+        for (Work w : o) {
+            // S'il n'est plus dans la nouvelle
+            if (indexOf(w, n) < 0)
+                // On signale sa suppression
+                removed.add(count);
+            count++;
+        }
+        // Transformation des removed+added en "changed"
+        /*for (Integer i : added)
+            for (Integer j : removed)
+                if (i.equals(j)) {
+                    added.remove(i);
+                    removed.remove(j);
+                    changed.add(i);
+                }*/
         return res;
+    }
+
+    public static List<Integer> getChanged(boolean archives) {
+        return archives ? changed_A : changed_D;
+    }
+
+    public static List<Integer> getAdded(boolean archives) {
+        return archives ? added_A : added_D;
+    }
+
+    public static void notifyItemRemoved(int position, Work w) {
+        if (pastwork.contains(w))
+            removed_A.add(position);
+        else
+            removed_D.add(position);
+    }
+
+    public static List<Integer> getRemoved(boolean archives) {
+        return archives ? removed_A : removed_D;
+    }
+
+    public static List<Integer[]> getMoved(boolean archives) {
+        return archives ? moved_A:moved_D;
+    }
+
+    public static void setChangesApplied(boolean archives) {
+        if (archives) {
+            added_A.clear();
+            moved_A.clear();
+            changed_A.clear();
+            removed_A.clear();
+        } else {
+            added_D.clear();
+            moved_D.clear();
+            changed_D.clear();
+            removed_D.clear();
+        }
     }
 
     /**
@@ -212,7 +307,7 @@ public class Work {
      * @param e    Element Work
      * @return Index du devoir dans la liste (recherche par ID) ou -1 si non présent
      */
-    public static int indexOf(Work e, List<Work> list) {
+    private static int indexOf(Work e, List<Work> list) {
         for (Work w : list)
             if (w.getId() == e.getId())
                 return list.indexOf(w);
