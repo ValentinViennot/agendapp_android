@@ -405,7 +405,7 @@ public class SyncFactory {
                         // TODO erreur 401 (utiliser notifs.getActivity() )
                         case 404:
                             if (notifs != null)
-                                notifs.add(2, notifs.getActivity().getResources().getString(R.string.code_404_title), notifs.getActivity().getResources().getString(R.string.code_404_message));
+                                notifs.add(2, R.string.code_404_title, R.string.code_404_message);
                             Log.i(App.TAG, "Http 404");
                             break;
                         case 401:
