@@ -91,7 +91,11 @@ class WorkHolder extends RecyclerView.ViewHolder {
 
         // Pièces jointes
         GridView gridview = (GridView) itemView.findViewById(R.id.card_attachments);
-        gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
+        if (w.getAttachments().size() > 0) {
+            gridview.setAdapter(new Attachment.AttachmentAdapter(w.getAttachments(), inflater));
+            gridview.setVisibility(View.VISIBLE);
+        } else
+            gridview.setVisibility(View.GONE);
 
         // Drapeau / Marqueur
         int color;

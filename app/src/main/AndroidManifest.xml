@@ -40,6 +40,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".pages.MainPage" />
         </activity>
+        <activity android:name=".pages.SelectFilterPage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
     </application>
 
 </manifest>

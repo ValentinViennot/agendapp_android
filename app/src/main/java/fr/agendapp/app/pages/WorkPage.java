@@ -1,10 +1,8 @@
 package fr.agendapp.app.pages;
 
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
@@ -48,11 +46,15 @@ public class WorkPage extends Fragment implements SyncListener {
     // message en cas de hors connexion
     private TextView msgoffline;
 
+    // Service de notification
     private NotificationFactory notificationFactory;
 
     // Nombre de synchronisations en attente
     private int planSync = 0;
+    // Délai de première synchronisation
     private int first_sync_delay = 700;
+    // Positionnement à l'initialisation
+    private int pos = 0;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,21 +63,15 @@ public class WorkPage extends Fragment implements SyncListener {
 
         Bundle extras = getActivity().getIntent().getExtras();
         if (extras != null) {
+            // Retarder la prochaine synchro (après un ajout par exemple)
             if (extras.containsKey("delay")) first_sync_delay = extras.getInt("delay");
+            // Se diriger vers une position particuliere dans la liste
+            if (extras.containsKey("pos")) pos = extras.getInt("pos");
         }
 
         Log.i(App.TAG, "first sync delay : " + first_sync_delay);
 
         // Remplissage de la vue
-
-        // Bouton d'action flottant (pour ajouter un devoir)
-        FloatingActionButton fab = (FloatingActionButton) view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(WorkPage.this.getActivity(), NewPage.class));
-            }
-        });
 
         // Section contenant la liste de fusion
         fusions = new FusionList(
@@ -122,6 +118,7 @@ public class WorkPage extends Fragment implements SyncListener {
         DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 
         workList.setHasFixedSize(true);
+        //workList.setHasFixedSize(false);
         workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
 
         workList.addItemDecoration(decor);
@@ -147,7 +144,11 @@ public class WorkPage extends Fragment implements SyncListener {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            if (workList != null) workList.smoothScrollToPosition(0);
+            if (workList != null) {
+                if (pos < adapter.getItemCount())
+                    workList.smoothScrollToPosition(pos);
+                pos = 0;
+            }
             // délai nécessaire au temps d'initialisation de la vue
             new Handler().postDelayed(new Runnable() {
                 @Override
