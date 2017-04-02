@@ -2,7 +2,6 @@ package fr.agendapp.app.objects;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.factories.SyncFactory;
@@ -101,7 +100,7 @@ public class User {
      * @return Utilisateur actif
      */
     public static User getInstance() {
-        // TODO seule cette méthode et init devraient etre statique
+        // TODO seule cette méthode et init devraient être statique
         // TODO devrait retourner null si rien de sauvegardé...
         // TODO comme sync
         return user;

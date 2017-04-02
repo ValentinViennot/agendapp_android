@@ -10,11 +10,6 @@ import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
@@ -23,6 +18,10 @@ import fr.agendapp.app.objects.Subject;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pending.PendADD;
+
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
 
 public class NewPage extends AppCompatActivity implements ClassicListener {
 
@@ -101,8 +100,8 @@ public class NewPage extends AppCompatActivity implements ClassicListener {
             page.putExtra("delay", 2000);
             startActivity(page);
         } else {
-            // TODO resources
-            NotificationFactory.add(this, 1, "Trop court", "La description du devoir doit faire plus de " + MIN_TEXT + " caractères.");
+            // TODO check Dylan :)
+            NotificationFactory.add(this, 1, this.getResources.getString(R.string.warning_title), this.getResources.getString(R.string.warning_msg, "" + MIN_TEXT);
         }
     }
 }

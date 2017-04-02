@@ -71,6 +71,8 @@
     <!-- Codes erreurs http -->
     <string name="code_404_title">Ressource indisponible</string>
     <string name="code_404_message">Essaie de relancer l'application ou d'actualiser les données à nouveau.</string>
+    <string name="code_401_title">Identification impossible</string>
+    <string name="code_401_message">Reconnecte toi...</string>
 
     <!-- Textes à trou -->
     <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>
@@ -113,14 +115,24 @@
         <item>23H</item>
     </string-array>
 
-    <!-- Nouveau Page -->
+    <!-- New Page -->
     <string name="new_infosprincipales">Infos principales</string>
     <string name="new_subject">Matière</string>
     <string name="new_text">Description</string>
     <string name="new_date">À faire pour le…</string>
+    <string name="warning_title">Texte trop court !</string>
+    <string name="warning_msg">La description du devoir doit faire plus de %1$s caractères.</string>
+
 
     <!-- Comment page -->
     <string name="comment_new">Ajouter un commentaire</string>
     <string name="comment_meta">\@%1$s \t (%2$s)</string>
+    <string name="error_title">Erreur</string>
+    <string name="error_msg">Action impossible</string>
+    <string name="warning_title">Texte trop court !</string>
+    <string name="warning_msg">Le commentaire doit contenir au moins %1$s caractères</string>
+
+    <!-- Work Holder -->
+    <string name="info_title">Envoi en cours...</string>
 
 </resources>

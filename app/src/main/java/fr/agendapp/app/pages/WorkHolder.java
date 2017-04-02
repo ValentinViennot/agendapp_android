@@ -10,17 +10,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.view.LayoutInflater;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.GridView;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
-
+import android.view.*;
+import android.widget.*;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.objects.Attachment;
@@ -222,8 +213,8 @@ class WorkHolder extends RecyclerView.ViewHolder {
             done.setOnClickListener(null);
             imgComm.setOnClickListener(null);
             imgComm.setImageDrawable(r.getDrawable(R.drawable.ic_cached_black_24dp));//TODO sync pic
-            // TODO resources
-            done.setText("Envoi en cours..");
+            // TODO check Dylan
+            done.setText(context.getResources.getString(R.string.info_title));
         }
     }
 }

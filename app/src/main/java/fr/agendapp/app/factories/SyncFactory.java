@@ -6,24 +6,11 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.agendapp.app.App;
-import fr.agendapp.app.R;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.Invite;
@@ -31,6 +18,13 @@ import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
 import fr.agendapp.app.pending.Pending;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static javafx.scene.input.KeyCode.R;
 
 public class SyncFactory {
 
@@ -401,8 +395,7 @@ public class SyncFactory {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null) {
                     switch (error.networkResponse.statusCode) {
-                        // TODO codes erreur + use resources
-                        // TODO erreur 401 (utiliser notifs.getActivity() )
+                        // TODO codes erreur + check si Dylan a pas fait de la merde :)
                         case 404:
                             if (notifs != null)
                                 notifs.add(2, R.string.code_404_title, R.string.code_404_message);
@@ -416,7 +409,7 @@ public class SyncFactory {
                                 editor.clear();
                                 editor.apply();
                                 // Ajoute une notification explicative
-                                notifs.add(1, "Identification impossible", "Reconnecte toi...");
+                                notifs.add(1, R.string.code_401_title, R.string.code_401_message);
                                 // Renvoyer l'utilisateur sur la page d'identification
                                 notifs.getActivity().startActivity(new Intent(notifs.getActivity(), App.class));
                             }

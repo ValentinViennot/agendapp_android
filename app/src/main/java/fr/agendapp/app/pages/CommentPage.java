@@ -12,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
@@ -65,9 +64,9 @@ public class CommentPage extends AppCompatActivity {
             this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
         } catch (NullPointerException e) {
             // Si ce n'est pas le cas, on mentionne l'erreur au logcat
-            Log.e(App.TAG, "Page commentaire ouverte sans avoir défini de devoir au prealable !");
-            // On ajoute une notification à l'utilisateur TODO resources
-            NotificationFactory.add(this, 1, "Erreur", "Action impossible");
+            Log.e(App.TAG, "Page commentaire ouverte sans avoir défini de devoir au préalable !");
+            // On ajoute une notification à l'utilisateur TODO check si Dylan a pas fait de la merde :)
+            NotificationFactory.add(this, 1, this.getResources.getString(R.string.error_title), this.getResources.getString(R.string.error_msg));
             // Puis on le redirige vers la page principale
             startActivity(new Intent(this, MainPage.class));
         }
@@ -88,8 +87,8 @@ public class CommentPage extends AppCompatActivity {
             this.text.clearFocus();
             this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
         } else {
-            // TODO resources
-            NotificationFactory.add(this, 1, "Trop court !", "Le commentaire doit contenir au moins " + MIN + " caractères");
+            // TODO check si Dylan a pas fait de la merde :)
+            NotificationFactory.add(this, 1, this.getResources.getString(R.string.warning_title), this.getResources.getString(R.string.warning_msg, "" + MIN));
         }
     }
 
