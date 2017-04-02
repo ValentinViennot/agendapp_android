@@ -9,6 +9,8 @@
     <color name="colorSecondaryText">#727272</color>
     <color name="colorDivider">#B6B6B6</color>
 
+    <color name="background">#fafafa</color>
+
     <!-- flag colors -->
     <color name="flag_grey">#999999</color>
     <color name="flag_blue">#4178BE</color>
