@@ -62,7 +62,8 @@ public class CommentPage extends AppCompatActivity {
                         }
                     }
             );
-            this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
+            if (w.getComments().size() > 0)
+                this.commentList.smoothScrollToPosition(w.getComments().size() - 1);
         } catch (NullPointerException e) {
             // Si ce n'est pas le cas, on mentionne l'erreur au logcat
             Log.e(App.TAG, "Page commentaire ouverte sans avoir défini de devoir au prealable !");

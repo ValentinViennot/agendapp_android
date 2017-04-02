@@ -29,6 +29,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/commentauthor"
         android:layout_marginBottom="@dimen/md_keylines"
+        android:autoLink="web"
         android:paddingLeft="@dimen/md_keylines"
         android:paddingStart="@dimen/md_keylines" />
 

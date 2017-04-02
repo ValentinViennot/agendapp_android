@@ -3,6 +3,7 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -141,7 +142,7 @@ public class Comment {
         }
 
         public void setComment(final Comment c) {
-            text.setText(c.getText());
+            text.setText(Html.fromHtml(c.getText()));
             Calendar cal = Calendar.getInstance();
             cal.setTime(c.getDate());
             String d = (cal.get(Calendar.DAY_OF_MONTH) < 10 ? "0" : "") + cal.get(Calendar.DAY_OF_MONTH) + "/"

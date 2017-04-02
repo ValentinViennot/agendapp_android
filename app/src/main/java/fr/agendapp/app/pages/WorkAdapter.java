@@ -42,6 +42,8 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
     private List<Header> subheaders;
     private SubHeaderHolder[] subholders;
 
+    private boolean first = true;
+
     /**
      * Création d'un nouvelle adapter
      *
@@ -294,7 +296,11 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
             System.arraycopy(tsh, 0, subholders, 0, Math.min(tsh.length, subholders.length));
             System.arraycopy(th, 0, holders, 0, Math.min(th.length, holders.length));
 
-            // Les changements seront notifiés au Thread UI dans le post execute
+            if (first) {
+                Work.initAddedList(workPage.isArchives());
+                first = false;
+            }
+
             return null;
         }
 
