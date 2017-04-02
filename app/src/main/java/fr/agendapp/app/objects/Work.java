@@ -188,6 +188,8 @@ public class Work {
             // On la récupére dans le stockage local de l'appareil
             SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
             pastwork = ParseFactory.parseWork(preferences.getString("archives", "[]"));
+            for (int i = 0; i < pastwork.size(); i++)
+                added_A.add(i);
         }
         return pastwork;
     }
@@ -196,6 +198,8 @@ public class Work {
         if (activity != null && comingwork == null) {
             SharedPreferences preferences = activity.getSharedPreferences(App.TAG, MODE_PRIVATE);
             comingwork = ParseFactory.parseWork(preferences.getString("devoirs", "[]"));
+            for (int i = 0; i < comingwork.size(); i++)
+                added_D.add(i);
         }
         return comingwork;
     }

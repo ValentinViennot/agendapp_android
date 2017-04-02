@@ -95,7 +95,7 @@ public class NotificationFactory {
         alertDialog.show();
     }
 
-    public Activity getActivity() {
+    Activity getActivity() {
         return activity;
     }
 

@@ -56,9 +56,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
         subheaders = new LinkedList<>();
         // Liste de vues contenant les en tetes
         setHolders();
-
-        update();
-        notifyDataSetChanged();
     }
 
     /**
