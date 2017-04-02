@@ -19,7 +19,6 @@ import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
-import fr.agendapp.app.filters.Filter;
 import fr.agendapp.app.objects.Header;
 import fr.agendapp.app.objects.Work;
 
@@ -230,10 +229,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                 holders[i].title.setText(headers.get(i).getTitle());
     }
 
-    void remove(Work w) {
-        this.homeworks.remove(w);
-    }
-
     Activity getActivity() {
         return this.workPage.getActivity();
     }
@@ -285,8 +280,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                     Work.getPastwork(workPage.getActivity()) :
                     Work.getComingwork(workPage.getActivity());
 
-            // Application des filtres à la liste de devoirs
-            homeworks = Filter.applyFilters(homeworks);
             // Recalcule les sections en fonction de l'état de la nouvelle liste
             recalcSections();
 

@@ -52,7 +52,7 @@ public class WorkPage extends Fragment implements SyncListener {
 
     // Nombre de synchronisations en attente
     private int planSync = 0;
-    private int first_sync_delay = 500;
+    private int first_sync_delay = 700;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,7 +61,7 @@ public class WorkPage extends Fragment implements SyncListener {
 
         Bundle extras = getActivity().getIntent().getExtras();
         if (extras != null) {
-            first_sync_delay = extras.getInt("delay");
+            if (extras.containsKey("delay")) first_sync_delay = extras.getInt("delay");
         }
 
         Log.i(App.TAG, "first sync delay : " + first_sync_delay);
@@ -130,6 +130,7 @@ public class WorkPage extends Fragment implements SyncListener {
         notificationFactory = new NotificationFactory(this.getActivity());
 
         msgoffline = (TextView) view.findViewById(R.id.offlinemsg);
+        msgoffline.setVisibility(View.GONE);
 
         // Retourne la vue initialisée
         return view;
