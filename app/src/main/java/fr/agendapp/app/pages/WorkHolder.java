@@ -23,6 +23,7 @@ import android.widget.TextView;
 
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
+import fr.agendapp.app.listeners.AskListener;
 import fr.agendapp.app.objects.Attachment;
 import fr.agendapp.app.objects.Work;
 
@@ -159,9 +160,23 @@ class WorkHolder extends RecyclerView.ViewHolder {
                                     return true;
                                 case R.id.menu_delete:
                                     if (w.isUser()) {
-                                        w.delete(context);
-                                        Work.notifyItemRemoved(getAdapterPosition(), w);
-                                        adapter.update();
+                                        NotificationFactory.ask(adapter.getActivity(), new AskListener() {
+                                                    @Override
+                                                    public void onAskOk() {
+                                                        w.delete(context);
+                                                        Work.notifyItemRemoved(getAdapterPosition(), w);
+                                                        adapter.update();
+                                                    }
+
+                                                    @Override
+                                                    public void onAskCancel() {
+                                                        // Ne rien faire
+                                                    }
+                                                },
+                                                "Confirmer la suppression ?",
+                                                "Plus personne n'aura accès à ce devoir une fois supprimé",
+                                                context.getResources().getString(R.string.button_confirm),
+                                                context.getResources().getString(R.string.button_cancel));// TODO resources
                                     } else {
                                         w.report(context);
                                         NotificationFactory.add(adapter.getActivity(), 0, context.getResources().getString(R.string.msg_alert), "");
