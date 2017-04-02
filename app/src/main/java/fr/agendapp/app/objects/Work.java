@@ -247,11 +247,13 @@ public class Work {
         }
         // Pour chaque élément de l'ancienne liste
         count = 0;
+        // Décalage de la position à cause des suppressions
+        int nb = 0;
         for (Work w : o) {
             // S'il n'est plus dans la nouvelle
             if (indexOf(w, n) < 0)
                 // On signale sa suppression
-                removed.add(count);
+                removed.add(count - nb++);
             count++;
         }
         // Transformation des removed+added en "changed"
