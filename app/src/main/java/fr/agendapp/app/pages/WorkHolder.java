@@ -113,103 +113,113 @@ class WorkHolder extends RecyclerView.ViewHolder {
         }
         flag.setColorFilter(color);
 
-        // Sélection d'un marqueur
-        flag.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setTitle(R.string.flags_title)
-                        .setItems(R.array.flags, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                // Modification locale + requete au serveur
-                                w.setFlag(context, which);
-                                // On signale à l'adapter qu'on vient de modifier la donnée locale
-                                adapter.notifyItemChanged(getAdapterPosition());
+        if (w.getId() > 0) {
+            menu.setVisibility(View.VISIBLE);
+            nbDone.setVisibility(View.VISIBLE);
+            nbComm.setVisibility(View.VISIBLE);
+            imgDone.setVisibility(View.VISIBLE);
+            imgComm.setImageDrawable(r.getDrawable(R.drawable.ic_comment_black_24dp));
+
+            // Sélection d'un marqueur
+            flag.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                    builder.setTitle(R.string.flags_title)
+                            .setItems(R.array.flags, new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Modification locale + requete au serveur
+                                    w.setFlag(context, which);
+                                    // On signale à l'adapter qu'on vient de modifier la donnée locale
+                                    adapter.notifyItemChanged(getAdapterPosition());
+                                }
+                            });
+                    builder.create().show();
+                }
+            });
+
+            // Menu
+            menu.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    PopupMenu popup = new PopupMenu(context, v);
+                    final MenuInflater inflater = popup.getMenuInflater();
+                    inflater.inflate(R.menu.work_menu, popup.getMenu());
+                    MenuItem done = popup.getMenu().findItem(R.id.menu_done);
+                    done.setTitle(w.isDone() ? R.string.button_undone : R.string.button_done);
+                    MenuItem delete = popup.getMenu().findItem(R.id.menu_delete);
+                    delete.setTitle(w.isUser() ? R.string.button_delete : R.string.button_alert);
+                    popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.menu_done:
+                                    w.done(context);
+                                    adapter.notifyItemChanged(getAdapterPosition());
+                                    return true;
+                                case R.id.menu_delete:
+                                    if (w.isUser()) {
+                                        w.delete(context);
+                                        adapter.update();
+                                    } else {
+                                        w.report(context);
+                                        NotificationFactory.add(adapter.getActivity(), 0, context.getResources().getString(R.string.msg_alert), "");
+                                    }
+                                    return true;
+                                case R.id.menu_fusion:
+                                    if (!adapter.fusion(w)) {
+                                        NotificationFactory.add(adapter.getActivity(), 1, r.getString(R.string.msg_impossible), r.getString(R.string.msg_fusionimpossible));
+                                    }
+                                    return true;
+                                default:
+                                    return false;
                             }
-                        });
-                builder.create().show();
-            }
-        });
-
-        // Menu
-        menu.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popup = new PopupMenu(context, v);
-                final MenuInflater inflater = popup.getMenuInflater();
-                inflater.inflate(R.menu.work_menu, popup.getMenu());
-                MenuItem done = popup.getMenu().findItem(R.id.menu_done);
-                done.setTitle(w.isDone() ? R.string.button_undone : R.string.button_done);
-                MenuItem delete = popup.getMenu().findItem(R.id.menu_delete);
-                delete.setTitle(w.isUser() ? R.string.button_delete : R.string.button_alert);
-                popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.menu_done:
-                                w.done(context);
-                                adapter.notifyItemChanged(getAdapterPosition());
-                                return true;
-                            case R.id.menu_delete:
-                                if (w.isUser()) {
-                                    w.delete(context);
-                                    // TODO Toujours nécessaire ? Voir nouvelle méthode
-                                    adapter.remove(w);
-                                    adapter.notifyItemRemoved(getAdapterPosition());
-                                    // TODO Décalage du devoir suivant celui supprimé dans le header du dessus (problème de bornes, recalcsections)
-                                    // TODO probleme mise à jour au mauvais endroit.. revoir d'où proviennent les List<Work> pour meilleure logique
-                                    // ? updateHeaders();
-                                } else {
-                                    w.report(context);
-                                    NotificationFactory.add(adapter.getActivity(), 0, context.getResources().getString(R.string.msg_alert), "");
-                                }
-                                return true;
-                            case R.id.menu_fusion:
-                                if (!adapter.fusion(w)) {
-                                    NotificationFactory.add(adapter.getActivity(), 1, r.getString(R.string.msg_impossible), r.getString(R.string.msg_fusionimpossible));
-                                }
-                                return true;
-                            default:
-                                return false;
                         }
-                    }
-                });
-                popup.show();
-            }
-        });
+                    });
+                    popup.show();
+                }
+            });
 
-        // Footer
-        String nb = "" + w.getNbDone();
-        nbDone.setText(nb);
-        nb = "" + w.getComments().size();
-        nbComm.setText(nb);
+            // Footer
+            String nb = "" + w.getNbDone();
+            nbDone.setText(nb);
+            nb = "" + w.getComments().size();
+            nbComm.setText(nb);
 
-        if (w.isDone())
-            done.setText(r.getString(R.string.button_undone));
-        else
-            done.setText(r.getString(R.string.button_done));
+            if (w.isDone())
+                done.setText(r.getString(R.string.button_undone));
+            else
+                done.setText(r.getString(R.string.button_done));
 
-        // Boutons
-        done.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                w.done(context);
-                adapter.notifyItemChanged(getAdapterPosition());
-            }
-        });
+            // Boutons
+            done.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    w.done(context);
+                    adapter.notifyItemChanged(getAdapterPosition());
+                }
+            });
 
-        // Ouverture des commentaires
-        View.OnClickListener openComm = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                CommentPage.setWork(w);
-                adapter.getActivity().startActivity(new Intent(adapter.getActivity(), CommentPage.class));
-            }
-        };
-        nbDone.setOnClickListener(openComm);
-        imgDone.setOnClickListener(openComm);
-        nbComm.setOnClickListener(openComm);
-        imgComm.setOnClickListener(openComm);
+            // Ouverture des commentaires
+            View.OnClickListener openComm = new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    CommentPage.setWork(w);
+                    adapter.getActivity().startActivity(new Intent(adapter.getActivity(), CommentPage.class));
+                }
+            };
+            nbDone.setOnClickListener(openComm);
+            imgDone.setOnClickListener(openComm);
+            nbComm.setOnClickListener(openComm);
+            imgComm.setOnClickListener(openComm);
+        } else {
+            menu.setVisibility(View.INVISIBLE);
+            nbDone.setVisibility(View.INVISIBLE);
+            nbComm.setVisibility(View.INVISIBLE);
+            imgDone.setVisibility(View.INVISIBLE);
 
+            imgComm.setImageDrawable(r.getDrawable(R.drawable.ic_add_black_24dp));//TODO sync pic
+            done.setText("Envoi en cours..");
+        }
     }
 }

@@ -41,6 +41,8 @@ public class PendADD extends Pending {
         this.user = groupe;
         pending.add(this);
         PendADD.saveList(context);
+        // sauvegarde les devoirs à venir localement
+        Work.saveList(context, false);
     }
 
     public PendADD(Context context, Work w) {

@@ -3,7 +3,6 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -11,7 +10,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Locale;
 
 import fr.agendapp.app.App;
@@ -116,12 +114,13 @@ public class Work {
     }
 
     private static void insert(Work w) {
-        ListIterator<Work> iterator = comingwork.listIterator();
-        while (iterator.hasNext())
-            if (w.getDate().compareTo(iterator.next().getDate()) >= 0) {
-                iterator.add(w);
+        int index = comingwork.size();
+        for (Work a : comingwork)
+            if (w.getDate().compareTo(a.getDate()) <= 0) {
+                index = comingwork.indexOf(a);
                 break;
             }
+        comingwork.add(index, w);
     }
 
     // STATIC RESOURCES
@@ -132,8 +131,7 @@ public class Work {
             json = ParseFactory.workToJson(pastwork);
         else
             json = ParseFactory.workToJson(comingwork);
-        Log.i(App.TAG, json);
-        //TODO saveList(context, b, json, "0");
+        saveList(context, b, json, "0");
     }
 
     public static void saveList(Context context) {
@@ -157,7 +155,7 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setComingwork(Context context, String json, String version) {
-        comingwork = updateList(comingwork, ParseFactory.parseWork(json));
+        comingwork = updateList(getComingwork(context), ParseFactory.parseWork(json));
         saveList(context, false, json, version);
     }
 
@@ -169,7 +167,7 @@ public class Work {
      * @param version Chaine de version
      */
     public static void setPastwork(Context context, String json, String version) {
-        pastwork = updateList(pastwork, ParseFactory.parseWork(json));
+        pastwork = updateList(getPastwork(context), ParseFactory.parseWork(json));
         saveList(context, true, json, version);
     }
 

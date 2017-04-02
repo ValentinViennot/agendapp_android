@@ -80,7 +80,7 @@ public abstract class Pending {
      * @param notificationFactory Ajout de notifications en cas d'erreur
      */
     public static void send(SyncListener syncListener, Context context, @Nullable NotificationFactory notificationFactory) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Récupération des actions en attente au format JSON
             String json = toJson();
             // S'il y a des actions en attente

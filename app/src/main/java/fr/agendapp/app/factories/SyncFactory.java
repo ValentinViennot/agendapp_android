@@ -280,7 +280,7 @@ public class SyncFactory {
      * @param context      Android Context
      */
     public void getVersion(final SyncListener syncListener, final Context context, final NotificationFactory notifs) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Nom de la version à controler (Archives ou Devoirs)
             final String name = "version" + (syncListener.isArchives() ? "A" : "D");
             SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
@@ -315,7 +315,7 @@ public class SyncFactory {
      * @param notifs Pour ajouter des notifications en cas d'erreur @Nullable
      */
     public synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Si un envoi n'est pas déjà en cours
             if (!lockpending) {
                 // On bloque l'envoi de listes d'actions
