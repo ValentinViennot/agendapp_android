@@ -11,6 +11,7 @@
     <string name="title_commentpage">Commentaires</string>
     <string name="title_selectfilter">Rechercher</string>
     <string name="title_filterresult">Résultats de la recherche</string>
+    <string name="title_login">Agendapp</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -55,6 +56,7 @@
     <string name="button_cancel">Annuler</string>
     <string name="button_yes">Oui</string>
     <string name="button_no">Non</string>
+    <string name="button_login">Connexion</string>
 
     <!-- Flags -->
     <string name="flags_title">Définir un marqueur…</string>
@@ -143,4 +145,8 @@
     <string name="filerUnDone">À faire</string>
     <string name="pourle">Pour le %1$s</string>
     <string name="fait">fait</string>
+
+    <!-- LoginPage -->
+    <string name="username">Adresse email</string>
+    <string name="password">Mot de passe</string>
 </resources>
