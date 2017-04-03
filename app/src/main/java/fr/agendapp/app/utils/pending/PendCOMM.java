@@ -1,4 +1,4 @@
-package fr.agendapp.app.pending;
+package fr.agendapp.app.utils.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,33 +9,35 @@ import java.util.ListIterator;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
-import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendALERT extends Pending {
+public class PendCOMM extends Pending {
 
-    private static List<PendALERT> pending;
-    private static String name = "pendALERT";
+    private static List<PendCOMM> pending;
+    private static String name = "pendCOMM";
 
     private int id;
+    private String comment;
 
-    public PendALERT(Context context, int id) {
+    /**
+     * @param id      ID
+     * @param comment Commentaire
+     *                Constructeur de PendCOMM
+     */
+    public PendCOMM(Context context, int id, String comment) {
         this.id = id;
+        this.comment = comment;
         pending.add(this);
-        PendALERT.saveList(context);
-    }
-
-    public PendALERT(Context context, Work w) {
-        this(context, w.getId());
+        PendCOMM.saveList(context);
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendALERT
+     * @return représentation JSON de la liste d'actions PendCOMM
      */
     static String getList() {
-        ListIterator<PendALERT> i = pending.listIterator();
+        ListIterator<PendCOMM> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -47,7 +49,7 @@ public class PendALERT extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendALERT(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendCOMM(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -71,11 +73,15 @@ public class PendALERT extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendALERT
+     * @return représentation JSON de l'action PendCOMM
      */
     public String toString() {
-        return "" + id;
+        String json = "{";
+        json += "\"id\":" + id + ",";
+        json += "\"content\": {" +
+                "\"texte\": \"" + comment + "\"";
+        json += "}";
+        json += "}";
+        return json;
     }
-
-
 }

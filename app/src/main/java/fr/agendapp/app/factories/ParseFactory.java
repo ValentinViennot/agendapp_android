@@ -13,6 +13,7 @@ import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.text.ParseException;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,16 +21,18 @@ import java.util.List;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
-import fr.agendapp.app.pending.PendADD;
-import fr.agendapp.app.pending.PendALERT;
-import fr.agendapp.app.pending.PendCOMM;
-import fr.agendapp.app.pending.PendDEL;
-import fr.agendapp.app.pending.PendDELc;
-import fr.agendapp.app.pending.PendDO;
-import fr.agendapp.app.pending.PendFLAG;
-import fr.agendapp.app.pending.PendMERGE;
+import fr.agendapp.app.utils.pending.PendADD;
+import fr.agendapp.app.utils.pending.PendALERT;
+import fr.agendapp.app.utils.pending.PendCOMM;
+import fr.agendapp.app.utils.pending.PendDEL;
+import fr.agendapp.app.utils.pending.PendDELc;
+import fr.agendapp.app.utils.pending.PendDO;
+import fr.agendapp.app.utils.pending.PendFLAG;
+import fr.agendapp.app.utils.pending.PendMERGE;
 
 public class ParseFactory {
+
+    private static final int DT = 2;
 
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Date.class, new DateDeserializer())
@@ -111,7 +114,10 @@ public class ParseFactory {
         @Override
         public Date deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
             try {
-                return Work.dateformat.parse(jsonElement.getAsJsonPrimitive().getAsString());
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(Work.dateformat.parse(jsonElement.getAsJsonPrimitive().getAsString()));
+                cal.add(Calendar.HOUR, -DT);
+                return cal.getTime();
             } catch (ParseException e) {
                 e.printStackTrace();
                 return new Date();
@@ -122,7 +128,7 @@ public class ParseFactory {
     private static class DateSerializer implements JsonSerializer<Date> {
         @Override
         public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {
-            return new JsonPrimitive(Work.dateformat.format(date) + "+02:00");
+            return new JsonPrimitive(Work.dateformat.format(date) + "+0" + DT + ":00");
         }
     }
 }

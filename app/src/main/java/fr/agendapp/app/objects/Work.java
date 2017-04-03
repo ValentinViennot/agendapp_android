@@ -15,11 +15,11 @@ import java.util.Locale;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
-import fr.agendapp.app.pending.PendALERT;
-import fr.agendapp.app.pending.PendCOMM;
-import fr.agendapp.app.pending.PendDEL;
-import fr.agendapp.app.pending.PendDO;
-import fr.agendapp.app.pending.PendFLAG;
+import fr.agendapp.app.utils.pending.PendALERT;
+import fr.agendapp.app.utils.pending.PendCOMM;
+import fr.agendapp.app.utils.pending.PendDEL;
+import fr.agendapp.app.utils.pending.PendDO;
+import fr.agendapp.app.utils.pending.PendFLAG;
 
 import static android.content.Context.MODE_PRIVATE;
 

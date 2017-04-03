@@ -1,9 +1,9 @@
-package fr.agendapp.app.filters;
+package fr.agendapp.app.utils.filters;
 
 import fr.agendapp.app.objects.Work;
 
 /**
- * Created by Charline on 21/03/2017.
+ * @author Charline Bardin
  */
 public class FilterDone extends Filter {
     boolean done;
@@ -15,5 +15,11 @@ public class FilterDone extends Filter {
 
     public boolean correspond(Work w) {
         return (w.isDone()==this.done);
+    }
+
+    @Override
+    public String toString() {
+        //TODO resources
+        return done ? "Faits" : "À faire";
     }
 }

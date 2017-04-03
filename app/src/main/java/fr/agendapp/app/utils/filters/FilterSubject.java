@@ -1,10 +1,7 @@
-package fr.agendapp.app.filters;
+package fr.agendapp.app.utils.filters;
 
 import fr.agendapp.app.objects.Work;
 
-/**
- * Created by Charline on 21/03/2017.
- */
 public class FilterSubject extends Filter {
     String subject;
 
@@ -13,7 +10,11 @@ public class FilterSubject extends Filter {
         this.subject = subject;
     }
 
+    public String getSubject() {
+        return subject;
+    }
+
     public boolean correspond(Work w) {
-        return (w.getSubject()==this.subject);
+        return (w.getSubject().equals(this.subject));
     }
 }

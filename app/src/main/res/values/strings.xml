@@ -9,6 +9,8 @@
     <string name="title_user">Paramètres</string>
     <string name="title_newpage">Ajouter un devoir</string>
     <string name="title_commentpage">Commentaires</string>
+    <string name="title_selectfilter">Rechercher</string>
+    <string name="title_filterresult">Résultats de la recherche</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -132,4 +134,13 @@
     <string name="comment_new">Ajouter un commentaire</string>
     <string name="comment_meta">\@%1$s \t (%2$s)</string>
 
+    <!-- SelectFilter Page -->
+    <string name="select_sectionApplied">Filtres appliqués (Appuie pour effacer)</string>
+    <string name="select_sectionSubjects">Filtrer par matière…</string>
+    <string name="select_sectionFilters">Filtrer par marqueur…</string>
+    <string name="select_sectionDone">Ne montrer que les devoirs…</string>
+    <string name="filterDone">Faits</string>
+    <string name="filerUnDone">À faire</string>
+    <string name="pourle">Pour le %1$s</string>
+    <string name="fait">fait</string>
 </resources>

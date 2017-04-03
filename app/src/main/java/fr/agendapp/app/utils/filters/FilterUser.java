@@ -1,4 +1,4 @@
-package fr.agendapp.app.filters;
+package fr.agendapp.app.utils.filters;
 
 import fr.agendapp.app.objects.Work;
 
@@ -18,4 +18,8 @@ public class FilterUser extends Filter {
         return w.getText().contains(txt);
     }
 
+    @Override
+    public String toString() {
+        return txt;
+    }
 }

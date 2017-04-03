@@ -82,6 +82,7 @@
                     android:paddingLeft="@dimen/md_keylines"
                     android:paddingRight="@dimen/md_keylines"
                     android:paddingStart="@dimen/md_keylines"
+                    android:paddingTop="@dimen/md_keylines"
                     android:text="@string/new_text"
                     android:textColor="@color/colorDarkText" />
 

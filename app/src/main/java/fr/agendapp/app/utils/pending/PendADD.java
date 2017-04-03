@@ -1,4 +1,4 @@
-package fr.agendapp.app.pending;
+package fr.agendapp.app.utils.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;

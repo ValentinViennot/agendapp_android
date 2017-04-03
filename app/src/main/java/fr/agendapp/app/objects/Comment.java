@@ -18,7 +18,7 @@ import java.util.List;
 
 import fr.agendapp.app.R;
 import fr.agendapp.app.pages.CommentPage;
-import fr.agendapp.app.pending.PendDELc;
+import fr.agendapp.app.utils.pending.PendDELc;
 
 import static android.view.View.GONE;
 

@@ -11,6 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import java.util.ArrayList;
@@ -52,8 +54,25 @@ public class MainPage extends AppCompatActivity {
         tabs.setupWithViewPager(viewPager);
         Bundle extras = getIntent().getExtras();
         if (extras != null) // Se positionner sur un onglet particulier
-            if (extras.containsKey("tab"))
-                viewPager.setCurrentItem(extras.getInt("tab"), true);
+            if (extras.containsKey("tab")) {
+                int tab = extras.getInt("tab");
+                viewPager.setCurrentItem(tab, true);
+            }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        getMenuInflater().inflate(R.menu.main, menu);
+        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
+        searchMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                startActivity(new Intent(MainPage.this, SelectFilterPage.class));
+                return true;
+            }
+        });
+        return true;
     }
 
     // Initialise les "pages" (=Fragments) de chaque onglet

@@ -1,5 +1,10 @@
-package fr.agendapp.app.filters;
+package fr.agendapp.app.utils.filters;
 
+import android.app.Activity;
+
+import java.util.Collections;
+import java.util.ConcurrentModificationException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -26,6 +31,8 @@ public abstract class Filter {
     static final int DATE_TYPE = 5;
     // Nombre de type de filtres différents
     private static final int NB_TYPES = 6;
+    private static List<SelectableFilter> subjects;
+    private static List<SelectableFilter> flags;
     // tableau 2D de filtres
     // Filter[] chaque case de ce tableau doit être vérifiée
     // Filter[i][] chaque case du sous tableau correspond à un Filter (filtre)
@@ -33,9 +40,47 @@ public abstract class Filter {
     private static Tab[] filters = Tab.init(Filter.NB_TYPES);
     // Permet de regrouper les filtres de même types dans une même condition ET
     private int type;
+    private boolean active;
 
     Filter(int type) {
         this.type = type;
+        this.active = false;
+    }
+
+    public static List<SelectableFilter> getSubjects() {
+        return subjects;
+    }
+
+    public static List<SelectableFilter> getFlags() {
+        return flags;
+    }
+
+    /**
+     * Défini les filtres selectionnables
+     *
+     * @param activity Activity appelante
+     */
+    public static void setSelectables(Activity activity) {
+        HashMap<String, SelectableFilter> filtersubjects = new HashMap<>();
+        HashMap<Integer, SelectableFilter> filterflags = new HashMap<>();
+        List<List<Work>> list = new LinkedList<>();
+        list.add(Work.getComingwork(activity));
+        list.add(Work.getPastwork(activity));
+        for (List<Work> l : list)
+            for (Work w : l) {
+                if (filtersubjects.containsKey(w.getSubject()))
+                    filtersubjects.get(w.getSubject()).inc();
+                else
+                    filtersubjects.put(w.getSubject(), new SelectableFilter(new FilterSubject(w.getSubject())));
+                if (filterflags.containsKey(w.getFlag()))
+                    filterflags.get(w.getFlag()).inc();
+                else
+                    filterflags.put(w.getFlag(), new SelectableFilter(new FilterFlag(w.getFlag())));
+            }
+        subjects = new LinkedList<>(filtersubjects.values());
+        flags = new LinkedList<>(filterflags.values());
+        Collections.sort(subjects);
+        Collections.sort(flags);
     }
 
     /**
@@ -44,16 +89,27 @@ public abstract class Filter {
      * addFilter(new FilterFlag(2))
      * pour filter sur les devoirs possédant un drapeau de couleur 2
      *
-     * @param filter              Filtre a appliquer
+     * @param filter Filtre a appliquer
      */
     public static void addFilter(Filter filter) {
         filters[filter.getType()].add(filter);
+        filter.active = true;
+    }
+
+    static void clearFilter(Filter filter) {
+        filters[filter.getType()].remove(filter);
+        filter.active = false;
     }
 
     /* Filtrage des devoirs */
 
-    public static void clearFilter(Filter filter) {
-        filters[filter.getType()].remove(filter);
+    /**
+     * Effacer tous les filtres actifs
+     */
+    public static void clearFilter() throws ConcurrentModificationException {
+        for (Tab list : filters)
+            for (Filter filter : list)
+                clearFilter(filter);
     }
 
     public static List<Work> applyFilters(List<Work> homeworks) {
@@ -71,17 +127,17 @@ public abstract class Filter {
      */
     private static boolean validateFilters(Work w) {
         // Pour chaque groupe de filtres
-        for (int i = 0; i < filters.length; ++i) {
+        for (Tab block : filters) {
             // Si le groupe contient des filtres
-            if (filters[i].size() > 0) {
+            if (block.size() > 0) {
                 // Le devoir doit correspondre à au moins un filtre du groupe
                 // On suppose que c'est faux
                 boolean b = false;
                 // Tant que c'est faux, on continue d'essayer de le montrer
                 // Jusqu'à avoir testé tous les filtres du groupe
-                for (Filter f : filters[i]) {
+                for (Filter filter : block) {
                     // Si le devoir correspond au filtre (condition suffisante)
-                    if (f.correspond(w)) {
+                    if (filter.correspond(w)) {
                         // On valide le groupe de filtres
                         b = true;
                         // Et on quitte la boucle
@@ -95,6 +151,20 @@ public abstract class Filter {
         }
         // Si la méthode n'a jamais renvoyé false, alors le devoir correspond
         return true;
+    }
+
+    /**
+     * @return Filtres actuellement actifs
+     */
+    public static List<Filter> getActiveFilters() {
+        List<Filter> list = new LinkedList<>();
+        for (Tab filter : filters)
+            list.addAll(filter);
+        return list;
+    }
+
+    boolean isActive() {
+        return active;
     }
 
     /**

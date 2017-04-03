@@ -1,4 +1,5 @@
-package fr.agendapp.app.pending;
+package fr.agendapp.app.utils.pending;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,31 +14,25 @@ import fr.agendapp.app.factories.ParseFactory;
 /**
  * @author Dylan Habans
  */
-public class PendCOMM extends Pending {
+public class PendMERGE extends Pending {
 
-    private static List<PendCOMM> pending;
-    private static String name = "pendCOMM";
+    private static List<PendMERGE> pending;
+    private static String name = "pendMERGE";
 
-    private int id;
-    private String comment;
+    private int[] ids;
 
-    /**
-     * @param id      ID
-     * @param comment Commentaire
-     *                Constructeur de PendCOMM
-     */
-    public PendCOMM(Context context, int id, String comment) {
-        this.id = id;
-        this.comment = comment;
+    public PendMERGE(Context context, int[] ids) {
+        this.ids = ids;
         pending.add(this);
-        PendCOMM.saveList(context);
+        PendMERGE.saveList(context);
     }
 
+
     /**
-     * @return représentation JSON de la liste d'actions PendCOMM
+     * @return représentation JSON de la liste d'actions PendDELc
      */
     static String getList() {
-        ListIterator<PendCOMM> i = pending.listIterator();
+        ListIterator<PendMERGE> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -49,7 +44,7 @@ public class PendCOMM extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendCOMM(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendMERGE(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -72,16 +67,14 @@ public class PendCOMM extends Pending {
         return name;
     }
 
-    /**
-     * @return représentation JSON de l'action PendCOMM
-     */
     public String toString() {
-        String json = "{";
-        json += "\"id\":" + id + ",";
-        json += "\"content\": {" +
-                "\"texte\": \"" + comment + "\"";
-        json += "}";
-        json += "}";
+        String json = "[";
+        for (int i = 0; i < ids.length; i++) {
+            json += ids[i];
+            json += ",";
+        }
+        json = json.substring(0, json.length() - 1); // supprime la dernière virgule
+        json += "]";
         return json;
     }
 }

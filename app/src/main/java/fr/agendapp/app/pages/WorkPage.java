@@ -8,14 +8,12 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
@@ -23,7 +21,8 @@ import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.FusionList;
 import fr.agendapp.app.objects.Invite;
-import fr.agendapp.app.pending.Pending;
+import fr.agendapp.app.utils.WrapLinearLayout;
+import fr.agendapp.app.utils.pending.Pending;
 
 /**
  * Page (Vue) d'affichage des devoirs à faire
@@ -69,8 +68,6 @@ public class WorkPage extends Fragment implements SyncListener {
             if (extras.containsKey("pos")) pos = extras.getInt("pos");
         }
 
-        Log.i(App.TAG, "first sync delay : " + first_sync_delay);
-
         // Remplissage de la vue
 
         // Section contenant la liste de fusion
@@ -108,7 +105,8 @@ public class WorkPage extends Fragment implements SyncListener {
         refresher.setColorSchemeColors(
                 getResources().getColor(R.color.colorAccent),
                 getResources().getColor(R.color.colorPrimary),
-                getResources().getColor(R.color.colorPrimaryDark));
+                getResources().getColor(R.color.colorPrimaryDark)
+        );
 
         // Section contenant la liste en elle même
         workList = (RecyclerView) view.findViewById(R.id.my_recycler_view);
@@ -119,7 +117,8 @@ public class WorkPage extends Fragment implements SyncListener {
 
         workList.setHasFixedSize(true);
         //workList.setHasFixedSize(false);
-        workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        //workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
+        workList.setLayoutManager(new WrapLinearLayout(this.getActivity()));
 
         workList.addItemDecoration(decor);
         workList.setAdapter(adapter);
@@ -144,15 +143,14 @@ public class WorkPage extends Fragment implements SyncListener {
         super.setUserVisibleHint(isVisibleToUser);
 
         if (isVisibleToUser) {
-            if (workList != null) {
-                if (pos < adapter.getItemCount())
-                    workList.smoothScrollToPosition(pos);
-                pos = 0;
-            }
             // délai nécessaire au temps d'initialisation de la vue
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    if (workList != null) {
+                        workList.smoothScrollToPosition(pos);
+                        pos = 0;
+                    }
                     // Autorise la synchronisation
                     planSync = 0;
                     // Lance une synchronisation des devoirs depuis le serveur

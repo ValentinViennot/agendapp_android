@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.PopupMenu;
@@ -74,6 +73,7 @@ class WorkHolder extends RecyclerView.ViewHolder {
      *
      * @param w Devoir
      */
+    @SuppressWarnings("deprecation")
     public void setWork(final Work w) {
 
         final Context context = inflater.getContext();
@@ -102,19 +102,19 @@ class WorkHolder extends RecyclerView.ViewHolder {
         switch (w.getFlag()) {
             case 1:
                 // Bleu
-                color = Color.parseColor("#4178BE");
+                color = r.getColor(R.color.flag_blue);
                 break;
             case 2:
                 // Orange
-                color = Color.parseColor("#FF7832");
+                color = r.getColor(R.color.flag_orange);
                 break;
             case 3:
                 // Rouge
-                color = Color.parseColor("#E71D32");
+                color = r.getColor(R.color.flag_red);
                 break;
             default:
                 // Gris
-                color = Color.parseColor("#999999");
+                color = r.getColor(R.color.flag_grey);
         }
         flag.setColorFilter(color);
 

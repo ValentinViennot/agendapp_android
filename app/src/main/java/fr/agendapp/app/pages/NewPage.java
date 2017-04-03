@@ -22,7 +22,7 @@ import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.objects.Subject;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
-import fr.agendapp.app.pending.PendADD;
+import fr.agendapp.app.utils.pending.PendADD;
 
 public class NewPage extends AppCompatActivity implements ClassicListener {
 

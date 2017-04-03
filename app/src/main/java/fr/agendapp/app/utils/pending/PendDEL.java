@@ -1,5 +1,4 @@
-package fr.agendapp.app.pending;
-
+package fr.agendapp.app.utils.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,29 +9,32 @@ import java.util.ListIterator;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendMERGE extends Pending {
+public class PendDEL extends Pending {
 
-    private static List<PendMERGE> pending;
-    private static String name = "pendMERGE";
+    private final static String name = "pendDEL";
+    private static List<PendDEL> pending;
+    private int id;
 
-    private int[] ids;
-
-    public PendMERGE(Context context, int[] ids) {
-        this.ids = ids;
+    private PendDEL(Context context, int id) {
+        this.id = id;
         pending.add(this);
-        PendMERGE.saveList(context);
+        PendDEL.saveList(context);
     }
 
+    public PendDEL(Context context, Work w) {
+        this(context, w.getId());
+    }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDELc
+     * @return représentation JSON de la liste d'actions PendDEL
      */
     static String getList() {
-        ListIterator<PendMERGE> i = pending.listIterator();
+        ListIterator<PendDEL> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -44,7 +46,7 @@ public class PendMERGE extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendMERGE(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendDEL(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -67,14 +69,10 @@ public class PendMERGE extends Pending {
         return name;
     }
 
+    /**
+     * @return représentation JSON de l'action PendDEL
+     */
     public String toString() {
-        String json = "[";
-        for (int i = 0; i < ids.length; i++) {
-            json += ids[i];
-            json += ",";
-        }
-        json = json.substring(0, json.length() - 1); // supprime la dernière virgule
-        json += "]";
-        return json;
+        return ("" + id);
     }
 }

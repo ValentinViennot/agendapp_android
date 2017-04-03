@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -15,7 +14,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.DateFactory;
 import fr.agendapp.app.factories.NotificationFactory;
@@ -205,18 +203,22 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
     public void onBindHeaderHolder(HeaderHolder viewholder, int position) {
         // Mise à jour de la vue de l'en tete de mois associé au devoir à cette position
         int id = (int) getHeaderId(position);
-        viewholder.title.setText(headers.get(id).getTitle());
-        holders[id] = viewholder;
+        if (id < headers.size()) {
+            viewholder.title.setText(headers.get(id).getTitle());
+            holders[id] = viewholder;
+        }
     }
 
     @Override
     public void onBindSubHeaderHolder(SubHeaderHolder viewholder, int position) {
         // Récupère l'ID de l'en tete associé au devoir à cette position
         int id = (int) getSubHeaderId(position);
-        // Met à jour le titre de la vue associée à cette position
-        viewholder.title.setText(subheaders.get(id).getTitle());
-        // Met à jour le lien vers la vue associée à l'en tête
-        subholders[id] = viewholder;
+        if (id < subheaders.size()) {
+            // Met à jour le titre de la vue associée à cette position
+            viewholder.title.setText(subheaders.get(id).getTitle());
+            // Met à jour le lien vers la vue associée à l'en tête
+            subholders[id] = viewholder;
+        }
     }
 
     private void updateHeaders() {
@@ -263,13 +265,13 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
         @Override
         protected Void doInBackground(Void... params) {
 
-            // TODO delete
+            /// DEBUG
             // Rend visible ce moment de calcul, a priori trop rapide pour etre visible
-            try {
+            /*try {
                 Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-            }
+            }*/
 
             // holders avant mise à jour
             SubHeaderHolder[] tsh = subholders;
@@ -317,7 +319,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                 notifyItemChanged(i);
 
             /// DEBUG
-            for (Integer i : Work.getRemoved(workPage.isArchives()))
+            /*for (Integer i : Work.getRemoved(workPage.isArchives()))
                 Log.i(App.TAG,"removed "+i);
             for (Integer i : Work.getAdded(workPage.isArchives()))
                 Log.i(App.TAG,"added "+i);
@@ -331,7 +333,7 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
                 }
             }
             for (Integer i : Work.getChanged(workPage.isArchives()))
-                Log.i(App.TAG,"changed "+i);
+                Log.i(App.TAG,"changed "+i);*/
 
             Work.setChangesApplied(workPage.isArchives());
 

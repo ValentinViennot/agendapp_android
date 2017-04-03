@@ -9,7 +9,7 @@ import android.widget.TextView;
 import java.util.Calendar;
 
 import fr.agendapp.app.R;
-import fr.agendapp.app.pending.PendMERGE;
+import fr.agendapp.app.utils.pending.PendMERGE;
 
 public class FusionList {
 
