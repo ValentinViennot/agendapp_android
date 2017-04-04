@@ -30,15 +30,28 @@ import fr.agendapp.app.utils.pending.PendDO;
 import fr.agendapp.app.utils.pending.PendFLAG;
 import fr.agendapp.app.utils.pending.PendMERGE;
 
+/**
+ * Lecture et écrire en JSON à partir de la librairie Gson (Google)
+ */
 public class ParseFactory {
 
+    /**
+     * Décalage horaire GMT+DT
+     */
     private static final int DT = 2;
 
+    /**
+     * Instance de la librairie GSON
+     */
     private static final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Date.class, new DateDeserializer())
             .registerTypeAdapter(Date.class, new DateSerializer())
             .create();
 
+    /***
+     * @param json Données JSON contenant une liste de devoirs
+     * @return Liste de devoirs
+     */
     public static List<Work> parseWork(String json) {
         Type collectionType = new TypeToken<LinkedList<Work>>() {
         }.getType();
@@ -103,12 +116,16 @@ public class ParseFactory {
         return gson.fromJson(json, User.class);
     }
 
+    /**
+     * @param workList Liste de devoirs
+     * @return représentation JSON de la liste
+     */
     public static String workToJson(List<Work> workList) {
         return gson.toJson(workList);
     }
 
     /**
-     * Lecture des dates depuis le format JSON
+     * Lecture des dates depuis le format JSON (compatibilité avec les APIs, format ISO)
      */
     private static class DateDeserializer implements JsonDeserializer<Date> {
         @Override
@@ -125,6 +142,9 @@ public class ParseFactory {
         }
     }
 
+    /**
+     * Ecriture des dates au format JSON (compatibilité avec les APIs, format ISO)
+     */
     private static class DateSerializer implements JsonSerializer<Date> {
         @Override
         public JsonElement serialize(Date date, Type type, JsonSerializationContext jsonSerializationContext) {

@@ -42,7 +42,7 @@ public class Day {
         colors.add(w.getSubjectColor());
     }
 
-    public List<Integer> getColors() {
+    List<Integer> getColors() {
         return colors;
     }
 
@@ -50,7 +50,7 @@ public class Day {
         return date;
     }
 
-    public int getDayOfWeek() {
+    int getDayOfWeek() {
         return dayOfWeek;
     }
 
@@ -62,7 +62,7 @@ public class Day {
 
         List<Integer> colors;
 
-        public DayAdapter(List<Integer> colors) {
+        DayAdapter(List<Integer> colors) {
             this.colors = colors;
         }
 
@@ -83,6 +83,7 @@ public class Day {
 
         static class Holder extends RecyclerView.ViewHolder {
 
+            // Rond de couleur correspondant à un devoir
             private ImageView tag;
 
             Holder(LayoutInflater inflater, ViewGroup parent) {

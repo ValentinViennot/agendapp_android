@@ -4,16 +4,23 @@ import android.graphics.Color;
 
 /**
  * Groupe : peut être un dossier ou une matière
+ *
  * @author Dylan Habans
  * @author Valentin Viennot
  */
 public abstract class Group {
 
-    /** ID dans la base */
+    /**
+     * ID dans la base
+     */
     private int id;
-    /** ID du groupe parent */
+    /**
+     * ID du groupe parent
+     */
     private int parentid;
-    /** Nom du groupe */
+    /**
+     * Nom du groupe
+     */
     private String nom;
     /**
      * Type de groupe (héritage)
@@ -22,9 +29,13 @@ public abstract class Group {
      * 2 : Matière
      */
     private int type;
-    /** Couleur du groupe (personnalisée) */
+    /**
+     * Couleur du groupe (personnalisée)
+     */
     private String color;
-    /** True si l'utilisateur est inscrit au groupe */
+    /**
+     * True si l'utilisateur est inscrit au groupe
+     */
     private int isUser;
 
     public Group(int type) {
@@ -54,6 +65,7 @@ public abstract class Group {
 
     /**
      * Rejoindre le groupe
+     *
      * @return true si l'utilisateur rejoint le groupe, false sinon
      */
     public boolean join() {
@@ -65,6 +77,7 @@ public abstract class Group {
 
     /**
      * Quitter le groupe
+     *
      * @return true si réussite
      */
     public boolean quit() {

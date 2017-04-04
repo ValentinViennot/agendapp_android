@@ -24,6 +24,9 @@ import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.utils.pending.PendADD;
 
+/**
+ * Page de création d'un nouveau devoir
+ */
 public class NewPage extends AppCompatActivity implements ClassicListener {
 
     User user;
@@ -68,6 +71,9 @@ public class NewPage extends AppCompatActivity implements ClassicListener {
         SyncFactory.getInstance(this).getUser(this, this, null);
     }
 
+    /**
+     * Actualise les matières disponibles pour l'ajout de devoir
+     */
     private void initForm() {
         // Récupération de l'utilisateur
         user = User.getInstance();
@@ -87,6 +93,9 @@ public class NewPage extends AppCompatActivity implements ClassicListener {
         initForm();
     }
 
+    /**
+     * Sauvegarde le nouveau devoir
+     */
     private void save() {
         final int MIN_TEXT = 3;
         String text = this.text.getText().toString();
@@ -98,6 +107,8 @@ public class NewPage extends AppCompatActivity implements ClassicListener {
                     new Work(user, user.getSubjects()[subject.getSelectedItemPosition()], text, c.getTime())
             );
             Intent page = new Intent(this, MainPage.class);
+            // Ajoute un délai avant l'actualisation des données pour que le devoir ait le temps de s'ajouter sur le serveur
+            // le cas echeant
             page.putExtra("delay", 2000);
             startActivity(page);
         } else {

@@ -1,5 +1,8 @@
 package fr.agendapp.app.listeners;
 
+/**
+ * Listener pour la synchronisation
+ */
 public interface SyncListener {
 
     /**

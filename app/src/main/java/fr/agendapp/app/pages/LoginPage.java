@@ -12,6 +12,9 @@ import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
 
+/**
+ * Page d'identification à l'application
+ */
 public class LoginPage extends AppCompatActivity {
 
     @Override
@@ -30,6 +33,12 @@ public class LoginPage extends AppCompatActivity {
         });
     }
 
+    /**
+     * A la réception d'un résultat positif à la requete de login
+     *
+     * @param token   Token d'identification aux APIs
+     * @param message Message de connexion
+     */
     public void onLogin(String token, String message) {
         SharedPreferences preferences = getSharedPreferences(App.TAG, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
@@ -40,6 +49,10 @@ public class LoginPage extends AppCompatActivity {
         startActivity(page);
     }
 
+    /**
+     * Requete de connexion aux APIs réussie mais echec de connexion
+     * @param message Message d'erreur
+     */
     public void onErrorLogin(String message) {
         NotificationFactory.add(this, 2, message, "");
     }

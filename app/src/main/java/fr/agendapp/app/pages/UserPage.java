@@ -21,6 +21,7 @@ import fr.agendapp.app.objects.User;
 
 /**
  * Réglage des paramètres utilisateur, déconnexion
+ * @author Valentin Viennot
  */
 public class UserPage extends AppCompatActivity implements ClassicListener {
 
@@ -124,6 +125,9 @@ public class UserPage extends AppCompatActivity implements ClassicListener {
         usernotifs.setSelection(user.getNotifs() + 1);
     }
 
+    /**
+     * Sauvegarde les données de l'utilisateur sur le serveur
+     */
     private void saveForm() {
         // Construction des données à envoyer
         String json = "{";
@@ -143,6 +147,9 @@ public class UserPage extends AppCompatActivity implements ClassicListener {
         SyncFactory.getInstance(this).saveUser(this, this, new NotificationFactory(this), json);
     }
 
+    /**
+     * Déconnecte l'utilisateur de l'application (et des APIs)
+     */
     private void logout() {
         // On efface les données enregistrées localement
         SharedPreferences preferences = getSharedPreferences(App.TAG, MODE_PRIVATE);

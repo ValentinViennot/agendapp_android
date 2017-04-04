@@ -2,10 +2,12 @@ package fr.agendapp.app.objects;
 
 /**
  * Dossier (groupe)
+ * TODO Page de gestion des groupes
+ *
  * @author Dylan Habans
  * @author Valentin Viennot
  */
-public class Directory extends Group {
+class Directory extends Group {
 
     Directory() {
         super(1);

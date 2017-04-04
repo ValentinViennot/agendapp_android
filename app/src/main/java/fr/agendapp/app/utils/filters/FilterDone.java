@@ -14,7 +14,7 @@ public class FilterDone extends Filter {
     }
 
     public boolean correspond(Work w) {
-        return (w.isDone()==this.done);
+        return (w.isDone() == this.done);
     }
 
     @Override

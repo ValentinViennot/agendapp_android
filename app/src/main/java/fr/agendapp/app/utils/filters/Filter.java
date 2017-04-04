@@ -96,6 +96,9 @@ public abstract class Filter {
         filter.active = true;
     }
 
+    /**
+     * @param filter Filtre à supprimer des filtres appliqués
+     */
     static void clearFilter(Filter filter) {
         filters[filter.getType()].remove(filter);
         filter.active = false;
@@ -112,6 +115,12 @@ public abstract class Filter {
                 clearFilter(filter);
     }
 
+    /**
+     * Appliquer les filtres actifs
+     *
+     * @param homeworks Liste sur laquelle appliquer le filtrage
+     * @return Liste filtrée
+     */
     public static List<Work> applyFilters(List<Work> homeworks) {
         List<Work> r = new LinkedList<>();
         // Pour chaque devoir

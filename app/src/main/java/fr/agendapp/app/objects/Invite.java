@@ -19,19 +19,28 @@ import fr.agendapp.app.listeners.ClassicListener;
 
 /**
  * Invitation à rejoindre un groupe
+ *
  * @author Dylan Habans
  * @author Valentin Viennot
  */
 public class Invite {
 
     private static List<Invite> invites = new LinkedList<>();
-    /** ID dans la base */
+    /**
+     * ID dans la base
+     */
     private int id;
-    /** Prénom de l'utilisateur qui invite */
+    /**
+     * Prénom de l'utilisateur qui invite
+     */
     private String de;
-    /** Nom du groupe */
+    /**
+     * Nom du groupe
+     */
     private String groupe;
-    /** ID du groupe invité */
+    /**
+     * ID du groupe invité
+     */
     private int groupeid;
 
     /**
@@ -54,6 +63,9 @@ public class Invite {
         return groupeid;
     }
 
+    /**
+     * Adapter pour l'affichage d'une liste d'invitations
+     */
     public static class InviteAdapter extends RecyclerView.Adapter<InviteAdapter.InviteHolder> {
 
         private Resources resources;
@@ -123,6 +135,9 @@ public class Invite {
             notifyItemRemoved(position);
         }
 
+        /**
+         * Invite UI
+         */
         class InviteHolder extends RecyclerView.ViewHolder {
             TextView text;
             Button confirm;

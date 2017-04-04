@@ -4,9 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Created by Valentin on 04/04/2017.
+ * @author Valentin Viennot
  */
-
 public class Month {
 
     private List<Week> weeks;

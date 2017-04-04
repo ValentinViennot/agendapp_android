@@ -9,7 +9,6 @@ import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.listeners.ClassicListener;
 
 /**
- * TODO
  * @author Dylan Habans
  */
 public class User {

@@ -32,6 +32,11 @@ import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
 import fr.agendapp.app.utils.pending.Pending;
 
+/**
+ * Service de communication avec le serveur d'APIs.
+ *
+ * @author Valentin Viennot
+ */
 public class SyncFactory {
 
     private static final String baseUrl = "https://apis.agendapp.fr/";
@@ -53,6 +58,7 @@ public class SyncFactory {
      * True si la liste de pending est en cours d'envoi
      */
     private boolean lockpending = false;
+
     /**
      * Création d'une nouvelle instance du service de synchronisation
      *

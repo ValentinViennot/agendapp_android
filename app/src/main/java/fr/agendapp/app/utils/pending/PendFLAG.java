@@ -23,12 +23,11 @@ public class PendFLAG extends Pending {
     private int flag;
 
     /**
-     * @param id
-     * @param flag
-     * @author Dylan Habans
+     * @param id Index du devoir auquel appliquer <code>flag</code>
+     * @param flag index du marqueur à appliquer
      * Constructeur de PendFLAG
      */
-    public PendFLAG(Context context, int id, int flag) {
+    private PendFLAG(Context context, int id, int flag) {
         this.id = id;
         this.flag = flag;
         pending.add(this);

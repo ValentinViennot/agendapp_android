@@ -28,6 +28,7 @@ import fr.agendapp.app.utils.pending.Pending;
  * Page (Vue) d'affichage des devoirs à faire
  * Une Vue est un composant affichable dans une activité
  * Cette Vue est un "Fragment" car elle est utilisée dans une vue de type "ViewPager" (onglets)
+ * @author Valentin Viennot
  */
 public class WorkPage extends Fragment implements SyncListener {
 
@@ -116,8 +117,6 @@ public class WorkPage extends Fragment implements SyncListener {
         DoubleHeaderDecoration decor = new DoubleHeaderDecoration(adapter);
 
         workList.setHasFixedSize(true);
-        //workList.setHasFixedSize(false);
-        //workList.setLayoutManager(new LinearLayoutManager(this.getActivity()));
         workList.setLayoutManager(new WrapLinearLayout(this.getActivity()));
 
         workList.addItemDecoration(decor);

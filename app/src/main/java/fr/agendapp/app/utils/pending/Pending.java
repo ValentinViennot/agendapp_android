@@ -15,6 +15,7 @@ import fr.agendapp.app.listeners.SyncListener;
  * --> Déclenchement d'une vérification de la présence d'une nouvelle version de devoirs
  *
  * @author Valentin Viennot
+ * @author Dylan Habans
  */
 public abstract class Pending {
 
@@ -57,6 +58,7 @@ public abstract class Pending {
     /**
      * Nettoie les listes (inclus une sauvegarde)
      * A appeler en cas de réussite d'envoi des actions en attente
+     *
      * @param context Android
      */
     public static void clear(Context context) {
@@ -75,8 +77,9 @@ public abstract class Pending {
     /**
      * Envoie les listes d'actions en attente au serveur pour traitement si elles ne sont pas vides
      * Sinon lance régulièrement une synchronisation des devoirs
-     * @param syncListener Callback post synchronisation
-     * @param context Android Context
+     *
+     * @param syncListener        Callback post synchronisation
+     * @param context             Android Context
      * @param notificationFactory Ajout de notifications en cas d'erreur
      */
     public static void send(SyncListener syncListener, Context context, @Nullable NotificationFactory notificationFactory) {

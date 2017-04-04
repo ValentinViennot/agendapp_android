@@ -25,9 +25,16 @@ import fr.agendapp.app.utils.calendar.Day;
 import fr.agendapp.app.utils.calendar.Month;
 import fr.agendapp.app.utils.calendar.Week;
 
+/**
+ * Vue Calendrier
+ *
+ * @author Valentin Viennot
+ */
 public class CalendarPage extends AppCompatActivity {
 
+    /** True si le calendrier affiche les archives, false s'il affiche les devoirs */
     boolean archives;
+    /** Vue contenant la liste des mois */
     RecyclerView view;
 
     Adapter adapter;
@@ -60,6 +67,10 @@ public class CalendarPage extends AppCompatActivity {
         new Init().execute();
     }
 
+    /**
+     * Tâche permettant de charger les données pour la vue
+     * Calcule les jours, semaines et mois contenant les devoirs
+     */
     private class Init extends AsyncTask<Void, Void, Void> {
 
         // Fenetre de dialogue de "chargement"

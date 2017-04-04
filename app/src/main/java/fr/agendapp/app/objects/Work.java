@@ -3,7 +3,6 @@ package fr.agendapp.app.objects;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
-import android.util.Log;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -28,12 +27,24 @@ import static android.content.Context.MODE_PRIVATE;
  *
  * @author Dylan Habans
  * @author Valentin Viennot
+ * @author Charline Bardin
+ * @author Lucas Probst
  */
 public class Work {
 
+    /**
+     * format des dates
+     */
     public static final DateFormat dateformat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+    /**
+     * Liste des devoirs à venir
+     */
     private static List<Work> comingwork;
+    /**
+     * Liste des devoirs passés
+     */
     private static List<Work> pastwork;
+    // Listes de changements
     private static List<Integer> changed_A = new LinkedList<>();
     private static List<Integer> added_A = new LinkedList<>();
     private static List<Integer> removed_A = new LinkedList<>();
@@ -41,6 +52,8 @@ public class Work {
     private static List<Integer> changed_D = new LinkedList<>();
     private static List<Integer> added_D = new LinkedList<>();
     private static List<Integer> removed_D = new LinkedList<>();
+
+    // STATIC RESOURCES
     private static List<Integer[]> moved_D = new LinkedList<>();
     /**
      * ID dans la base
@@ -66,12 +79,12 @@ public class Work {
      * Texte du devoir
      */
     private String texte;
+
+    // SETTERS
     /**
      * Date d'échéance
      */
     private Date date;
-
-    // STATIC RESOURCES
     /**
      * Nombre de marqué comme faits
      */
@@ -123,8 +136,6 @@ public class Work {
         this.pjs = new ArrayList<>();
         insert(this);
     }
-
-    // SETTERS
 
     private static void insert(Work w) {
         int index = comingwork.size();
@@ -209,7 +220,6 @@ public class Work {
      * @return Ancienne liste mise à jour à partir de la nouvelle
      */
     private static List<Work> updateList(List<Work> o, List<Work> n, boolean archives) {
-        Log.i(App.TAG, "updateList");
         // Récupère le bon objet pour les listes de modifications
         List<Integer> changed = archives ? changed_A : changed_D;
         List<Integer> added = archives ? added_A : added_D;
@@ -327,7 +337,6 @@ public class Work {
 
     /**
      * Marque comme fait/non fait selon le statut actuel
-     * TODO enregistrer les modifications au localStorage (implémenter sur les autres méthodes)
      */
     public void done(Context context) {
         // Inverse la valeur (si était 0, devient 1-0 : 1 ; si était 1, devient 1-1 : 0)
@@ -352,10 +361,8 @@ public class Work {
      * L'utilisateur doit en être le propriétaire
      */
     public void delete(Context context) {
-        // TODO réorganiser les listes pour qu'une seule liste de devoirs subsiste
         // La liste de l'adapter (filtrée + associée aux headers) doit être maj dès que celle locale a changée
         // Soit parce que celle locale a été mise à jour avec le serveur, soit parce qu'elle a été modifiée localement
-        // TODO : attribut static haschanged ? (par exemple)
         if (comingwork.contains(this)) {
             comingwork.remove(this);
             // Sauvegarde la liste de devoirs locale
@@ -471,6 +478,12 @@ public class Work {
         );
     }
 
+    /**
+     * Copie les données variables d'un autre devoir
+     *
+     * @param w Devoir a copier
+     * @return Référence au devoir actuel (devoir copieur)
+     */
     private Work copyFrom(Work w) {
         this.flag = w.flag;
         this.fait = w.fait;

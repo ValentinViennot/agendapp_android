@@ -19,9 +19,17 @@ import fr.agendapp.app.objects.Subject;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.pages.FilterInterface;
 
+/**
+ * Filtre appliquable
+ *
+ * @author Valentin Viennot
+ * @author Charline Bardin
+ */
 public class SelectableFilter implements Comparable<SelectableFilter> {
 
+    /** Filtre à appliquer */
     private Filter filter;
+    /** Nombre d'items potentiels dans ce filtre */
     private int count;
 
     SelectableFilter(Filter filter) {
@@ -42,6 +50,9 @@ public class SelectableFilter implements Comparable<SelectableFilter> {
         return o.count - this.count;
     }
 
+    /**
+     * Adapter pour l'affichage d'une liste de Filtres
+     */
     public static class FilterAdapter extends RecyclerView.Adapter<FilterHolder> {
 
         List<Filter> filters;
@@ -79,6 +90,9 @@ public class SelectableFilter implements Comparable<SelectableFilter> {
         }
     }
 
+    /**
+     * Filter UI
+     */
     static class FilterHolder extends RecyclerView.ViewHolder {
 
         private LayoutInflater inflater;

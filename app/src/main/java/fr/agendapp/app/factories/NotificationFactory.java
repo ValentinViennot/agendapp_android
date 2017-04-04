@@ -21,6 +21,12 @@ public class NotificationFactory {
 
     private Activity activity;
 
+    /**
+     * Créé une instance de Notification Factory mettant à disposition des méthodes pour ajouter
+     * des notifications en dehors d'un contexte(nécessite le passage d'une activité lors de la création)
+     *
+     * @param activity Activité mère
+     */
     public NotificationFactory(Activity activity) {
         this.activity = activity;
     }
@@ -95,14 +101,22 @@ public class NotificationFactory {
         alertDialog.show();
     }
 
+    // NOT STATIC
+
     Activity getActivity() {
         return activity;
     }
 
+    /**
+     * @see NotificationFactory#add(int, String, String)
+     */
     public void add(int priority, String title, String message) {
         add(activity, priority, title, message);
     }
 
+    /**
+     * @see NotificationFactory#add(int, int, int)
+     */
     public void add(int priority, int title, int message) {
         add(activity, priority, title, message);
     }

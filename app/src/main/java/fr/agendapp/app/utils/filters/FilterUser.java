@@ -3,7 +3,8 @@ package fr.agendapp.app.utils.filters;
 import fr.agendapp.app.objects.Work;
 
 /**
- * Created by Charline on 21/03/2017.
+ * Filtre personnalisé (chaine de caractères)
+ * @author Charline Bardin
  */
 public class FilterUser extends Filter {
 

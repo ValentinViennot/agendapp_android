@@ -21,16 +21,15 @@ public class PendADD extends Pending {
     private static List<PendADD> pending;
     private static String name = "pendADD";
 
-    // TODO vérifier que les champs correspondent à leur nom JSON (sur les autres pending)
     private String date;
     private String texte;
     private int user;
 
     /**
-     * @param date Date d'échéance
-     * @param text Description
+     * @param date   Date d'échéance
+     * @param text   Description
      * @param groupe Matière (ID)
-     * Constructeur de PendADD :
+     *               Constructeur de PendADD :
      */
     private PendADD(Context context, Date date, String text, int groupe) {
         Work.dateformat.setTimeZone(TimeZone.getTimeZone("GMT"));

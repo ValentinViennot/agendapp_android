@@ -33,10 +33,16 @@ import fr.agendapp.app.utils.filters.Filter;
 import fr.agendapp.app.utils.filters.SelectableFilter;
 
 /**
+ * Page de résultats après filtrage
  * @author Valentin Viennot
+ * @author Charline Bardin
+ * @author Lucas Probst
  */
 public class FilterPage extends AppCompatActivity implements FilterInterface {
 
+    /**
+     * Devoirs correspondant aux filtres
+     */
     List<Work> results = new LinkedList<>();
 
     Adapter adapter;
@@ -109,6 +115,10 @@ public class FilterPage extends AppCompatActivity implements FilterInterface {
         new Init().execute();
     }
 
+    /**
+     * Tâche calculant les données affichées
+     * Applique les filtres au
+     */
     private class Init extends AsyncTask<Void, Void, Void> {
 
         // Fenetre de dialogue de "chargement"
@@ -154,6 +164,9 @@ public class FilterPage extends AppCompatActivity implements FilterInterface {
         }
     }
 
+    /**
+     * Adapter pour l'affichage de la liste de résultats
+     */
     private class Adapter extends RecyclerView.Adapter<Holder> {
 
         @Override
@@ -172,6 +185,9 @@ public class FilterPage extends AppCompatActivity implements FilterInterface {
         }
     }
 
+    /**
+     * UI résultat de recherche
+     */
     class Holder extends RecyclerView.ViewHolder {
 
         private TextView text;
@@ -196,6 +212,9 @@ public class FilterPage extends AppCompatActivity implements FilterInterface {
             flag = (ImageView) itemView.findViewById(R.id.resultflag);
         }
 
+        /**
+         * @param work Devoir à afficher dans les résultats
+         */
         @SuppressWarnings("deprecation")
         void setResult(final Work work) {
             Resources r = FilterPage.this.getResources();
@@ -227,7 +246,7 @@ public class FilterPage extends AppCompatActivity implements FilterInterface {
                     Filter.clearFilter();
                     Intent intent = new Intent(FilterPage.this, MainPage.class);
                     int tab = 0;
-                    int pos = 0;
+                    int pos;
                     pos = Work.getComingwork(FilterPage.this).indexOf(work);
                     if (pos < 0) {
                         tab = 1;

@@ -30,6 +30,7 @@ import fr.agendapp.app.objects.Work;
  * Définition de l'affichage d'un devoir (UI)
  * Quels widgets sont nécessaires pour l'affichage ?
  * Comment sont affichées les données , réactions au clic etc
+ * @author Valentin Viennot
  */
 class WorkHolder extends RecyclerView.ViewHolder {
 
@@ -171,6 +172,7 @@ class WorkHolder extends RecyclerView.ViewHolder {
                                                         Work.notifyItemRemoved(getAdapterPosition(), w);
                                                         adapter.update();
                                                     }
+
                                                     @Override
                                                     public void onAskCancel() {
                                                         // Ne rien faire

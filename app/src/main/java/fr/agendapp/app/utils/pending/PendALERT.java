@@ -21,7 +21,7 @@ public class PendALERT extends Pending {
 
     private int id;
 
-    public PendALERT(Context context, int id) {
+    private PendALERT(Context context, int id) {
         this.id = id;
         pending.add(this);
         PendALERT.saveList(context);

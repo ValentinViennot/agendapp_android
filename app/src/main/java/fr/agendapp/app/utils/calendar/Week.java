@@ -21,9 +21,8 @@ import fr.agendapp.app.utils.filters.Filter;
 import fr.agendapp.app.utils.filters.FilterDate;
 
 /**
- * Created by Valentin on 04/04/2017.
+ * @author Valentin Viennot
  */
-
 public class Week {
 
     private Day[] days;
@@ -45,8 +44,9 @@ public class Week {
         return days[Calendar.SUNDAY] != null;
     }
 
-
-    // TODO jours de la semaine ? Passer par 7* include plutot ?
+    /**
+     * Adapter pour l'affichage d'un liste de semaine
+     */
     public static class WeekAdapter extends RecyclerView.Adapter<WeekAdapter.Holder> {
 
         List<Week> weeks = new LinkedList<>();
@@ -72,6 +72,9 @@ public class Week {
             return weeks.size();
         }
 
+        /**
+         * UI Week
+         */
         class Holder extends RecyclerView.ViewHolder {
 
             private TextView lundi;

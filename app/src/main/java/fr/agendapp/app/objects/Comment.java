@@ -101,7 +101,7 @@ public class Comment {
         return user;
     }
 
-    public String getAuteur() {
+    private String getAuteur() {
         return auteur;
     }
 
@@ -113,13 +113,16 @@ public class Comment {
         return date;
     }
 
-    public List<Attachment> getAttchments() {
+    private List<Attachment> getAttchments() {
         return pjs;
     }
 
 
     // Affichage des commentaires
 
+    /**
+     * Affichage (UI) d'un commentaire
+     */
     public static class CommentHolder extends RecyclerView.ViewHolder {
 
         private LayoutInflater inflater;
@@ -141,6 +144,9 @@ public class Comment {
             comments = (GridView) itemView.findViewById(R.id.commentattachments);
         }
 
+        /**
+         * @param c Commentaire à afficher sur la vue (recyclée)
+         */
         public void setComment(final Comment c) {
             text.setText(Html.fromHtml(c.getText()));
             Calendar cal = Calendar.getInstance();

@@ -7,6 +7,10 @@ import java.util.Calendar;
 
 import fr.agendapp.app.R;
 
+/**
+ * Service "Dates"
+ * Fourni des resources pour le traitement des dates
+ */
 public final class DateFactory {
 
     /**

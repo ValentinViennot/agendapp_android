@@ -22,6 +22,9 @@ import fr.agendapp.app.objects.Work;
 
 /**
  * Adapteur pour l'affichage de la liste de devoirs
+ * @author Valentin Viennot
+ * @author Charline Bardin
+ * @author Lucas Probst
  */
 class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
         ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderAdapter<WorkAdapter.HeaderHolder, WorkAdapter.SubHeaderHolder> {
@@ -74,7 +77,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
     }
 
     /**
-     * TODO : Problème soit dans le calcul des en tetes soit dans le calcul de l'ID d'en tete
      * Calcule les en-têtes et leur emplacement en fonction de la liste de devoirs actuelle
      */
     private void recalcSections() {
@@ -243,12 +245,6 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
 
         // Fenetre de dialogue de "chargement"
         ProgressDialog progressDialog;
-
-        // Notifications de données modifiées
-        private List<Integer> changed;
-        private List<Integer> added;
-        private List<Integer> removed;
-        private List<Integer[]> moved;
 
         @Override
         protected void onPreExecute() {

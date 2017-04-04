@@ -19,14 +19,26 @@ import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.objects.Comment;
 import fr.agendapp.app.objects.Work;
 
+/**
+ * Affichage des commentaires d'un devoir
+ *
+ * @author Valentin Viennot
+ */
 public class CommentPage extends AppCompatActivity {
 
+    /** Devoir dont les commentaires sont affichés */
     private static Work w;
+    /** Texte du nouveau commentaire */
     private EditText text;
 
+    /** Affichage de la liste de commentaires */
     private CommentAdapter adapter;
+    /** Vue de la liste de commentaires */
     private RecyclerView commentList;
 
+    /**
+     * @param work Devoir dont il faut afficher les commentaires
+     */
     public static void setWork(Work work) {
         w = work;
     }
@@ -75,6 +87,8 @@ public class CommentPage extends AppCompatActivity {
     }
 
     private void sendComment() {
+        // On est sûr qu'un devoir a bien été défini
+        assert w != null;
         // vérifions si l'utilisateur a entré un minimum de caractères
         final int MIN = 3;
         String text = this.text.getText().toString();
@@ -93,7 +107,6 @@ public class CommentPage extends AppCompatActivity {
             NotificationFactory.add(this, 1, "Trop court !", "Le commentaire doit contenir au moins " + MIN + " caractères");
         }
     }
-
 
     public static class CommentAdapter extends RecyclerView.Adapter<Comment.CommentHolder> {
 
