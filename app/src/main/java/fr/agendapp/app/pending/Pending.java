@@ -1,10 +1,12 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.NotificationFactory;
+import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.listeners.SyncListener;
 
 /**
@@ -24,7 +26,7 @@ public abstract class Pending {
      * Récupérer l'ancienne pending list du stockage local
      * (à appeler à l'ouverture)
      */
-    static void init(Context context) {
+    public static void init(Context context) {
         PendDO.initList(context);
         PendFLAG.initList(context);
         PendDEL.initList(context);
@@ -57,7 +59,7 @@ public abstract class Pending {
      * A appeler en cas de réussite d'envoi des actions en attente
      * @param context Android
      */
-    static void clear(Context context) {
+    public static void clear(Context context) {
         if (context != null) {
             PendDO.clearList(context);
             PendFLAG.clearList(context);
@@ -78,7 +80,7 @@ public abstract class Pending {
      * @param notificationFactory Ajout de notifications en cas d'erreur
      */
     public static void send(SyncListener syncListener, Context context, @Nullable NotificationFactory notificationFactory) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Récupération des actions en attente au format JSON
             String json = toJson();
             // S'il y a des actions en attente

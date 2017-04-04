@@ -1,26 +1,15 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
-
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
+import com.android.volley.*;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import fr.agendapp.app.App;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
@@ -28,6 +17,14 @@ import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
+import fr.agendapp.app.pending.Pending;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static javafx.scene.input.KeyCode.R;
 
 public class SyncFactory {
 
@@ -192,6 +189,15 @@ public class SyncFactory {
         req(context, "logout/", Request.Method.GET, "", null, (NotificationFactory) null);
     }
 
+    public void deleteAttachment(Context context, final String id) {
+        req(context, "cdn/?id=" + id + "&delete", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(App.TAG, "Attchment " + id + " deleted from server");
+            }
+        }, (NotificationFactory) null);
+    }
+
     public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite, final NotificationFactory notifs) {
         req(context, "invitations/?id=" + invite.getId(), Request.Method.POST,
                 "{\"groupe\":" + invite.getGroupeid() + "}",
@@ -236,19 +242,26 @@ public class SyncFactory {
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version, NotificationFactory notifs) {
         if (context != null) {
-            Log.i(App.TAG, "test : getWork");
             req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                     new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
-                            // Ecrire la réponse au localStorage (SharedPreferences)
-                            if (syncListener.isArchives()) {
-                                Work.setPastwork(context, response, version);
-                            } else {
-                                Work.setComingwork(context, response, version);
-                            }
-                            // Notification qu'une nouvelle version des données a été synchronisée
-                            syncListener.onSync();
+                        public void onResponse(final String response) {
+                            // L'operation setXXXwork risque d'etre longue, on prefere donc l'executer dans un Thread separe
+                            // Seulement une fois que tout est terminé, on previent le callback
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    // Ecrire la réponse au localStorage (SharedPreferences)
+                                    if (syncListener.isArchives()) {
+                                        Work.setPastwork(context, response, version);
+                                    } else {
+                                        Work.setComingwork(context, response, version);
+                                    }
+                                    // Notification qu'une nouvelle version des données a été synchronisée
+                                    syncListener.onSync();
+                                }
+                            }.run();
                         }
                     }, notifs
             );
@@ -262,7 +275,7 @@ public class SyncFactory {
      * @param context      Android Context
      */
     public void getVersion(final SyncListener syncListener, final Context context, final NotificationFactory notifs) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Nom de la version à controler (Archives ou Devoirs)
             final String name = "version" + (syncListener.isArchives() ? "A" : "D");
             SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
@@ -296,8 +309,8 @@ public class SyncFactory {
      * @param json Liste de requêtes à envoyer au format JSON
      * @param notifs Pour ajouter des notifications en cas d'erreur @Nullable
      */
-    synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
-        if (context != null) {
+    public synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
+        if (context != null && syncListener != null) {
             // Si un envoi n'est pas déjà en cours
             if (!lockpending) {
                 // On bloque l'envoi de listes d'actions
@@ -382,11 +395,24 @@ public class SyncFactory {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null) {
                     switch (error.networkResponse.statusCode) {
-                        // TODO + use resources
+                        // TODO codes erreur + check si Dylan a pas fait de la merde :)
                         case 404:
                             if (notifs != null)
-                                notifs.add(2, "Ressource indisponible", "Essaie de relancer l'application ou d'actualiser les données à nouveau.");
+                                notifs.add(2, R.string.code_404_title, R.string.code_404_message);
                             Log.i(App.TAG, "Http 404");
+                            break;
+                        case 401:
+                            if (notifs != null) {
+                                // Efface les données locales de l'utilisateur
+                                SharedPreferences preferences = notifs.getActivity().getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.clear();
+                                editor.apply();
+                                // Ajoute une notification explicative
+                                notifs.add(1, R.string.code_401_title, R.string.code_401_message);
+                                // Renvoyer l'utilisateur sur la page d'identification
+                                notifs.getActivity().startActivity(new Intent(notifs.getActivity(), App.class));
+                            }
                             break;
                         default:
                             Log.w(App.TAG, "Code HTTP non géré : " + error.networkResponse.statusCode);

@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,12 +10,13 @@ import java.util.ListIterator;
 import java.util.TimeZone;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-class PendADD extends Pending {
+public class PendADD extends Pending {
 
     private static List<PendADD> pending;
     private static String name = "pendADD";
@@ -31,7 +32,7 @@ class PendADD extends Pending {
      * @param groupe Matière (ID)
      * Constructeur de PendADD :
      */
-    public PendADD(Date date, String text, int groupe) {
+    private PendADD(Context context, Date date, String text, int groupe) {
         Work.dateformat.setTimeZone(TimeZone.getTimeZone("GMT"));
         // Décalage d'horaire +2H forcé
         this.date = Work.dateformat.format(date) + "+02:00";
@@ -39,6 +40,13 @@ class PendADD extends Pending {
         // l'API est configurée ainsi...
         this.user = groupe;
         pending.add(this);
+        PendADD.saveList(context);
+        // sauvegarde les devoirs à venir localement
+        Work.saveList(context, false);
+    }
+
+    public PendADD(Context context, Work w) {
+        this(context, w.getDate(), w.getText(), w.getUser());
     }
 
     /**

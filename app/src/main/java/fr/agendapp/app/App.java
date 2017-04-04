@@ -41,7 +41,6 @@ public class App extends AppCompatActivity {
             User.init(this, true);
             // redirige vers la page des devoirs
             page = new Intent(App.this, MainPage.class);
-
         } else {
             // redirige vers la page d'identification
             page = new Intent(App.this, LoginPage.class);

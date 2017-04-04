@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".pages.NewPage">
+
+        <include
+            android:id="@+id/toolbar"
+            layout="@layout/toolbar" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/md_keylines"
+                android:layout_marginStart="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:text="@string/new_infosprincipales"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorDarkText"
+                android:textSize="22sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="35dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".30"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/md_keylines"
+                    android:paddingLeft="@dimen/md_keylines"
+                    android:paddingRight="@dimen/md_keylines"
+                    android:paddingStart="@dimen/md_keylines"
+                    android:text="@string/new_subject"
+                    android:textColor="@color/colorDarkText" />
+
+                <Spinner
+                    android:id="@+id/newsubject"
+                    style="@style/Widget.AppCompat.Spinner.DropDown"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".70"
+                    android:background="@color/background"
+                    android:padding="5dp"
+                    android:spinnerMode="dialog"
+                    android:textAlignment="center"
+                    android:textColor="@color/colorDarkText" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="35dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight=".30"
+                    android:gravity="center_vertical"
+                    android:paddingEnd="@dimen/md_keylines"
+                    android:paddingLeft="@dimen/md_keylines"
+                    android:paddingRight="@dimen/md_keylines"
+                    android:paddingStart="@dimen/md_keylines"
+                    android:text="@string/new_text"
+                    android:textColor="@color/colorDarkText" />
+
+                <EditText
+                    android:id="@+id/newtext"
+                    style="@style/Base.V7.Widget.AppCompat.EditText"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight=".70"
+                    android:gravity="top|start"
+                    android:inputType="textMultiLine"
+                    android:lines="8"
+                    android:maxLines="10"
+                    android:minLines="5"
+                    android:scrollbars="vertical" />
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/md_keylines"
+                android:layout_marginStart="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:text="@string/new_date"
+                android:textAppearance="@style/TextAppearance.AppCompat.Title"
+                android:textColor="@color/colorDarkText"
+                android:textSize="22sp" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <DatePicker
+                android:id="@+id/newdate"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:firstDayOfWeek="0" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginBottom="@dimen/md_keylines"
+                android:layout_marginTop="@dimen/md_keylines"
+                android:background="@color/colorDivider" />
+
+            <Button
+                android:id="@+id/newsave"
+                style="@style/Widget.AppCompat.Button.Colored"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:text="@string/button_save" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+</ScrollView>

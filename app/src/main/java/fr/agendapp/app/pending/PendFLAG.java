@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,55 +8,54 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
  */
-public class PendDO extends Pending {
+public class PendFLAG extends Pending {
 
-    private static String name = "pendDO";
-    private static List<PendDO> pending;
+    private static List<PendFLAG> pending;
+    private static String name = "pendFLAG";
 
-    // TODO penser à vérifier que les noms des attributs sont bien les mêmes que ceux en JSON (sinon changer les attributs, pas le JSON) (pour les autres pending aussi)
     private int id;
-    private boolean done;
+    private int flag;
 
     /**
      * @param id
-     * @param done
-     * Constructeur de PendDO
+     * @param flag
+     * @author Dylan Habans
+     * Constructeur de PendFLAG
      */
-    public PendDO(Context context, int id, boolean done) {
+    public PendFLAG(Context context, int id, int flag) {
         this.id = id;
-        this.done = done;
+        this.flag = flag;
         pending.add(this);
-        // TODO faire pareil pour les autres Pending (nécessite d'ajouter un paramètre Context)
-        PendDO.saveList(context);
+        PendFLAG.saveList(context);
     }
 
-    // TODO ajouter un constructeur avec l'objet concerné (pour les autres pending aussi)
-    public PendDO(Context context, Work w) {
-        this(context, w.getId(), w.isDone());
+    public PendFLAG(Context context, Work w) {
+        this(context, w.getId(), w.getFlag());
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDO
+     * @return représentation JSON de la liste d'actions PendFLAG
      */
     static String getList() {
-        ListIterator<PendDO> i = pending.listIterator();
+        ListIterator<PendFLAG> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
             if (i.hasNext()) json += ",";
         }
-        json+="]";
+        json += "]";
         return json;
     }
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendDO(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendFLAG(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -80,12 +79,12 @@ public class PendDO extends Pending {
     }
 
     /**
-     * @return Représentation JSON de l'action PendDO
+     * @return représentation JSON de l'action PendFLAG
      */
     public String toString() {
         String json = "{";
         json += "\"id\":" + id + ",";
-        json += "\"done\":" + done;
+        json += "\"flag\":" + flag;
         json += "}";
         return json;
     }

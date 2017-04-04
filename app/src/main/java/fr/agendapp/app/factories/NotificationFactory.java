@@ -2,6 +2,7 @@ package fr.agendapp.app.factories;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
@@ -53,6 +54,11 @@ public class NotificationFactory {
         }
     }
 
+    public static void add(Activity activity, int priority, int titre, int message) {
+        Resources r = activity.getResources();
+        add(activity, priority, r.getString(titre), r.getString(message));
+    }
+
     /**
      * Ajoute une fenetre de dialogue pour poser une question à l'utilisateur
      *
@@ -89,7 +95,15 @@ public class NotificationFactory {
         alertDialog.show();
     }
 
+    public Activity getActivity() {
+        return activity;
+    }
+
     public void add(int priority, String title, String message) {
+        add(activity, priority, title, message);
+    }
+
+    public void add(int priority, int title, int message) {
         add(activity, priority, title, message);
     }
 

@@ -1,4 +1,4 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Work;
 
 /**
  * @author Dylan Habans
@@ -19,10 +21,14 @@ public class PendALERT extends Pending {
 
     private int id;
 
-    public PendALERT(int id) {
+    public PendALERT(Context context, int id) {
         this.id = id;
         pending.add(this);
+        PendALERT.saveList(context);
+    }
 
+    public PendALERT(Context context, Work w) {
+        this(context, w.getId());
     }
 
     /**

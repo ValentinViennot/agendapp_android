@@ -3,8 +3,10 @@
     <string name="app_name">Agendapp</string>
 
     <!-- Titres -->
-    <string name="title_fusion">Liste de fusion</string>
+    <string name="title_fusion">Fusionner ces devoirs</string>
     <string name="title_user">Paramètres</string>
+    <string name="title_newpage">Ajouter un devoir</string>
+    <string name="title_commentpage">Commentaires</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
@@ -64,6 +66,13 @@
     <string name="msg_fusionimpossible">Maximum 3 devoirs de la même matière et pour la même date.</string>
     <string name="msg_wait">Quelques instants</string>
     <string name="msg_updating">Mise à jour en cours…</string>
+    <string name="msg_alert">Devoir signalé au modérateur</string>
+
+    <!-- Codes erreurs http -->
+    <string name="code_404_title">Ressource indisponible</string>
+    <string name="code_404_message">Essaie de relancer l'application ou d'actualiser les données à nouveau.</string>
+    <string name="code_401_title">Identification impossible</string>
+    <string name="code_401_message">Reconnecte toi...</string>
 
     <!-- Textes à trou -->
     <string name="invit_text">%1$s vient de créer le groupe %2$s. Souhaites tu le rejoindre ?</string>
@@ -105,4 +114,25 @@
         <item>22H</item>
         <item>23H</item>
     </string-array>
+
+    <!-- New Page -->
+    <string name="new_infosprincipales">Infos principales</string>
+    <string name="new_subject">Matière</string>
+    <string name="new_text">Description</string>
+    <string name="new_date">À faire pour le…</string>
+    <string name="warning_title">Texte trop court !</string>
+    <string name="warning_msg">La description du devoir doit faire plus de %1$s caractères.</string>
+
+
+    <!-- Comment page -->
+    <string name="comment_new">Ajouter un commentaire</string>
+    <string name="comment_meta">\@%1$s \t (%2$s)</string>
+    <string name="error_title">Erreur</string>
+    <string name="error_msg">Action impossible</string>
+    <string name="warning_title">Texte trop court !</string>
+    <string name="warning_msg">Le commentaire doit contenir au moins %1$s caractères</string>
+
+    <!-- Work Holder -->
+    <string name="info_title">Envoi en cours...</string>
+
 </resources>

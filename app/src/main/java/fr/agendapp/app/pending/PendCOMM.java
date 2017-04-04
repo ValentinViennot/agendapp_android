@@ -1,5 +1,4 @@
-package fr.agendapp.app.factories;
-
+package fr.agendapp.app.pending;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -9,26 +8,36 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
 
 /**
  * @author Dylan Habans
  */
-public class PendDELc extends Pending {
+public class PendCOMM extends Pending {
 
-    private static final String name = "pendDELc";
-    private static List<PendDELc> pending;
+    private static List<PendCOMM> pending;
+    private static String name = "pendCOMM";
+
     private int id;
+    private String comment;
 
-    public PendDELc(int id) {
+    /**
+     * @param id      ID
+     * @param comment Commentaire
+     *                Constructeur de PendCOMM
+     */
+    public PendCOMM(Context context, int id, String comment) {
         this.id = id;
+        this.comment = comment;
         pending.add(this);
+        PendCOMM.saveList(context);
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendDELc
+     * @return représentation JSON de la liste d'actions PendCOMM
      */
     static String getList() {
-        ListIterator<PendDELc> i = pending.listIterator();
+        ListIterator<PendCOMM> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -40,7 +49,7 @@ public class PendDELc extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendDELc(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendCOMM(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -64,12 +73,15 @@ public class PendDELc extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendDELc
+     * @return représentation JSON de l'action PendCOMM
      */
     public String toString() {
-        return ("" + id);
+        String json = "{";
+        json += "\"id\":" + id + ",";
+        json += "\"content\": {" +
+                "\"texte\": \"" + comment + "\"";
+        json += "}";
+        json += "}";
+        return json;
     }
-
-
-
 }

@@ -89,8 +89,13 @@ public abstract class Group {
     }
 
     public int getColor() {
-        if (color == null) color = "#FFFFFF";
-        return Color.parseColor(color);
+        if (color == null) color = "000000";
+        return Color.parseColor('#' + color);
+    }
+
+    public String getHex() {
+        if (color == null) color = "000000";
+        return color;
     }
 
     // Méthodes statiques

@@ -1,4 +1,5 @@
-package fr.agendapp.app.factories;
+package fr.agendapp.app.pending;
+
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,35 +9,33 @@ import java.util.List;
 import java.util.ListIterator;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.factories.ParseFactory;
+import fr.agendapp.app.objects.Comment;
 
 /**
  * @author Dylan Habans
  */
-public class PendCOMM extends Pending {
+public class PendDELc extends Pending {
 
-    private static List<PendCOMM> pending;
-    private static String name = "pendCOMM";
-
+    private static final String name = "pendDELc";
+    private static List<PendDELc> pending;
     private int id;
-    private String comment;
 
-    /**
-     * @param id
-     * @param comment
-     * @author Dylan Habans
-     * Constructeur de PendCOMM
-     */
-    public PendCOMM(int id, String comment) {
+    private PendDELc(Context context, int id) {
         this.id = id;
-        this.comment = comment;
         pending.add(this);
+        PendDELc.saveList(context);
+    }
+
+    public PendDELc(Context context, Comment c) {
+        this(context, c.getId());
     }
 
     /**
-     * @return représentation JSON de la liste d'actions PendCOMM
+     * @return représentation JSON de la liste d'actions PendDELc
      */
     static String getList() {
-        ListIterator<PendCOMM> i = pending.listIterator();
+        ListIterator<PendDELc> i = pending.listIterator();
         String json = "[";
         while (i.hasNext()) {
             json += i.next();
@@ -48,7 +47,7 @@ public class PendCOMM extends Pending {
 
     static void initList(Context context) {
         SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
-        pending = ParseFactory.parsePendCOMM(preferences.getString(name, "[]"));
+        pending = ParseFactory.parsePendDELc(preferences.getString(name, "[]"));
     }
 
     static void saveList(Context context) {
@@ -72,16 +71,12 @@ public class PendCOMM extends Pending {
     }
 
     /**
-     * @return représentation JSON de l'action PendCOMM
+     * @return représentation JSON de l'action PendDELc
      */
     public String toString() {
-
-        String json = "{";
-        json += "\"id\":" + id + ",";
-        json += "\"content\": {" +
-                "\"texte\": \"" + comment + "\"";
-        json += "}";
-
-        return json;
+        return ("" + id);
     }
+
+
+
 }
