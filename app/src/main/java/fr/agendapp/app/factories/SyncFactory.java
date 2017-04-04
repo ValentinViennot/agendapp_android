@@ -237,7 +237,12 @@ public class SyncFactory {
      * Déconnexion de l'utilisateur (sécurité) = effacement du token
      */
     public void logout(Context context) {
-        req(context, "logout/", Request.Method.GET, "", null, (NotificationFactory) null);
+        req(context, "logout/", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // void
+            }
+        }, (NotificationFactory) null);
     }
 
     public void deleteAttachment(Context context, final String id) {

@@ -64,15 +64,20 @@ public class MainPage extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.main, menu);
-        MenuItem searchMenuItem = menu.findItem(R.id.action_search);
-        searchMenuItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-            @Override
-            public boolean onMenuItemClick(MenuItem item) {
-                startActivity(new Intent(MainPage.this, SelectFilterPage.class));
-                return true;
-            }
-        });
         return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_search:
+                startActivity(new Intent(this, SelectFilterPage.class));
+                return true;
+            case R.id.action_params:
+                startActivity(new Intent(this, UserPage.class));
+                return true;
+        }
+        return false;
     }
 
     // Initialise les "pages" (=Fragments) de chaque onglet

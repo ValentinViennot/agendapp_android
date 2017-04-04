@@ -148,6 +148,7 @@ public class UserPage extends AppCompatActivity implements ClassicListener {
         SharedPreferences preferences = getSharedPreferences(App.TAG, MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.clear();
+        editor.putString("token", "x");
         editor.apply();
         // On lance une demande d'effacement du token au serveur (silencieuse)
         SyncFactory.getInstance(this).logout(this);

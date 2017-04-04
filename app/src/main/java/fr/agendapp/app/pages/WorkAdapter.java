@@ -341,9 +341,8 @@ class WorkAdapter extends RecyclerView.Adapter<WorkHolder> implements
 
             progressDialog.dismiss();
 
-            if (homeworks.size() <= 0)
-                // TODO resources
-                NotificationFactory.add(getActivity(), 1, "Aucun devoir à afficher", "Commence à en ajouter dès maintenant !");
+            /*if (homeworks.size() <= 0)
+                NotificationFactory.add(getActivity(), 1, "Aucun devoir à afficher", "Commence à en ajouter dès maintenant !");*/
         }
     }
 

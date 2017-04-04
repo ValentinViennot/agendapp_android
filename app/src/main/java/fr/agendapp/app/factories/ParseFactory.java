@@ -116,7 +116,7 @@ public class ParseFactory {
             try {
                 Calendar cal = Calendar.getInstance();
                 cal.setTime(Work.dateformat.parse(jsonElement.getAsJsonPrimitive().getAsString()));
-                cal.add(Calendar.HOUR, -DT);
+                //cal.add(Calendar.HOUR, -DT);
                 return cal.getTime();
             } catch (ParseException e) {
                 e.printStackTrace();

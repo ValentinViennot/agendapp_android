@@ -1,11 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:theme="@style/Base.Theme.AppCompat.Light.DarkActionBar">
 
     <item
         android:id="@+id/action_search"
         android:icon="@drawable/ic_search_white_24dp"
         android:title="@string/title_selectfilter"
         app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_calendar"
+        android:icon="@drawable/ic_event_white_24dp"
+        android:title="@string/title_calendar"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_params"
+        android:icon="@drawable/ic_build_white_24dp"
+        android:title="@string/title_user"
+        app:showAsAction="never" />
 
 </menu>

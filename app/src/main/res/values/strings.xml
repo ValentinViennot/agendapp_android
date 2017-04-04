@@ -12,6 +12,7 @@
     <string name="title_selectfilter">Rechercher</string>
     <string name="title_filterresult">Résultats de la recherche</string>
     <string name="title_login">Agendapp</string>
+    <string name="title_calendar">Vue Calendrier</string>
 
     <!-- Navigation -->
     <string name="nav_devoirs">À faire</string>
