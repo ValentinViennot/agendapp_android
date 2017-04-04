@@ -8,12 +8,14 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import ca.barrenechea.widget.recyclerview.decoration.DoubleHeaderDecoration;
+import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.NotificationFactory;
 import fr.agendapp.app.factories.SyncFactory;
@@ -54,7 +56,7 @@ public class WorkPage extends Fragment implements SyncListener {
     // Délai de première synchronisation
     private int first_sync_delay = 700;
     // Positionnement à l'initialisation
-    private int pos;
+    private static int pos=0;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -67,6 +69,7 @@ public class WorkPage extends Fragment implements SyncListener {
             if (extras.containsKey("delay")) first_sync_delay = extras.getInt("delay");
             // Se diriger vers une position particuliere dans la liste
             if (extras.containsKey("pos")) pos = extras.getInt("pos");
+            extras.clear();
         }
 
         // Remplissage de la vue
@@ -127,7 +130,6 @@ public class WorkPage extends Fragment implements SyncListener {
         msgoffline = (TextView) view.findViewById(R.id.offlinemsg);
         msgoffline.setVisibility(View.GONE);
 
-        pos = 0;
         planSync = 0;
 
         // Retourne la vue initialisée
