@@ -9,7 +9,6 @@ import fr.agendapp.app.factories.SyncFactory;
 import fr.agendapp.app.listeners.ClassicListener;
 
 /**
- * TODO
  * @author Dylan Habans
  */
 public class User {
@@ -181,5 +180,7 @@ public class User {
         return root;
     }
 
-
+    public Subject[] getSubjects() {
+        return courses;
+    }
 }

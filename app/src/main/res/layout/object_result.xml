@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/result"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="@dimen/md_keylines">
+
+    <ImageView
+        android:id="@+id/resultcolor"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:contentDescription="@string/flags_title"
+        android:src="@drawable/circle" />
+
+    <ImageView
+        android:id="@+id/resultflag"
+        android:layout_width="10dp"
+        android:layout_height="10dp"
+        android:layout_toEndOf="@id/resultcolor"
+        android:layout_toRightOf="@id/resultcolor"
+        android:contentDescription="@string/flags_title"
+        android:src="@drawable/ic_flag_black_24dp" />
+
+    <TextView
+        android:id="@+id/resultsubject"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/default_divider_height"
+        android:layout_marginEnd="100dp"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="100dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@id/resultcolor"
+        android:layout_toRightOf="@id/resultcolor"
+        tools:text="Matière test" />
+
+    <TextView
+        android:id="@+id/resultdate"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginBottom="@dimen/default_divider_height"
+        android:gravity="end"
+        tools:text="Pour le 22/02" />
+
+    <TextView
+        android:id="@+id/resulttext"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/resultsubject"
+        android:autoLink="web"
+        android:ellipsize="end"
+        android:maxLines="5"
+        android:textColor="@color/colorDarkText"
+        android:textSize="@dimen/article_subheading"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua." />
+
+    <TextView
+        android:id="@+id/result_nbDone"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/result_imgComment"
+        android:layout_toLeftOf="@+id/result_imgDone"
+        android:layout_toStartOf="@+id/result_imgDone"
+        android:gravity="end"
+        tools:text="0" />
+
+    <ImageView
+        android:id="@id/result_imgDone"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/result_imgComment"
+        android:layout_toLeftOf="@+id/result_nbComment"
+        android:layout_toStartOf="@+id/result_nbComment"
+        android:contentDescription="@string/img_done"
+        android:src="@drawable/ic_done_black_24dp" />
+
+    <TextView
+        android:id="@id/result_nbComment"
+        android:layout_width="25dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/result_imgComment"
+        android:layout_toLeftOf="@+id/result_imgComment"
+        android:layout_toStartOf="@+id/result_imgComment"
+        android:gravity="end"
+        tools:text="0" />
+
+    <ImageView
+        android:id="@id/result_imgComment"
+        android:layout_width="30dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@id/resulttext"
+        android:layout_marginBottom="@dimen/md_keylines"
+        android:layout_marginEnd="@dimen/md_keylines"
+        android:layout_marginRight="@dimen/md_keylines"
+        android:contentDescription="@string/img_comm"
+        android:src="@drawable/ic_comment_black_24dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="@dimen/md_keylines"
+        android:background="@color/colorDivider" />
+
+</RelativeLayout>

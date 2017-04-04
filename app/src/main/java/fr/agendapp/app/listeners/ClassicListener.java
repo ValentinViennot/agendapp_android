@@ -1,9 +1,11 @@
 package fr.agendapp.app.listeners;
 
 /**
- * Created by Valentin on 25/03/2017.
+ * Classe Listener générique
  */
-
 public interface ClassicListener {
+    /**
+     * Méthode de callback sans paramètres , générique
+     */
     void onCallBackListener();
 }

@@ -2,6 +2,7 @@ package fr.agendapp.app.factories;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 import android.widget.Toast;
 
@@ -20,6 +21,12 @@ public class NotificationFactory {
 
     private Activity activity;
 
+    /**
+     * Créé une instance de Notification Factory mettant à disposition des méthodes pour ajouter
+     * des notifications en dehors d'un contexte(nécessite le passage d'une activité lors de la création)
+     *
+     * @param activity Activité mère
+     */
     public NotificationFactory(Activity activity) {
         this.activity = activity;
     }
@@ -51,6 +58,11 @@ public class NotificationFactory {
             // On affiche un Toast plus ou moins longtemps selon la priorité
             Toast.makeText(activity, titre + (message.length() > 0 ? " - " : "") + message, priority > 0 ? Toast.LENGTH_LONG : Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static void add(Activity activity, int priority, int titre, int message) {
+        Resources r = activity.getResources();
+        add(activity, priority, r.getString(titre), r.getString(message));
     }
 
     /**
@@ -89,7 +101,23 @@ public class NotificationFactory {
         alertDialog.show();
     }
 
+    // NOT STATIC
+
+    Activity getActivity() {
+        return activity;
+    }
+
+    /**
+     * @see NotificationFactory#add(int, String, String)
+     */
     public void add(int priority, String title, String message) {
+        add(activity, priority, title, message);
+    }
+
+    /**
+     * @see NotificationFactory#add(int, int, int)
+     */
+    public void add(int priority, int title, int message) {
         add(activity, priority, title, message);
     }
 

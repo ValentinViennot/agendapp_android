@@ -1,6 +1,7 @@
 package fr.agendapp.app.factories;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -22,16 +23,25 @@ import java.util.HashMap;
 import java.util.Map;
 
 import fr.agendapp.app.App;
+import fr.agendapp.app.R;
 import fr.agendapp.app.listeners.ClassicListener;
 import fr.agendapp.app.listeners.SyncListener;
 import fr.agendapp.app.objects.Invite;
 import fr.agendapp.app.objects.User;
 import fr.agendapp.app.objects.Work;
 import fr.agendapp.app.pages.LoginPage;
+import fr.agendapp.app.utils.pending.Pending;
 
+/**
+ * Service de communication avec le serveur d'APIs.
+ *
+ * @author Valentin Viennot
+ */
 public class SyncFactory {
 
     private static final String baseUrl = "https://apis.agendapp.fr/";
+    private static boolean offline = false;
+    private static String servererror = null;
     /**
      * Instance active du service de synchronisation
      */
@@ -49,8 +59,6 @@ public class SyncFactory {
      */
     private boolean lockpending = false;
 
-    // TODO gestion de l'hors connexion ?
-
     /**
      * Création d'une nouvelle instance du service de synchronisation
      *
@@ -66,11 +74,19 @@ public class SyncFactory {
         Pending.init(context);
     }
 
+    public static boolean isOffline() {
+        return offline;
+    }
+
+    public static String getServererror() {
+        return servererror;
+    }
+
     /**
      * Initialisation du service de discussion avec le serveur d'APIs
      *
      * @param context APPLICATION Context
-     * @param t   Token d'identification aux APIs
+     * @param t       Token d'identification aux APIs
      */
     public static synchronized void init(Context context, String t) {
         // Initialisation des lites d'actions en attente
@@ -93,7 +109,7 @@ public class SyncFactory {
      */
     public static synchronized SyncFactory getInstance(Context context) {
         if (instance == null)
-            init(context,null);
+            init(context, null);
         return instance;
     }
 
@@ -134,7 +150,7 @@ public class SyncFactory {
                     new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            // TODO
+                            checkServerStatus(lp, null);
                             error.printStackTrace();
                         }
                     }
@@ -152,6 +168,44 @@ public class SyncFactory {
 
     private void setToken(String t) {
         token = t;
+    }
+
+    public static void checkServerStatus(final Context context, @Nullable final ClassicListener classicListener) {
+        JsonObjectRequest req = new JsonObjectRequest(
+                Request.Method.GET,
+                baseUrl + "status/",
+                new JSONObject(),
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            if (response.has("message")) {
+                                servererror = response.getString("message");
+                            } else {
+                                servererror = null;
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            servererror = context.getResources().getString(R.string.code_0_message);
+                        } finally {
+                            offline = false;
+                            if (classicListener != null)
+                                classicListener.onCallBackListener();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        servererror = null;
+                        offline = true;
+                        if (classicListener != null)
+                            classicListener.onCallBackListener();
+                    }
+                }
+        );
+        // Execution de la requete
+        getInstance(context).getRequestQueue(context).add(req);
     }
 
     public void getUser(final Context context, final ClassicListener classicListener, @Nullable NotificationFactory notifs) {
@@ -189,7 +243,21 @@ public class SyncFactory {
      * Déconnexion de l'utilisateur (sécurité) = effacement du token
      */
     public void logout(Context context) {
-        req(context, "logout/", Request.Method.GET, "", null, (NotificationFactory) null);
+        req(context, "logout/", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                // void
+            }
+        }, (NotificationFactory) null);
+    }
+
+    public void deleteAttachment(Context context, final String id) {
+        req(context, "cdn/?id=" + id + "&delete", Request.Method.GET, "", new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.i(App.TAG, "Attchment " + id + " deleted from server");
+            }
+        }, (NotificationFactory) null);
     }
 
     public void acceptInvite(Context context, final ClassicListener classicListener, Invite invite, final NotificationFactory notifs) {
@@ -224,7 +292,7 @@ public class SyncFactory {
                 // Appel du callback
                 classicListener.onCallBackListener();
             }
-        }, (NotificationFactory)null );
+        }, (NotificationFactory) null);
     }
 
     /**
@@ -236,19 +304,26 @@ public class SyncFactory {
      */
     private void getWork(final SyncListener syncListener, final Context context, final String version, NotificationFactory notifs) {
         if (context != null) {
-            Log.i(App.TAG, "test : getWork");
             req(context, "devoirs/" + (syncListener.isArchives() ? "?archives=1" : ""), Request.Method.GET, "",
                     new Response.Listener<String>() {
                         @Override
-                        public void onResponse(String response) {
-                            // Ecrire la réponse au localStorage (SharedPreferences)
-                            if (syncListener.isArchives()) {
-                                Work.setPastwork(context, response, version);
-                            } else {
-                                Work.setComingwork(context, response, version);
-                            }
-                            // Notification qu'une nouvelle version des données a été synchronisée
-                            syncListener.onSync();
+                        public void onResponse(final String response) {
+                            // L'operation setXXXwork risque d'etre longue, on prefere donc l'executer dans un Thread separe
+                            // Seulement une fois que tout est terminé, on previent le callback
+                            new Thread() {
+                                @Override
+                                public void run() {
+                                    super.run();
+                                    // Ecrire la réponse au localStorage (SharedPreferences)
+                                    if (syncListener.isArchives()) {
+                                        Work.setPastwork(context, response, version);
+                                    } else {
+                                        Work.setComingwork(context, response, version);
+                                    }
+                                    // Notification qu'une nouvelle version des données a été synchronisée
+                                    syncListener.onSync();
+                                }
+                            }.run();
                         }
                     }, notifs
             );
@@ -262,7 +337,7 @@ public class SyncFactory {
      * @param context      Android Context
      */
     public void getVersion(final SyncListener syncListener, final Context context, final NotificationFactory notifs) {
-        if (context != null) {
+        if (context != null && syncListener != null) {
             // Nom de la version à controler (Archives ou Devoirs)
             final String name = "version" + (syncListener.isArchives() ? "A" : "D");
             SharedPreferences preferences = context.getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
@@ -291,13 +366,14 @@ public class SyncFactory {
      * deux fois la même liste d'actions au serveur.
      * Comme cette méthode met en réalité une requête en attente elle est exécutée rapidement et ce n'est pas suffisant
      * C'est pourquoi on passe par un attribut booleen pour tester si un envoi est en cours via cette instance de SyncFactory
+     *
      * @param syncListener Callback
-     * @param context Android Context
-     * @param json Liste de requêtes à envoyer au format JSON
-     * @param notifs Pour ajouter des notifications en cas d'erreur @Nullable
+     * @param context      Android Context
+     * @param json         Liste de requêtes à envoyer au format JSON
+     * @param notifs       Pour ajouter des notifications en cas d'erreur @Nullable
      */
-    synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
-        if (context != null) {
+    public synchronized void synchronize(final SyncListener syncListener, final Context context, String json, @Nullable final NotificationFactory notifs) {
+        if (context != null && syncListener != null) {
             // Si un envoi n'est pas déjà en cours
             if (!lockpending) {
                 // On bloque l'envoi de listes d'actions
@@ -321,7 +397,7 @@ public class SyncFactory {
                         // On débloque l'envoi de listes d'actions
                         setLockpending(false);
                         // On fait appel à la gestion d'erreur par défaut de SyncFactory
-                        // TODO
+                        getErrorListener(notifs).onErrorResponse(error);
                     }
                 });
             } else {
@@ -382,17 +458,39 @@ public class SyncFactory {
             public void onErrorResponse(VolleyError error) {
                 if (error.networkResponse != null) {
                     switch (error.networkResponse.statusCode) {
-                        // TODO + use resources
+                        case 400:
+                            if (notifs != null)
+                                notifs.add(2, R.string.code_400_title, R.string.code_400_message);
                         case 404:
                             if (notifs != null)
-                                notifs.add(2, "Ressource indisponible", "Essaie de relancer l'application ou d'actualiser les données à nouveau.");
+                                notifs.add(2, R.string.code_404_title, R.string.code_404_message);
                             Log.i(App.TAG, "Http 404");
                             break;
+                        case 401:
+                            if (notifs != null) {
+                                // Efface les données locales de l'utilisateur
+                                SharedPreferences preferences = notifs.getActivity().getSharedPreferences(App.TAG, Context.MODE_PRIVATE);
+                                SharedPreferences.Editor editor = preferences.edit();
+                                editor.clear();
+                                editor.apply();
+                                // Ajoute une notification explicative
+                                notifs.add(1, "Identification impossible", "Reconnecte toi...");
+                                // Renvoyer l'utilisateur sur la page d'identification
+                                notifs.getActivity().startActivity(new Intent(notifs.getActivity(), App.class));
+                            }
+                            break;
+                        case 503:
+                            if (notifs != null)
+                                notifs.add(2, R.string.code_503_title, R.string.code_503_message);
                         default:
+                            if (notifs != null)
+                                notifs.add(1, R.string.code_0_title, R.string.code_0_message);
                             Log.w(App.TAG, "Code HTTP non géré : " + error.networkResponse.statusCode);
                     }
                 } else {
-                    Log.e(App.TAG, "Erreur réseau non renseignée...");
+                    // On teste la connexion au serveur grâce à une API spéciale
+                    Log.i(App.TAG, "Test de connexion au serveur...");
+                    if (notifs != null) checkServerStatus(notifs.getActivity(), null);
                 }
             }
         };
@@ -411,6 +509,6 @@ public class SyncFactory {
     }
 
     private void setLockpending(boolean b) {
-        lockpending=b;
+        lockpending = b;
     }
 }

@@ -26,6 +26,43 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".pages.MainPage" />
         </activity>
+        <activity
+            android:name=".pages.NewPage"
+            android:label="@string/title_newpage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
+        <activity
+            android:name=".pages.CommentPage"
+            android:label="@string/title_commentpage">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
+        <activity
+            android:name=".pages.SelectFilterPage"
+            android:label="@string/title_selectfilter"
+            android:theme="@style/noAnimTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
+        <activity
+            android:name=".pages.FilterPage"
+            android:label="@string/title_filterresult"
+            android:theme="@style/noAnimTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.SelectFilterPage" />
+        </activity>
+        <activity
+            android:name=".pages.CalendarPage"
+            android:label="@string/title_calendar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".pages.MainPage" />
+        </activity>
     </application>
 
 </manifest>

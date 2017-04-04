@@ -1,6 +1,8 @@
 package fr.agendapp.app.objects;
 
-import android.util.Log;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,52 +12,57 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import fr.agendapp.app.App;
 import fr.agendapp.app.R;
 import fr.agendapp.app.factories.SyncFactory;
 
 /**
  * Pièce jointe attachée à un commentaire ou à un devoir
+ *
  * @author Dylan Habans
  * @author Valentin Viennot
  */
 public class Attachment {
 
-    /** "@prenomnom" de l'auteur de la pièce jointe */
+    /**
+     * "@prenomnom" de l'auteur de la pièce jointe
+     */
     private String auteur;
-    /** ID de l'auteur */
+    /**
+     * ID de l'auteur
+     */
     private int user;
-    /** Nom du fichier sur le serveur */
+    /**
+     * Nom du fichier sur le serveur
+     */
     private String file;
-    /** Nom lisible du fichier */
+    /**
+     * Nom lisible du fichier
+     */
     private String title;
 
+    /**
+     * Constructeur par défaut, utilisé par GSON
+     */
     public Attachment() {
-        // TODO
     }
 
     /**
      * Lance le téléchargement de la pièce jointe sur l'appareil de l'utilisateur
      */
-    public void download() {
-        // TODO
+    private void download(Context context) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(this.getLink(SyncFactory.getToken())));
+        context.startActivity(intent);
     }
 
     /**
      * Supprime la pièce jointe de la base de données
-     * @return true si la pièce jointe est bien supprimée par l'utilisateur, false sinon
      */
-    public boolean delete() {
-        // TODO
-        // Attention : penser à vérifier que l'utilisateur actuel est bien l'auteur
-        return false;
+    private void delete(Context context) {
+        // La suppression nécessite une connexion à Internet
+        SyncFactory.getInstance(context).deleteAttachment(context, this.getFile());
     }
 
     // GETTERS
-
-    public String getAuteur() {
-        return auteur;
-    }
 
     public int getUser() {
         return user;
@@ -73,12 +80,15 @@ public class Attachment {
      * @param token Token d'identification aux APIs
      * @return URL (lien) d'accès au fichier
      */
-    public String getLink(String token) {
+    private String getLink(String token) {
         return (
                 "https://apis.agendapp.fr/cdn/?get=" + this.file + "&token=" + token
         );
     }
 
+    /**
+     * Adapter pour l'affichage d'une liste de piece jointe
+     */
     public static class AttachmentAdapter extends BaseAdapter {
 
         private List<Attachment> attachments;
@@ -107,7 +117,7 @@ public class Attachment {
 
         @Override
         public View getView(final int position, View convertView, ViewGroup parent) {
-            ViewHolder holder = null;
+            ViewHolder holder;
             // Si la vue n'est pas recyclée
             if (convertView == null) {
                 // On récupère le layout
@@ -123,7 +133,6 @@ public class Attachment {
                 holder = (ViewHolder) convertView.getTag();
             }
 
-            // Dans tous les cas, on récupère le contact téléphonique concerné
             final Attachment a = getItem(position);
             // Si cet élément existe vraiment…
             if (a != null) {
@@ -131,20 +140,29 @@ public class Attachment {
                 holder.title.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        Log.i(App.TAG, "Go to : " + a.getLink(SyncFactory.getToken()));
+                        a.download(inflater.getContext());
                     }
                 });
-                holder.delete.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        Log.i(App.TAG, "supprimer " + position + " ? ");
-                    }
-                });
+                if (User.getInstance().getId() == a.getUser()) {
+                    holder.delete.setVisibility(View.VISIBLE);
+                    holder.delete.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            attachments.remove(a);
+                            notifyDataSetChanged();
+                            a.delete(inflater.getContext());
+                        }
+                    });
+                } else
+                    holder.delete.setVisibility(View.GONE);
             }
             return convertView;
         }
     }
 
+    /**
+     * Vue associée à une piece jointe
+     */
     private static class ViewHolder {
         TextView title;
         ImageButton delete;

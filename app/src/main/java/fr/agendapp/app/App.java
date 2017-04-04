@@ -15,7 +15,6 @@ import fr.agendapp.app.pages.MainPage;
  */
 public class App extends AppCompatActivity {
 
-    // TODO supprimer Logs de debug
     public static final String TAG = "Agendapp";
 
     @Override
@@ -41,7 +40,6 @@ public class App extends AppCompatActivity {
             User.init(this, true);
             // redirige vers la page des devoirs
             page = new Intent(App.this, MainPage.class);
-
         } else {
             // redirige vers la page d'identification
             page = new Intent(App.this, LoginPage.class);
@@ -52,6 +50,7 @@ public class App extends AppCompatActivity {
 
     /**
      * Les données nécessaires au lancement sont : le token d'identification aux APIs
+     *
      * @param preferences LocalStorage
      * @return True si les données nécessaires au démarrage sont présentes, False sinon
      */
