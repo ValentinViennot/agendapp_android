@@ -20,6 +20,8 @@ import java.util.List;
 
 import fr.agendapp.app.App;
 import fr.agendapp.app.R;
+import fr.agendapp.app.factories.NotificationFactory;
+import fr.agendapp.app.factories.SyncFactory;
 
 /**
  * Page principale de l'application, contient des éléments de navigation
@@ -27,6 +29,8 @@ import fr.agendapp.app.R;
  * @author Valentin Viennot
  */
 public class MainPage extends AppCompatActivity {
+
+    private ViewPager viewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +51,7 @@ public class MainPage extends AppCompatActivity {
         setSupportActionBar(toolbar);
         // Prépare la navigation par système d'onglets
         // TODO : Remplacer les onglets par un menu latéral ?
-        ViewPager viewPager = (ViewPager) findViewById(R.id.viewpager);
+        viewPager = (ViewPager) findViewById(R.id.viewpager);
         setupViewPager(viewPager);
         // Ajoute les onglets à la barre de navigation
         TabLayout tabs = (TabLayout) findViewById(R.id.tabs);
@@ -74,7 +78,17 @@ public class MainPage extends AppCompatActivity {
                 startActivity(new Intent(this, SelectFilterPage.class));
                 return true;
             case R.id.action_params:
-                startActivity(new Intent(this, UserPage.class));
+                if (!SyncFactory.isOffline()) {
+                    startActivity(new Intent(this, UserPage.class));
+                    return true;
+                } else {
+                    NotificationFactory.add(this, 0, "Hors ligne", "Une connexion à Internet est nécessaire pour modifier les paramères.");
+                }
+                return false;
+            case R.id.action_calendar:
+                Intent intent = new Intent(this, CalendarPage.class);
+                intent.putExtra("archives", viewPager.getCurrentItem() > 0);
+                startActivity(intent);
                 return true;
         }
         return false;

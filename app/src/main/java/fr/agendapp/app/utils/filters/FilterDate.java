@@ -17,7 +17,12 @@ public class FilterDate extends Filter {
     }
 
     public boolean correspond(Work w) {
-        return (w.getDate()==this.date);
+        Calendar cal = Calendar.getInstance();
+        cal.setTime(date);
+        Calendar cal2 = Calendar.getInstance();
+        cal2.setTime(w.getDate());
+        return (cal.get(Calendar.MONTH) == cal2.get(Calendar.MONTH)
+                && cal.get(Calendar.DAY_OF_MONTH) == cal2.get(Calendar.DAY_OF_MONTH));
     }
 
     @Override

@@ -49,11 +49,11 @@ public class WorkPage extends Fragment implements SyncListener {
     private NotificationFactory notificationFactory;
 
     // Nombre de synchronisations en attente
-    private int planSync = 0;
+    private int planSync;
     // Délai de première synchronisation
     private int first_sync_delay = 700;
     // Positionnement à l'initialisation
-    private int pos = 0;
+    private int pos;
 
     @Override // A la création de la Vue (page)
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -127,6 +127,9 @@ public class WorkPage extends Fragment implements SyncListener {
 
         msgoffline = (TextView) view.findViewById(R.id.offlinemsg);
         msgoffline.setVisibility(View.GONE);
+
+        pos = 0;
+        planSync = 0;
 
         // Retourne la vue initialisée
         return view;

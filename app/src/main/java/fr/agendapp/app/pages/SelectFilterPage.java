@@ -140,7 +140,7 @@ public class SelectFilterPage extends AppCompatActivity implements FilterInterfa
                 int day = Integer.parseInt(text.substring(0, 2));
                 int month = Integer.parseInt(text.substring(3, 5));
                 int year = Integer.parseInt(text.substring(6));
-                cal.set(year, month, day);
+                cal.set(year, month - 1, day);
                 filter = new FilterDate(cal.getTime());
             } else
                 switch (type) {

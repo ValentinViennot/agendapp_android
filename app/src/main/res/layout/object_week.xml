@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:background="@color/colorText"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weeklundi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wlurv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorText"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weekmardi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wmarv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:background="@color/colorText"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weekmercredi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wmerv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorText"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weekjeudi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wjerv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:background="@color/colorText"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weekvendredi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wverv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorText"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weeksamedi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wsarv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/background"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="0dp"
+        android:layout_height="60dp"
+        android:layout_weight=".14"
+        android:background="@color/colorText"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/weekdimanche"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/wdirv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorText"
+            android:clipToPadding="false"
+            android:padding="3dp"
+            android:scrollbars="none" />
+
+    </LinearLayout>
+</LinearLayout>
